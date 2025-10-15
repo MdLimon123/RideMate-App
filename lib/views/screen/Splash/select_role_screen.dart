@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:radeef/controllers/splash_controller.dart';
 import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/screen/Splash/location_enable_screen.dart';
 
+/// Enum
+/// DRIVER, PASSENGER
 class SelectRoleScreen extends StatefulWidget {
   const SelectRoleScreen({super.key});
 
@@ -10,6 +15,9 @@ class SelectRoleScreen extends StatefulWidget {
 }
 
 class _SelectRoleScreenState extends State<SelectRoleScreen> {
+
+  final _splashController = Get.put(SplashController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,22 +43,31 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
             ),
             textAlign: TextAlign.center,),
             SizedBox(height: 258,),
-            CustomButton(onTap: (){}, text: "User Account"),
+            CustomButton(onTap: (){
+              _splashController.setRole("PASSENGER");
+              Get.to(()=> LocationEnableScreen(role: "PASSENGER",));
+            }, text: "User Account"),
             SizedBox(height: 16,),
-            Container(
-              height: 52,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFFE6EAF0),
-                borderRadius: BorderRadius.circular(24)
-              ),
-              child: Center(
-                child: Text("Drivers Account",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF545454)
-                ),),
+            InkWell(
+              onTap: (){
+                _splashController.setRole("DRIVER");
+                Get.to(()=> LocationEnableScreen(role: "DRIVER",));
+              },
+              child: Container(
+                height: 52,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xFFE6EAF0),
+                  borderRadius: BorderRadius.circular(24)
+                ),
+                child: Center(
+                  child: Text("Drivers Account",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF545454)
+                  ),),
+                ),
               ),
             )
           ],
