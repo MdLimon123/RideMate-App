@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/screen/UserFLow/SetupProfile/setup_profile_screen.dart';
 
 class TermsConditionScreen extends StatefulWidget {
   const TermsConditionScreen({super.key});
@@ -107,7 +109,9 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
           ),
           SizedBox(height: 111,),
 
-          CustomButton(onTap: (){},
+          CustomButton(onTap: (){
+            Get.to(()=> SetupProfileScreen());
+          },
               text: "Start")
         ],
       ),
