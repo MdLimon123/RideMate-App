@@ -41,12 +41,17 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           SizedBox(height: 12,),
           Align(
             alignment: Alignment.centerRight,
-            child: Text("Forget Password?",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF345983)
-            ),),
+            child: InkWell(
+              onTap: (){
+                Get.offAllNamed(AppRoutes.userForgotPasswordScreen);
+              },
+              child: Text("Forget Password?",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF345983)
+              ),),
+            ),
           ),
           SizedBox(height: 293,),
           CustomButton(onTap: (){},
