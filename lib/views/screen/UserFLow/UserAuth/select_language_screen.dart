@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/localization_controller.dart';
+import 'package:radeef/helpers/route.dart';
 import 'package:radeef/language_controller.dart';
 import 'package:radeef/utils/app_constants.dart';
 import 'package:radeef/utils/style.dart';
@@ -95,9 +96,7 @@ class _SelectUserLanguageScreenState extends State<SelectUserLanguageScreen> {
                       child: Column(
                         children: _languageController.languages
                             .map((lang) {
-                          bool isSelected = _languageController
-                              .selectedLanguage.value ==
-                              lang.tr;
+                        
 
                           return GestureDetector(
                             onTap: () {
@@ -141,7 +140,7 @@ class _SelectUserLanguageScreenState extends State<SelectUserLanguageScreen> {
             }),
             SizedBox(height: 205,),
             CustomButton(onTap: (){
-
+              Get.offAllNamed(AppRoutes.userLoginScreen);
             }, text: "Next")
           ],
 
