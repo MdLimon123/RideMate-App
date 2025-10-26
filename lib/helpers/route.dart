@@ -9,6 +9,7 @@ import 'package:radeef/views/screen/UserFLow/UserAuth/user_login_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserAuth/user_otp_verify_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserAuth/user_reset_password_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserAuth/user_signup_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserHome/user_home_screen.dart';
 import 'package:radeef/views/screen/Wallet/wallet_screen.dart';
 import '../views/screen/Splash/splash_screen.dart';
 
@@ -26,6 +27,8 @@ class AppRoutes{
   static String userTermsConditionScreen = "/user_terms_condition_screen";
   static String userOtpVerifyScreen = "/user_otp_verify_screen";
   static String userResetPasswordScreen = "/user_reset_password_screen";
+  static String userHomeScreen = "/user_home_screen";
+
 
 
 
@@ -41,7 +44,8 @@ class AppRoutes{
    GetPage(name:userTermsConditionScreen, page: ()=>const TermsConditionScreen(),transition: Transition.noTransition),
    GetPage(name:userForgotPasswordScreen, page: ()=>const UserForgetPasswordScreen(),transition: Transition.noTransition),
    GetPage(name: userOtpVerifyScreen, page: ()=> const UserOtpVerifyScreen(),transition: Transition.noTransition),
-   GetPage(name: userResetPasswordScreen, page: ()=> const UserResetPasswordScreen(), transition: Transition.noTransition)
+   GetPage(name: userResetPasswordScreen, page: ()=> const UserResetPasswordScreen(), transition: Transition.noTransition),
+   GetPage(name: userHomeScreen, page: ()=> const UserHomeScreen(), transition: Transition.noTransition),
   ];
 
 

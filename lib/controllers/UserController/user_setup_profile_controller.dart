@@ -53,12 +53,12 @@ class UserSetupProfileController extends GetxController{
 
 
 
-  @override
-  void onInit() {
-    super.onInit();
-
-    requestCameraPermission();
-  }
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //
+  //   requestCameraPermission();
+  // }
 
   /// 🔹 Step 1: Request Camera Permission
   Future<void> requestCameraPermission() async {

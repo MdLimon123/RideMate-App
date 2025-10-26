@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/user_setup_profile_controller.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/base/custom_page_loading.dart';
+import 'package:radeef/views/screen/UserFLow/SetupProfile/verify_success_screen.dart';
 
 class VerifyIdentityScreen extends StatefulWidget {
   const VerifyIdentityScreen({super.key});
@@ -17,6 +19,12 @@ class VerifyIdentityScreen extends StatefulWidget {
 class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
   final _setupProfileController = Get.put(UserSetupProfileController());
+
+  @override
+  void initState() {
+    _setupProfileController.requestCameraPermission();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +127,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
                 CustomButton(
                   onTap: () {
-
+                    Get.to(()=> VerifySuccessScreen());
                   },
                   text: "Confirm & Continue",
                 ),
@@ -142,9 +150,9 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             );
           }
 
-          // Loading indicator
+
           else {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CustomPageLoading());
           }
         }),
       ),

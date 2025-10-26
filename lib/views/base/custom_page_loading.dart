@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../utils/app_colors.dart';
 
@@ -9,10 +9,10 @@ class CustomPageLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: SpinKitCircle(
-        color:AppColors.primaryColor,
-        size: 60.0,
-    ),);
+      child: LoadingAnimationWidget.threeArchedCircle(
+        color: AppColors.primaryColor,
+        size: 70,
+      ),);
   }
 }
 
