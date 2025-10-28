@@ -5,7 +5,7 @@ import '../../utils/app_colors.dart';
 import '../../utils/app_constants.dart';
 
 class CustomTextField extends StatefulWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final TextInputType? keyboardType;
   final bool? isObscureText;
   final String? obscure;
@@ -29,7 +29,7 @@ class CustomTextField extends StatefulWidget {
       this.suffixIcon,
       this.validator,
       this.isEmail,
-      required this.controller,
+       this.controller,
       this.keyboardType = TextInputType.text,
       this.isObscureText = false,
       this.obscure = '*',

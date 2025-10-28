@@ -1,17 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:radeef/views/base/custom_button.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/search_a_driver_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/find_driver_screen.dart';
 
-class ShowAmountScreen extends StatefulWidget {
-  const ShowAmountScreen({super.key});
+class SearchADriverScreen extends StatefulWidget {
+  const SearchADriverScreen({super.key});
 
   @override
-  State<ShowAmountScreen> createState() => _ShowAmountScreenState();
+  State<SearchADriverScreen> createState() => _SearchADriverScreenState();
 }
 
-class _ShowAmountScreenState extends State<ShowAmountScreen> {
+class _SearchADriverScreenState extends State<SearchADriverScreen> with TickerProviderStateMixin{
+
+  late AnimationController _xController;
+  late AnimationController _yController;
+  late AnimationController _rotationController;
+
+  late Animation<double> _xScale;
+  late Animation<double> _yScale;
+  late Animation<double> _rotation;
+
+  @override
+  void initState() {
+    _xController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    /// Y-axis scale (faster 1s)
+    _yController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+
+    /// Rotation (slow, continuous)
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat();
+
+    _xScale = Tween<double>(begin: 0.9, end: 1.15).animate(
+      CurvedAnimation(parent: _xController, curve: Curves.easeInOut),
+    );
+
+    _yScale = Tween<double>(begin: 0.9, end: 1.15).animate(
+      CurvedAnimation(parent: _yController, curve: Curves.easeInOut),
+    );
+
+    _rotation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _rotationController, curve: Curves.linear),
+    );
+
+
+
+    /// 🕐 Simulate searching for a driver (e.g., 5 seconds)
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        Get.to(()=> FindDriverScreen());
+      }
+    });
+
+    super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    _xController.dispose();
+    _yController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,7 +119,7 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                 child: ListView(
                   children: [
                     TextFormField(
-
+                
                       onTap: (){},
                       decoration: InputDecoration(
                           hint: Text("Aqua Tower, Mohakhali",
@@ -85,12 +144,12 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                               borderSide: BorderSide(color: Color(0xFFB5F5D7))),
                           filled: true,
                           fillColor: Color(0xFFE6E6E6).withValues(alpha: 0.24)
-
+                
                       ),
                     ),
                     SizedBox(height: 12,),
                     TextFormField(
-
+                
                       onTap: (){},
                       decoration: InputDecoration(
                           hint: Text("Aqua Tower, Mohakhali",
@@ -117,55 +176,116 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                           ),
                           filled: true,
                           fillColor: Color(0xFFE6E6E6).withValues(alpha: 0.24)
-
+                
                       ),
                     ),
                     SizedBox(height: 32,),
+
                     Container(
+                      height: 250,
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 75),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                       decoration: BoxDecoration(
-                          color: Color(0xFF345983),
-                          borderRadius: BorderRadius.circular(24)
+                        color: const Color(0xFF345983),
+                        borderRadius: BorderRadius.circular(24),
                       ),
-                      child: Center(
-                        child: Text("28 XAF",
-                          style: TextStyle(
-                              fontSize: 50,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white
-                          ),),
-                      ),
-                    ),
-                    SizedBox(height: 51,),
-                    Row(
-                      children: [
-                        Expanded(child:  Container(
-                          width: double.infinity,
-                          height: 52,
-                          decoration: BoxDecoration(
-                              color: Color(0xFFE6E6E6),
-                              borderRadius: BorderRadius.circular(24)
-                          ),
-                          child: Center(
-                            child: Text("Cancel",
-                              style: TextStyle(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Container(
+                              margin: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                "28 XAF",
+                                style: TextStyle(
+                                  color: Color(0xFF012F64),
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF333333),
-                                  fontSize: 16
-                              ),),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
                           ),
-                        )),
-                        SizedBox(width: 12,),
-                        Expanded(
-                          child: CustomButton(onTap: (){
-                            Get.to(()=> SearchADriverScreen());
-                          },
-                              text: "Confirm"),
-                        )
-                      ],
+
+                          const Spacer(),
+
+
+                          /// 🔥 Animated Search Icon
+                          AnimatedBuilder(
+                            animation: Listenable.merge(
+                                [_xController, _yController, _rotationController]),
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scaleX: _xScale.value,
+                                scaleY: _yScale.value,
+                                child: Transform.rotate(
+                                  angle: _rotation.value * 6.28319, // 2π radians
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.white.withOpacity(0.4),
+                                          blurRadius: 30,
+                                          spreadRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                    child: child,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: SvgPicture.asset(
+                              'assets/icons/search_fill.svg',
+                              color: Colors.white,
+                              width: 72,
+                              height: 72,
+                            ),
+                          ),
+
+
+
+                          const SizedBox(height: 15),
+
+                          const Text(
+                            "We’re searching a Driver\nfor you!",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+
+                          const Spacer(),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 74,),
+
+                    // Container(
+                    //   width: double.infinity,
+                    //   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 75),
+                    //   decoration: BoxDecoration(
+                    //       color: Color(0xFF345983),
+                    //       borderRadius: BorderRadius.circular(24)
+                    //   ),
+                    //   child: Center(
+                    //     child: Text("28 XAF",
+                    //       style: TextStyle(
+                    //           fontSize: 50,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Colors.white
+                    //       ),),
+                    //   ),
+                    // ),
+                    
+                    SizedBox(height: 169,),
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -174,7 +294,7 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                           borderRadius: BorderRadius.circular(12)
                       ),
                       child: Row(
-
+                
                         children: [
                           SvgPicture.asset('assets/icons/what.svg'),
                           SizedBox(width: 10,),
@@ -203,7 +323,6 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                   ],
                 ),
               )
-
             ],
           ),
         ),

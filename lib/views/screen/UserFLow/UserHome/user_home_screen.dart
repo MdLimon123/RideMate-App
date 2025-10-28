@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/book_a_ride_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/parcel_details_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -48,13 +50,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   Spacer(),
                   SvgPicture.asset('assets/icons/notification.svg'),
                   SizedBox(width: 12,),
-                  Container(
-                    height: 32,
-                    width: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(image: AssetImage('assets/images/demo.png',),
-                      fit: BoxFit.cover)
+                  InkWell(
+                    onTap: (){
+                      Get.to(()=> UserProfileScreen());
+                    },
+                    child: Container(
+                      height: 32,
+                      width: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(image: AssetImage('assets/images/demo.png',),
+                        fit: BoxFit.cover)
+                      ),
                     ),
                   )
                 ],
@@ -106,8 +113,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         height: 64,
                         decoration: BoxDecoration(
                           color: selectedIndex == 0
-                              ? const Color(0xFF345983) // selected color
-                              : const Color(0xFFE6E6E6), // unselected color
+                              ? const Color(0xFF345983)
+                              : const Color(0xFFE6E6E6),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -141,6 +148,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         setState(() {
                           selectedIndex = 1;
                         });
+                        Get.to(()=> ParcelDetailsScreen());
                       },
                       child: Container(
                         width: double.infinity,
