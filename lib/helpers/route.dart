@@ -10,7 +10,6 @@ import 'package:radeef/views/screen/UserFLow/UserAuth/user_otp_verify_screen.dar
 import 'package:radeef/views/screen/UserFLow/UserAuth/user_reset_password_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserAuth/user_signup_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/user_home_screen.dart';
-import 'package:radeef/views/screen/Wallet/wallet_screen.dart';
 import '../views/screen/Splash/splash_screen.dart';
 
 class AppRoutes{
@@ -35,7 +34,6 @@ class AppRoutes{
  static List<GetPage> page=[
     GetPage(name:splashScreen, page: ()=>const SplashScreen()),
     GetPage(name:homeScreen, page: ()=>const HomeScreen(),transition:Transition.noTransition),
-    GetPage(name:walletScreen, page: ()=>const WalletScreen(),transition:Transition.noTransition),
     GetPage(name:profileScreen, page: ()=>const ProfileScreen(),transition: Transition.noTransition),
    GetPage(name:selectRole, page: ()=>const SelectRoleScreen(),transition: Transition.noTransition),
    GetPage(name:selectUserLanguage, page: ()=>const SelectUserLanguageScreen(),transition: Transition.noTransition),
