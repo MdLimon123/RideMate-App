@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/splash_controller.dart';
 import 'package:radeef/helpers/route.dart';
 import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverAuth/driver_select_language_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserAuth/select_language_screen.dart';
 
 class LocationEnableScreen extends StatefulWidget {
@@ -54,7 +55,7 @@ class _LocationEnableScreenState extends State<LocationEnableScreen> {
                 if(widget.role == "PASSENGER"){
                   Get.to(()=> SelectUserLanguageScreen());
                 }else if(widget.role == "DRIVER"){
-                  print("Driver");
+                  Get.to(()=> DriverSelectUserLanguageScreen());
                 }
 
               }, text: "Enable Location"),

@@ -36,6 +36,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDEOhUOUDVMYiBOHqEtCnyrztCrlOqZ6bo"/>
+
         <receiver android:name="com.jaumard.smsautofill.SmsRetrieverReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.auth.api.phone.SMS_RETRIEVED"/>

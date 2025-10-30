@@ -5,33 +5,42 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:radeef/utils/image_utils.dart';
 
-class UserSetupProfileController extends GetxController{
+class DriverProfileSetupController extends GetxController{
 
-
-
-  Rx<File?> userProfileImage = Rx<File?>(null);
+  Rx<File?> driverProfileImage = Rx<File?>(null);
   Rx<File?> frontImage = Rx<File?>(null);
   Rx<File?> backImage = Rx<File?>(null);
+  Rx<File?> vehicleImage = Rx<File?>(null);
 
   CameraController? cameraController;
   RxBool isCameraInitialized = false.obs;
   XFile? capturedImage;
   RxBool isPermissionGranted = false.obs;
 
-
-
-  /// Pick image from camera or gallery
-  Future<void> pickCoachImage({bool fromCamera = false})async{
+/// Pick image from camera or gallery
+  Future<void> pickVehicleImage({bool fromCamera = false})async{
 
     final pickedFile = await ImageUtils.pickAndCropImage(fromCamera: fromCamera);
     if(pickedFile != null){
-      userProfileImage.value = pickedFile;
+      vehicleImage.value = pickedFile;
+    }
+
+  }
+
+  /// Pick image from camera or gallery
+  Future<void> pickDriverImage({bool fromCamera = false})async{
+
+    final pickedFile = await ImageUtils.pickAndCropImage(fromCamera: fromCamera);
+    if(pickedFile != null){
+      driverProfileImage.value = pickedFile;
     }
 
   }
 
   /// Pick nid image front camera or gallery
 
+
+  /// Pick nid image front camera or gallery
   Future<void> pickFrontImage({bool fromCamera = false})async{
 
     final pickedFile = await ImageUtils.pickAndCropImage(fromCamera: fromCamera);
@@ -46,14 +55,10 @@ class UserSetupProfileController extends GetxController{
 
     final pickedFile = await ImageUtils.pickAndCropImage(fromCamera: fromCamera);
     if(pickedFile != null){
-      frontImage.value = pickedFile;
+      backImage.value = pickedFile;
     }
 
   }
-
-
-
-
 
   /// 🔹 Step 1: Request Camera Permission
   Future<void> requestCameraPermission() async {

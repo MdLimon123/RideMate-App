@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/screen/Splash/select_role_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/need_help_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserProfile/AllSubScreen/about_us_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/AllSubScreen/change_password_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/AllSubScreen/edit_profile_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserProfile/AllSubScreen/support_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/AllSubScreen/trip_history_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/AllSubScreen/wallet_screen.dart';
 
@@ -135,17 +140,79 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   title: "Change Password"),
 
               _customTile(
-                  onTap: (){},
+                  onTap: (){
+                    Get.to(()=> AboutUsScreen());
+                  },
                   image: "assets/icons/about.svg",
                   title: "About Us"),
 
               _customTile(
-                  onTap: (){},
+                  onTap: (){
+                    Get.to(()=> SupportScreen());
+                  },
                   image: "assets/icons/support.svg",
                   title: "Support"),
 
               _customTile(
-                  onTap: (){},
+                  onTap: (){
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) => Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFFFFFF)
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Center(
+                              child: Text("Do you have Log Out ?",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF333333)
+                              ),),
+                            ),
+                            SizedBox(height: 24,),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: (){
+                                      Get.to(()=> SelectRoleScreen());
+                                    },
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 52,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFFE6E6E6),
+                                        borderRadius: BorderRadius.circular(24)
+                                      ),
+                                      child: Center(
+                                        child: Text("Log out",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF333333)
+                                        ),),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 33,),
+                                Expanded(child: CustomButton(
+                                    onTap: (){
+                                      Get.back();
+                                    },
+                                    text: "Cancel"))
+                              ],
+                            )
+                          ],
+                        ),
+                      )
+                    );
+                  },
                   image: "assets/icons/logout.svg",
                   title: "Log Out"),
             ],

@@ -3,26 +3,29 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/DriverController/driver_profile_setup_controller.dart';
 import 'package:radeef/controllers/UserController/user_setup_profile_controller.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_page_loading.dart';
+import 'package:radeef/views/screen/DriverFlow/SetupDriverProfile/driver_verify_success_screen.dart';
 import 'package:radeef/views/screen/UserFLow/SetupProfile/verify_success_screen.dart';
 
-class VerifyIdentityScreen extends StatefulWidget {
-  const VerifyIdentityScreen({super.key});
+class DriverVerifyIdentityScreen extends StatefulWidget {
+  const DriverVerifyIdentityScreen({super.key});
 
   @override
-  State<VerifyIdentityScreen> createState() => _VerifyIdentityScreenState();
+  State<DriverVerifyIdentityScreen> createState() => _DriverVerifyIdentityScreenState();
 }
 
-class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
+class _DriverVerifyIdentityScreenState extends State<DriverVerifyIdentityScreen> {
 
-  final _setupProfileController = Get.put(UserSetupProfileController());
+  final _driverSetupController = Get.put(DriverProfileSetupController());
+
 
   @override
   void initState() {
-    _setupProfileController.requestCameraPermission();
+    _driverSetupController.requestCameraPermission();
     super.initState();
   }
 
@@ -50,7 +53,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Obx(() {
     
-          if (!_setupProfileController.isPermissionGranted.value) {
+          if (!_driverSetupController.isPermissionGranted.value) {
             return  Center(
               child: Text(
                 "Camera permission required to continue.",
@@ -62,7 +65,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           }
 
           // Camera initializing
-          if (_setupProfileController.isCameraInitialized.value) {
+          if (_driverSetupController.isCameraInitialized.value) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -70,13 +73,13 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
-                      CameraPreview(_setupProfileController.cameraController!,
+                      CameraPreview(_driverSetupController.cameraController!,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: FloatingActionButton(
                           backgroundColor: Colors.white,
-                          onPressed: _setupProfileController.captureSelfie,
+                          onPressed: _driverSetupController.captureSelfie,
                           child: const Icon(Icons.camera_alt,
                               color: Colors.black, size: 30),
                         ),
@@ -90,8 +93,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             );
           }
 
-          /// Selfie captured
-          else if (_setupProfileController.capturedImage != null) {
+          // Selfie captured ✅
+          else if (_driverSetupController.capturedImage != null) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -102,7 +105,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       image: FileImage(
-                        File(_setupProfileController.capturedImage!.path),
+                        File(_driverSetupController.capturedImage!.path),
                       ),
                       fit: BoxFit.cover,
                     ),
@@ -127,7 +130,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
                 CustomButton(
                   onTap: () {
-                    Get.to(()=> VerifySuccessScreen());
+                    Get.to(()=> DriverVerifySuccessScreen());
                   },
                   text: "Confirm & Continue",
                 ),
@@ -136,7 +139,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
 
                 TextButton(
-                  onPressed: _setupProfileController.retakeSelfie,
+                  onPressed: _driverSetupController.retakeSelfie,
                   child: const Text(
                     "Retake Selfie",
                     style: TextStyle(

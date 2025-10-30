@@ -38,7 +38,8 @@ class BottomMenu extends StatelessWidget {
     final theme = Theme.of(context);
     List<BottomNavigationBarItem> menuItems = [
       getItem(AppIcons.homeIcon, 'Home', theme, 0),
-      getItem(AppIcons.walletIcon, 'Wallet', theme, 1),
+      getItem(AppIcons.rider, 'Riders', theme, 1),
+      getItem(AppIcons.earn, 'Earn', theme, 2),
       getItem(AppIcons.profileIcon, 'Profile', theme, 2),
     ];
 
@@ -48,9 +49,7 @@ class BottomMenu extends StatelessWidget {
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(20.r),topLeft: Radius.circular(20.r)
           ),
-          boxShadow: const [
-            BoxShadow(color:Colors.black38,spreadRadius:0,blurRadius: 10)
-          ]
+         
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.only(
@@ -59,19 +58,29 @@ class BottomMenu extends StatelessWidget {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          
-          selectedItemColor:Theme.of(context).primaryColor,
+          backgroundColor:Color(0xFFfafafa),//0xFFfafafa
+          selectedItemColor: Color(0xFF012F64),
+          unselectedItemColor: Color(0xFF333333),
+          selectedLabelStyle: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w400,
+          ),
           currentIndex: menuIndex,
           
           onTap: (value) {
             switch (value) {
               case 0:
-                Get.offAndToNamed(AppRoutes.homeScreen);
+                Get.offAndToNamed(AppRoutes.driverHomeScreen);
                 break;
               case 1:
+                Get.offAndToNamed(AppRoutes.driverRidesScreen);
                 break;
               case 2:
-                Get.offAndToNamed(AppRoutes.profileScreen);
+                Get.offAndToNamed(AppRoutes.driverEarnScreen);
+                break;
+
+              case 3:
+                Get.offAndToNamed(AppRoutes.driverProfileScreen);
                 break;
             }
           },
