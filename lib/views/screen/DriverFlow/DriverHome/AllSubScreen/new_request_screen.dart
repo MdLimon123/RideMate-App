@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
 
 class NewRequestScreen extends StatefulWidget {
   const NewRequestScreen({super.key});
@@ -21,6 +23,17 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     target: LatLng(23.8041, 90.4152),
     zoom: 14.4746,
   );
+
+  bool isParcel = false;
+
+  @override
+  void initState() {
+    setState(() {
+      isParcel = true;
+    });
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +88,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 10,
                             offset: const Offset(0, -3),
                           )
@@ -86,7 +99,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         children: [
                           Center(
                             child: Text(
-                             "New Ride Request",
+                            isParcel?"New Parcel Request": "New Ride Request",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -148,6 +161,28 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                   ],
                                 ),
                                 SizedBox(height: 12,),
+
+                                isParcel ? Row(
+                                  children: [
+                                    SvgPicture.asset("assets/icons/box.svg"),
+                                    SizedBox(width: 12,),
+                                    Text( "228",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF012F64)
+                                      ),
+                                    ),
+                                    SizedBox(width: 4,),
+                                    Text("(XAF)",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w200,
+                                          color: AppColors.textColor
+                                      ),)
+                                  ]): SizedBox(),
+
+                                SizedBox(height: 12,),
                                 Row(
                                   children: [
                                     SvgPicture.asset('assets/icons/location.svg',
@@ -204,7 +239,11 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   ),
                   SizedBox(width: 22,),
                   Expanded(
-                    child: CustomButton(onTap: (){},
+                    child: CustomButton(onTap: (){
+                      Get.to(()=> AcceptScreen(
+                        isParcel: isParcel,
+                      ));
+                    },
                         text: "Accept"),
                   )
                 ],
