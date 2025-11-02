@@ -8,6 +8,7 @@ import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/bottom_menu..dart';
 import 'package:radeef/views/base/custom_switch.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/new_request_screen.dart';
+import 'package:radeef/views/screen/Notification/notification_screen.dart';
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
@@ -71,7 +72,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
     /// 🕐 Simulate searching for a driver (e.g., 5 seconds)
     Future.delayed(const Duration(seconds: 8), () {
       if (mounted) {
-        Get.to(()=> NewRequestScreen());
+       // Get.to(()=> NewRequestScreen());
       }
     });
 
@@ -111,7 +112,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
                         });
                       }),
                   Spacer(),
-                  SvgPicture.asset('assets/icons/notification.svg'),
+                  InkWell(
+                    onTap: (){
+                      Get.to(()=> NotificationScreen());
+                    },
+                      child: SvgPicture.asset('assets/icons/notification.svg')),
                 ],
               ),
             ),

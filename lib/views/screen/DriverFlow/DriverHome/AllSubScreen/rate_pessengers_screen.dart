@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverEarn/driver_earn_screen.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/earn_screen.dart';
 
 class RatePessengersScreen extends StatefulWidget {
   const RatePessengersScreen({super.key});
@@ -159,7 +162,9 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                   ),
                 ),
                 SizedBox(width: 22,),
-                Expanded(child: CustomButton(onTap: (){},
+                Expanded(child: CustomButton(onTap: (){
+                  Get.to(()=> EarnScreen());
+                },
                     text: "Rate Now"))
               ],
             )
