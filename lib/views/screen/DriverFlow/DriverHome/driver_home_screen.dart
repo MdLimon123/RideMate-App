@@ -1,11 +1,13 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:radeef/models/Driver/parcel_request_model.dart';
+import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
-import 'package:radeef/views/base/bottom_menu..dart';
+import 'package:radeef/views/base/bottom_menu.dart';
 import 'package:radeef/views/base/custom_switch.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/new_request_screen.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
@@ -17,11 +19,12 @@ class DriverHomeScreen extends StatefulWidget {
   State<DriverHomeScreen> createState() => _DriverHomeScreenState();
 }
 
-class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProviderStateMixin{
-
+class _DriverHomeScreenState extends State<DriverHomeScreen>
+    with TickerProviderStateMixin {
   bool isSwitch = true;
+  bool _activeRequestExists = false;
   final Completer<GoogleMapController> _controller =
-  Completer<GoogleMapController>();
+      Completer<GoogleMapController>();
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(23.8041, 90.4152),
@@ -38,6 +41,9 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
 
   @override
   void initState() {
+    isSwitch = true;
+    toggleOnlineStatus(isSwitch);
+
     _xController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -55,35 +61,75 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
       duration: const Duration(seconds: 5),
     )..repeat();
 
-    _xScale = Tween<double>(begin: 0.9, end: 1.15).animate(
-      CurvedAnimation(parent: _xController, curve: Curves.easeInOut),
-    );
+    _xScale = Tween<double>(
+      begin: 0.9,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _xController, curve: Curves.easeInOut));
 
-    _yScale = Tween<double>(begin: 0.9, end: 1.15).animate(
-      CurvedAnimation(parent: _yController, curve: Curves.easeInOut),
-    );
+    _yScale = Tween<double>(
+      begin: 0.9,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _yController, curve: Curves.easeInOut));
 
     _rotation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _rotationController, curve: Curves.linear),
     );
 
+    SocketService().on('parcel:request', (data) {
+      final socketModel = ParcelRequestSocketModel.fromJson(data);
 
+      if (_activeRequestExists) return;
 
-    /// 🕐 Simulate searching for a driver (e.g., 5 seconds)
-    Future.delayed(const Duration(seconds: 8), () {
-      if (mounted) {
-       // Get.to(()=> NewRequestScreen());
+      if (socketModel.parcel != null) {
+        _activeRequestExists = true;
+        Get.to(
+          () => NewRequestScreen(
+            isParcel: true,
+            parcel: socketModel.parcel,
+            parcelUserModel: socketModel.user,
+          ),
+        )?.then((value) {
+          _activeRequestExists = false;
+        });
       }
     });
+
+    SocketService().on('trip:request', (data) {
+      final socketModel = TripRequestSocketModel.fromJson(data);
+
+      if (_activeRequestExists) return;
+
+      if (socketModel.trip != null) {
+        _activeRequestExists = true;
+        Get.to(
+          () => NewRequestScreen(
+            isParcel: false,
+            trip: socketModel.trip,
+            tripUserModel: socketModel.user,
+          ),
+        )?.then((value) {
+          _activeRequestExists = false;
+        });
+      }
+    });
+
+ 
 
     super.initState();
   }
 
+  void toggleOnlineStatus(bool status) {
+    SocketService().emit('driver:toggle_online',data:  {'online': status});
+
+    print('Online status ===========>: $status');
+  }
 
   @override
   void dispose() {
     _xController.dispose();
     _yController.dispose();
+    _rotationController.dispose();
+    //SocketService().socket?.disconnect();
     super.dispose();
   }
 
@@ -97,30 +143,35 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
               child: Row(
                 children: [
-                  Text( isSwitch ?"Online": "Offline",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textColor
-                  ),),
-                  SizedBox(width: 4,),
+                  Text(
+                    isSwitch ? "Online" : "Offline",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textColor,
+                    ),
+                  ),
+                  SizedBox(width: 4),
                   CustomSwitch(
-                      value: isSwitch,
-                      onChanged: (val){
-                        setState(() {
-                          isSwitch = val;
-                        });
-                      }),
+                    value: isSwitch,
+                    onChanged: (val) {
+                      setState(() {
+                        isSwitch = val;
+                        toggleOnlineStatus(isSwitch);
+                      });
+                    },
+                  ),
                   Spacer(),
                   InkWell(
-                    onTap: (){
-                      Get.to(()=> NotificationScreen());
+                    onTap: () {
+                      Get.to(() => NotificationScreen());
                     },
-                      child: SvgPicture.asset('assets/icons/notification.svg')),
+                    child: SvgPicture.asset('assets/icons/notification.svg'),
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(height: 20),
             SizedBox(
               height: 500,
               child: Stack(
@@ -155,13 +206,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
                     ),
                   ),
 
-
                   Positioned(
                     bottom: -60, //
                     left: 20,
                     right: 20,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 30,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF345983),
                         borderRadius: BorderRadius.circular(12),
@@ -170,7 +223,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
                             color: Colors.black.withOpacity(0.1),
                             blurRadius: 10,
                             offset: const Offset(0, -3),
-                          )
+                          ),
                         ],
                       ),
                       child: Column(
@@ -178,7 +231,9 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
                         children: [
                           Center(
                             child: Text(
-                             isSwitch?"We're searching a request for you!": 'You are now Offline',
+                              isSwitch
+                                  ? "We’re searching a request for you!"
+                                  : 'You are Now Offline',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -188,45 +243,58 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
                             ),
                           ),
                           const SizedBox(height: 30),
-                         isSwitch? Center(
-                           child: AnimatedBuilder(
-                             animation: Listenable.merge(
-                                 [_xController, _yController, _rotationController]),
-                             builder: (context, child) {
-                               return Transform.scale(
-                                 scaleX: _xScale.value,
-                                 scaleY: _yScale.value,
-                                 child: Transform.rotate(
-                                   angle: _rotation.value * 6.28319, // 2π radians
-                                   child: Container(
-                                     decoration: BoxDecoration(
-                                       boxShadow: [
-                                         BoxShadow(
-                                           color: Colors.white.withOpacity(0.4),
-                                           blurRadius: 30,
-                                           spreadRadius: 4,
-                                         ),
-                                       ],
-                                     ),
-                                     child: child,
-                                   ),
-                                 ),
-                               );
-                             },
-                             child: SvgPicture.asset(
-                               'assets/icons/search_fill.svg',
-                               color: Colors.white,
-                               width: 72,
-                               height: 72,
-                             ),
-                           ),
-                         ):  Center(
-                            child: SvgPicture.asset('assets/icons/happy.svg'),
-                          ),
+                          isSwitch
+                              ? Center(
+                                  child: AnimatedBuilder(
+                                    animation: Listenable.merge([
+                                      _xController,
+                                      _yController,
+                                      _rotationController,
+                                    ]),
+                                    builder: (context, child) {
+                                      return Transform.scale(
+                                        scaleX: _xScale.value,
+                                        scaleY: _yScale.value,
+                                        child: Transform.rotate(
+                                          angle:
+                                              _rotation.value *
+                                              6.28319, // 2π radians
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.white
+                                                      .withOpacity(0.4),
+                                                  blurRadius: 30,
+                                                  spreadRadius: 4,
+                                                ),
+                                              ],
+                                            ),
+                                            child: child,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/search_fill.svg',
+                                      color: Colors.white,
+                                      width: 72,
+                                      height: 72,
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: SvgPicture.asset(
+                                    'assets/icons/happy.svg',
+                                  ),
+                                ),
                           const SizedBox(height: 20),
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
@@ -234,57 +302,76 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> with TickerProvider
                             child: Column(
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: const [
-                                    Text("Tips",
-                                        style: TextStyle(
-                                            color: Color(0xFF333333),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400)),
-                                    Text("Online",
-                                        style: TextStyle(
-                                            color: Color(0xFF333333),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400)),
-                                    Text("Earnings",
-                                        style: TextStyle(
-                                            color: Color(0xFF333333),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400)),
+                                    Text(
+                                      "Tips",
+                                      style: TextStyle(
+                                        color: Color(0xFF333333),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Online",
+                                      style: TextStyle(
+                                        color: Color(0xFF333333),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Earnings",
+                                      style: TextStyle(
+                                        color: Color(0xFF333333),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 6),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: const [
-                                    Text("14",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xFF333333))),
-                                    Text("3h 45m",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xFF333333))),
-                                    Text("128.50 XAF",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xFF333333))),
+                                    Text(
+                                      "14",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF333333),
+                                      ),
+                                    ),
+                                    Text(
+                                      "3h 45m",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF333333),
+                                      ),
+                                    ),
+                                    Text(
+                                      "128.50 XAF",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF333333),
+                                      ),
+                                    ),
                                   ],
-                                )
+                                ),
                               ],
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-            )
-
+            ),
           ],
         ),
       ),

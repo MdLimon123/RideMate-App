@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:radeef/utils/app_colors.dart';
 
 class CustomSwitch extends StatelessWidget {
 

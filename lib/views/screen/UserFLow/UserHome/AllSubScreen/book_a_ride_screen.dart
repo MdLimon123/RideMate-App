@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/home_controller.dart';
+import 'package:radeef/controllers/UserController/user_profile_controller.dart';
+import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/views/base/custom_button.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/show_amount_screen.dart';
+import 'package:radeef/views/base/custom_loading.dart';
+import 'package:radeef/views/base/custom_network_image.dart';
+import 'package:radeef/views/screen/Notification/notification_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class BookARideScreen extends StatefulWidget {
   const BookARideScreen({super.key});
@@ -12,6 +18,18 @@ class BookARideScreen extends StatefulWidget {
 }
 
 class _BookARideScreenState extends State<BookARideScreen> {
+  final _userProfileController = Get.put(UserProfileController());
+  final _homeController = Get.put(HomeController());
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _userProfileController.fetchUserInfo();
+      _homeController.loadRecentDestinations();
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,181 +46,347 @@ class _BookARideScreenState extends State<BookARideScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Good morning",
+                      Text(
+                        "Good morning",
                         style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF545454)
-                        ),),
-                      SizedBox(height: 5,),
-                      Text("Alex",
-                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF545454),
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Obx(
+                        () => Text(
+                          _userProfileController.userProfileModel.value.name ??
+                              "",
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF545454)
-                        ),)
+                            color: Color(0xFF545454),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   Spacer(),
-                  SvgPicture.asset('assets/icons/notification.svg'),
-                  SizedBox(width: 12,),
-                  Container(
-                    height: 32,
-                    width: 32,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(image: AssetImage('assets/images/demo.png',),
-                            fit: BoxFit.cover)
+                  InkWell(
+                    onTap: () {
+                      Get.to(() => NotificationScreen());
+                    },
+                    child: SvgPicture.asset('assets/icons/notification.svg'),
+                  ),
+                  SizedBox(width: 12),
+                  Obx(
+                    () => InkWell(
+                      onTap: () {
+                        Get.to(() => UserProfileScreen());
+                      },
+                      child: CustomNetworkImage(
+                        imageUrl:
+                            "${ApiConstant.imageBaseUrl}${_userProfileController.userProfileModel.value.avatar}",
+                        boxShape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey, width: 1),
+                        height: 32,
+                        width: 32,
+                      ),
                     ),
-                  )
+                  ),
                 ],
               ),
-              SizedBox(height: 24,),
-            Expanded(
-              child: ListView(
-                children: [
-                  TextFormField(
-                    onTap: (){},
-                    decoration: InputDecoration(
-                        hint: Text("Aqua Tower, Mohakhali",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF676769)
-                          ),),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: SvgPicture.asset('assets/icons/pick.svg'),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Color(0xFFB5F5D7))),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Color(0xFFB5F5D7))),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Color(0xFFB5F5D7))),
-                        filled: true,
-                        fillColor: Color(0xFFE6E6E6).withValues(alpha: 0.24)
-              
+
+              SizedBox(height: 24),
+
+              Expanded(
+                child: ListView(
+                  children: [
+                    Obx(
+                      () => Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormField(
+                            controller: _homeController.pickController,
+                            onChanged: (value) {
+                              _homeController.fetchSuggestions(
+                                value,
+                                LocationField.pick,
+                              );
+                            },
+                            decoration: InputDecoration(
+                              hint: Text(
+                                "Aqua Tower, Mohakhali",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF676769),
+                                ),
+                              ),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: SvgPicture.asset(
+                                  'assets/icons/pick.svg',
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFB5F5D7),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFB5F5D7),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFB5F5D7),
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Color(
+                                0xFFE6E6E6,
+                              ).withValues(alpha: 0.24),
+                            ),
+                          ),
+
+                          if (_homeController.isLoading.value &&
+                              _homeController.activeField.value ==
+                                  LocationField.pick)
+                            CustomLoading(),
+
+                          if (_homeController.suggestions.isNotEmpty &&
+                              _homeController.activeField.value ==
+                                  LocationField.pick)
+                            suggestionList(onTap: _homeController.selectPick),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 12,),
-                  TextFormField(
-              
-                    onTap: (){},
-                    decoration: InputDecoration(
-                        hint: Text("Aqua Tower, Mohakhali",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF676769)
-                          ),),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: SvgPicture.asset('assets/icons/location.svg'),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Color(0xFFB5F5D7))),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Color(0xFFB5F5D7))),
-                        filled: true,
-                        fillColor: Color(0xFFE6E6E6).withValues(alpha: 0.24)
-              
+
+                    SizedBox(height: 12),
+
+                    Obx(
+                      () => Column(
+                        children: [
+                          TextFormField(
+                            controller: _homeController.dropController,
+                            onChanged: (value) {
+                              _homeController.fetchSuggestions(
+                                value,
+                                LocationField.drop,
+                              );
+                            },
+                            decoration: InputDecoration(
+                              hint: Text(
+                                "Aqua Tower, Mohakhali",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF676769),
+                                ),
+                              ),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: SvgPicture.asset(
+                                  'assets/icons/location.svg',
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 15,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFB5F5D7),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFB5F5D7),
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Color(
+                                0xFFE6E6E6,
+                              ).withValues(alpha: 0.24),
+                            ),
+                          ),
+
+                          if (_homeController.isLoading.value &&
+                              _homeController.activeField.value ==
+                                  LocationField.drop)
+                            CustomLoading(),
+
+                          if (_homeController.suggestions.isNotEmpty &&
+                              _homeController.activeField.value ==
+                                  LocationField.drop)
+                            suggestionList(onTap: _homeController.selectDrop),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 28,),
-                  Text("Recent Destination",
-                    style: TextStyle(
+
+                    SizedBox(height: 28),
+                    Text(
+                      "recentDestination".tr,
+                      style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 24,
-                        color: Color(0xFF545454)
-                    ),),
-                  SizedBox(height: 12,),
-                  ListView.separated(
-                    separatorBuilder: (_, _)=> SizedBox(height: 6,),
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: 5,
-                    itemBuilder: (context, index){
-                      return Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Color(0xFFE6E6E6).withValues(alpha: 0.24),
-                            borderRadius: BorderRadius.circular(12)
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset('assets/icons/location.svg'),
-                            SizedBox(width: 12,),
-                            Text("2972 Westheimer Rd. Santa ",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF8A8A8A)
-                              ),)
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 57,),
-                  CustomButton(
-                      color: Color(0xFF345983),
-                      onTap: (){
-                        Get.to(()=> ShowAmountScreen());
-                      },
-                      text: "Confirm"),
-                  SizedBox(height: 90,),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                    decoration: BoxDecoration(
-                        color: Color(0xFFE6E6E6),
-                        borderRadius: BorderRadius.circular(12)
+                        color: Color(0xFF545454),
+                      ),
                     ),
-                    child: Row(
-              
-                      children: [
-                        SvgPicture.asset('assets/icons/what.svg'),
-                        SizedBox(width: 10,),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Need Help?",
-                              style: TextStyle(
+                    SizedBox(height: 12),
+
+                    Obx(
+                      () => ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _homeController.recentDestinations.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 6),
+                        itemBuilder: (context, index) {
+                          final dest =
+                              _homeController.recentDestinations[index];
+
+                          return InkWell(
+                            onTap: () {
+                              _homeController.dropController.text =
+                                  dest.address;
+                              _homeController.dropAddress.value = dest.address;
+                              _homeController.dropCoordinates.value = [
+                                dest.lat,
+                                dest.lng,
+                              ];
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFFE6E6E6,
+                                ).withValues(alpha: 0.24),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset('assets/icons/location.svg'),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      dest.address,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF8A8A8A),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    SizedBox(height: 57),
+                    Obx(
+                      () => CustomButton(
+                        loading: _homeController.isShowAnountLoading.value,
+                        color: Color(0xFF345983),
+                        onTap: () {
+                          if (_homeController.selectedIndex.value == 0) {
+                            // Book a Ride selected, so call calculateAccount()
+                            _homeController.calculateAccount();
+                          } else if (_homeController.selectedIndex.value == 1) {
+                            // Send Parcel selected, so call calculateParcelAmount()
+                            _homeController.calculateParcelAmount();
+                          }
+                        },
+                        text: "confirm".tr,
+                      ),
+                    ),
+
+                    SizedBox(height: 90),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE6E6E6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset('assets/icons/what.svg'),
+                          SizedBox(width: 10),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "needHelp".tr,
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF333333)
-                              ),),
-                            SizedBox(height: 10,),
-                            Text("Chat with our support",
-                              style: TextStyle(
+                                  color: Color(0xFF333333),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                "support".tr,
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
-                                  color: Color(0xFF333333)
-                              ),)
-                          ],
-                        )
-                      ],
+                                  color: Color(0xFF333333),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  )
-                ],
+                  ],
+                ),
               ),
-            )
-
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget suggestionList({required Function(String) onTap}) {
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey),
+      ),
+      child: ListView.builder(
+        itemCount: _homeController.suggestions.length,
+        itemBuilder: (_, index) => ListTile(
+          title: Text(
+            _homeController.suggestions[index],
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF000000),
+            ),
+          ),
+          onTap: () => onTap(_homeController.suggestions[index]),
         ),
       ),
     );

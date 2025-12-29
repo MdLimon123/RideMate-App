@@ -1,8 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
-    <uses-permission android:name="android.permission.READ_SMS"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+ 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+
+    <!-- For Url Launcher -->
+    <queries>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="sms" />
+      </intent>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="tel" />
+      </intent>
+      <intent>
+        <action android:name="android.support.customtabs.action.CustomTabsService" />
+      </intent>
+    </queries>
 
 
     <application
@@ -37,7 +52,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDEOhUOUDVMYiBOHqEtCnyrztCrlOqZ6bo"/>
+            android:value="AIzaSyBRiTsXAZERl87rSPcgdqw3R-EOAcJ-ehw"/>
 
         <receiver android:name="com.jaumard.smsautofill.SmsRetrieverReceiver" android:exported="true">
             <intent-filter>

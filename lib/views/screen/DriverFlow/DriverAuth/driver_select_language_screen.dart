@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/localization_controller.dart';
 import 'package:radeef/helpers/route.dart';
-import 'package:radeef/language_controller.dart';
+import 'package:radeef/controllers/language_controller.dart';
 import 'package:radeef/utils/app_constants.dart';
 import 'package:radeef/utils/style.dart';
 import 'package:radeef/views/base/custom_appbar.dart';
@@ -31,14 +31,14 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 50,),
-            Text("Choose Your Language",
+            Text("choose".tr,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w500,
               color: Color(0xFF333333)
             ),),
             SizedBox(height: 4,),
-            Text("Select your preferred language to get started",
+            Text("select".tr,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
@@ -141,7 +141,7 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
             SizedBox(height: 205,),
             CustomButton(onTap: (){
               Get.offAllNamed(AppRoutes.driverLoginScreen);
-            }, text: "Next")
+            }, text: "next".tr)
           ],
 
         ),
@@ -149,4 +149,7 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
 
     );
   }
+
+
+
 }

@@ -24,7 +24,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
             child: SvgPicture.asset('assets/icons/ride2.svg')),
           SizedBox(height: 24,),
           Center(
-            child: Text("Let’s Set Up Your User Profile",
+            child: Text("letSetUpProfile".tr,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w500,
@@ -33,7 +33,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
           ),
           SizedBox(height: 16,),
           Center(
-            child: Text("A few quick steps to start earning with us",
+            child: Text("quickEran".tr,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
@@ -45,7 +45,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
           CustomButton(onTap: (){
             Get.to(()=> SetupPersonalInfoScreen());
           },
-              text: "Next")
+              text: "next".tr)
         ],
       ),
     );

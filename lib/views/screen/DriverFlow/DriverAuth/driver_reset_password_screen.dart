@@ -24,7 +24,7 @@ class _DriverResetPasswordScreenState extends State<DriverResetPasswordScreen> {
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
           SizedBox(height: 100,),
-          Text("Set New Password",
+          Text("new_Password".tr,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w500,
@@ -40,7 +40,7 @@ class _DriverResetPasswordScreenState extends State<DriverResetPasswordScreen> {
           CustomButton(onTap: (){
             Get.offAllNamed(AppRoutes.driverLoginScreen);
           },
-              text: "Change Now")
+              text: "changeNow".tr)
         ],
       ),
     );

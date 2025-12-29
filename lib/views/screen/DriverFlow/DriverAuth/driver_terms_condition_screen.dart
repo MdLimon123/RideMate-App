@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/screen/DriverFlow/SetupDriverProfile/get_start_driver_screen.dart';
-import 'package:radeef/views/screen/UserFLow/SetupProfile/setup_profile_screen.dart';
+
+
 
 class DriverTermsConditionScreen extends StatefulWidget {
   const DriverTermsConditionScreen({super.key});
@@ -113,7 +114,7 @@ class _DriverTermsConditionScreenState extends State<DriverTermsConditionScreen>
           CustomButton(onTap: (){
             Get.to(()=> GetStartDriverScreen());
           },
-              text: "Start")
+              text: "start".tr)
         ],
       ),
     );

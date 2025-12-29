@@ -21,7 +21,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
@@ -44,8 +44,8 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
             textAlign: TextAlign.center,),
             SizedBox(height: 258,),
             CustomButton(onTap: (){
-              _splashController.setRole("PASSENGER");
-              Get.to(()=> LocationEnableScreen(role: "PASSENGER",));
+              _splashController.setRole("USER");
+              Get.to(()=> LocationEnableScreen(role: "USER",));
             }, text: "User Account"),
             SizedBox(height: 16,),
             InkWell(

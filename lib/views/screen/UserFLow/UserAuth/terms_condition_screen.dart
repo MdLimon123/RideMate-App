@@ -112,7 +112,7 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
           CustomButton(onTap: (){
             Get.to(()=> SetupProfileScreen());
           },
-              text: "Start")
+              text: "start".tr)
         ],
       ),
     );

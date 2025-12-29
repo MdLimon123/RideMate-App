@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:radeef/views/base/custom_appbar.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/need_help_screen.dart';
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({super.key});
@@ -62,7 +60,7 @@ class _SupportScreenState extends State<SupportScreen> {
           SizedBox(height: 12,),
           InkWell(
             onTap: (){
-              Get.to(()=> NeedHelpScreen());
+             // Get.to(()=> NeedHelpScreen());
             },
             child: Container(
               height: 52,

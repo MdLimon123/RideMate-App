@@ -2,19 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/DriverController/driver_parcel_controller.dart';
+import 'package:radeef/models/Driver/parcel_request_model.dart';
+import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverEarn/driver_earn_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/earn_screen.dart';
+import 'package:radeef/views/base/custom_network_image.dart';
 
 class RatePessengersScreen extends StatefulWidget {
-  const RatePessengersScreen({super.key});
+  final bool isParcel;
+  final ParcelRequestModel? parcel;
+  final TripRequestModel? trip;
+  final ParcelUserModel? parcelUserModel;
+  final TripUserModel? tripUserModel;
+  const RatePessengersScreen({
+    super.key,
+    required this.isParcel,
+    this.parcel,
+    this.trip,
+    this.parcelUserModel,
+    this.tripUserModel,
+  });
 
   @override
   State<RatePessengersScreen> createState() => _RatePessengersScreenState();
 }
 
 class _RatePessengersScreenState extends State<RatePessengersScreen> {
+  final _driverController = Get.put(DriverParcelController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +39,7 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 22),
           children: [
-            SizedBox(height: 162,),
+            SizedBox(height: 162),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
               decoration: BoxDecoration(
@@ -33,29 +50,28 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                     color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, -3),
-                  )
+                  ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child: Container(
+                    child: CustomNetworkImage(
+                      imageUrl:
+                          "${ApiConstant.imageBaseUrl}${widget.isParcel ? widget.parcelUserModel!.avatar : widget.tripUserModel!.avatar}",
+                      boxShape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                       height: 48,
                       width: 48,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/images/demo.png'),
-                        ),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Center(
                     child: Text(
-                      "Sergio Romasis",
+                      widget.isParcel
+                          ? widget.parcelUserModel!.name
+                          : widget.tripUserModel!.name,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -70,8 +86,9 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                       width: 158,
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       child: Row(
                         children: [
                           SvgPicture.asset("assets/icons/cycle.svg"),
@@ -79,68 +96,74 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                           const Text(
                             "Trip",
                             style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF333333)),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
                           ),
                           const SizedBox(width: 4),
-                          const Text(
-                            "4",
+                          Text(
+                            widget.isParcel
+                                ? widget.parcelUserModel!.tripReceivedCount
+                                      .toString()
+                                : widget.tripUserModel!.tripReceivedCount
+                                      .toString(),
                             style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF333333)),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
                           ),
                           const SizedBox(width: 20),
-                          const Icon(
-                            Icons.star,
-                            color: Color(0xFF012F64),
-                          ),
+                          const Icon(Icons.star, color: Color(0xFF012F64)),
                           const SizedBox(width: 4),
-                          const Text(
-                            "4.6",
+                          Text(
+                            widget.isParcel
+                                ? widget.parcelUserModel!.rating.toString().substring(0, 3)
+                                : widget.tripUserModel!.rating.toString().substring(0, 3),
                             style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF333333)),
-                          )
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 34,),
+                  SizedBox(height: 34),
                   Center(
-                    child: Text("Rate the Passengers",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFFFFFFFF)
-                    ),),
+                    child: Text(
+                      "Rate the Passengers",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFFFFFFF),
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 16,),
-                 Center(
-          child: RatingBar.builder(
-            initialRating: 3,
-            minRating: 1,
-            direction: Axis.horizontal,
-            allowHalfRating: true,
-            itemCount: 5,
-            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-            itemBuilder: (context, _) => Icon(
-              Icons.star,
-              color: Color(0xFFFFFFFF),
-            ),
-            onRatingUpdate: (rating) {
-              print(rating);
-            },
-          ),
-        )
-
-
+                  SizedBox(height: 16),
+                  Center(
+                    child: Obx(
+                      () => RatingBar.builder(
+                        initialRating: _driverController.rating.value,
+                        minRating: 1,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemSize: 30,
+                        itemPadding: const EdgeInsets.symmetric(horizontal: 4),
+                        itemBuilder: (context, _) =>
+                            const Icon(Icons.star, color: Colors.amber),
+                        onRatingUpdate: (value) {
+                          _driverController.updateRating(value);
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 68,),
+            SizedBox(height: 68),
             Row(
               children: [
                 Expanded(
@@ -149,26 +172,45 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Color(0xFFE6E6E6),
-                      borderRadius: BorderRadius.circular(24)
+                      borderRadius: BorderRadius.circular(24),
                     ),
                     child: Center(
-                      child: Text("Skip",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textColor
-                      ),),
+                      child: Text(
+                        "Skip",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textColor,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(width: 22,),
-                Expanded(child: CustomButton(onTap: (){
-                  Get.to(()=> EarnScreen());
-                },
-                    text: "Rate Now"))
+                SizedBox(width: 22),
+                Expanded(
+                  child: Obx(
+                    () => CustomButton(
+                      loading: _driverController.isLoading.value,
+                      onTap: () {
+                        _driverController.submitRating(
+                          isParcel: widget.isParcel,
+                          userId: widget.isParcel
+                              ? widget.parcel!.userId
+                              : widget.trip!.userId,
+                          parcelId: widget.isParcel ? widget.parcel!.id : null,
+                          tripId: widget.isParcel ? null : widget.trip!.id,
+                          parcel: widget.parcel,
+                          parcelUserModel: widget.parcelUserModel,
+                          trip: widget.trip,
+                          tripUserModel: widget.tripUserModel,
+                        );
+                      },
+                      text: "Rate Now",
+                    ),
+                  ),
+                ),
               ],
-            )
-
+            ),
           ],
         ),
       ),

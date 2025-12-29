@@ -1,27 +1,23 @@
-
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_profile_setup_controller.dart';
-import 'package:radeef/controllers/UserController/user_setup_profile_controller.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_page_loading.dart';
-import 'package:radeef/views/screen/DriverFlow/SetupDriverProfile/driver_verify_success_screen.dart';
-import 'package:radeef/views/screen/UserFLow/SetupProfile/verify_success_screen.dart';
 
 class DriverVerifyIdentityScreen extends StatefulWidget {
   const DriverVerifyIdentityScreen({super.key});
 
   @override
-  State<DriverVerifyIdentityScreen> createState() => _DriverVerifyIdentityScreenState();
+  State<DriverVerifyIdentityScreen> createState() =>
+      _DriverVerifyIdentityScreenState();
 }
 
-class _DriverVerifyIdentityScreenState extends State<DriverVerifyIdentityScreen> {
-
+class _DriverVerifyIdentityScreenState
+    extends State<DriverVerifyIdentityScreen> {
   final _driverSetupController = Get.put(DriverProfileSetupController());
-
 
   @override
   void initState() {
@@ -40,25 +36,28 @@ class _DriverVerifyIdentityScreenState extends State<DriverVerifyIdentityScreen>
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Get.back(),
         ),
-        actions:  [
+        actions: [
           Padding(
             padding: EdgeInsets.only(right: 16.0),
-            child: Text('3 Of 3', style: TextStyle(color: Color(0xFF012F64),
-            fontWeight: FontWeight.w500,
-            fontSize: 16)),
+            child: Text(
+              '3 Of 3',
+              style: TextStyle(
+                color: Color(0xFF012F64),
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Obx(() {
-    
           if (!_driverSetupController.isPermissionGranted.value) {
-            return  Center(
+            return Center(
               child: Text(
                 "Camera permission required to continue.",
-                style: TextStyle(fontSize: 16,
-                fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
             );
@@ -73,27 +72,27 @@ class _DriverVerifyIdentityScreenState extends State<DriverVerifyIdentityScreen>
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
-                      CameraPreview(_driverSetupController.cameraController!,
-                      ),
+                      CameraPreview(_driverSetupController.cameraController!),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: FloatingActionButton(
                           backgroundColor: Colors.white,
                           onPressed: _driverSetupController.captureSelfie,
-                          child: const Icon(Icons.camera_alt,
-                              color: Colors.black, size: 30),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.black,
+                            size: 30,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
-
               ],
             );
           }
-
-          // Selfie captured ✅
+          /// Selfie captured ✅
           else if (_driverSetupController.capturedImage != null) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -112,31 +111,39 @@ class _DriverVerifyIdentityScreenState extends State<DriverVerifyIdentityScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                 Text(
+                Text(
                   "Verify Your Identity",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500,
-                  color: AppColors.textColor),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textColor,
+                  ),
                 ),
                 const SizedBox(height: 16),
-                 Text(
+                Text(
                   "Take a quick selfie to complete your profile",
-                  style: TextStyle(fontSize: 16, color: AppColors.textColor,
-                  fontWeight: FontWeight.w400,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textColor,
+                    fontWeight: FontWeight.w400,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 240),
 
-
-                CustomButton(
-                  onTap: () {
-                    Get.to(()=> DriverVerifySuccessScreen());
-                  },
-                  text: "Confirm & Continue",
+                Obx(
+                  () => CustomButton(
+                    loading: _driverSetupController.isLoading.value,
+                    onTap: () {
+                      _driverSetupController.uploadCaptureImage(
+                        imagePath: _driverSetupController.capturedImage!.path,
+                      );
+                    },
+                    text: "Confirm & Continue",
+                  ),
                 ),
 
                 const SizedBox(height: 16),
-
 
                 TextButton(
                   onPressed: _driverSetupController.retakeSelfie,
@@ -151,10 +158,7 @@ class _DriverVerifyIdentityScreenState extends State<DriverVerifyIdentityScreen>
                 ),
               ],
             );
-          }
-
-
-          else {
+          } else {
             return const Center(child: CustomPageLoading());
           }
         }),

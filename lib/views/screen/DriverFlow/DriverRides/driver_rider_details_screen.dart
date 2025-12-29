@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:radeef/controllers/DriverController/driver_rider_controller.dart';
+import 'package:radeef/models/Driver/rider_history_model.dart';
+import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_appbar.dart';
+import 'package:radeef/views/base/custom_network_image.dart';
 
 class DriverRiderDetailsScreen extends StatefulWidget {
   final bool isParcel;
+  final RiderHistoryItem? riderHistoryItem;
 
-  const DriverRiderDetailsScreen({super.key, required this.isParcel});
+  const DriverRiderDetailsScreen({
+    super.key,
+    required this.isParcel,
+    this.riderHistoryItem,
+  });
 
   @override
   State<DriverRiderDetailsScreen> createState() =>
@@ -16,20 +22,19 @@ class DriverRiderDetailsScreen extends StatefulWidget {
 }
 
 class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
-
-  final _driverRiderController = Get.put(DriverRiderController());
-
   @override
   Widget build(BuildContext context) {
+    final totalCost = widget.riderHistoryItem?.totalCost ?? 0;
+    final radeefFee = (totalCost * 0.02).toInt();
+    final driverEarn = totalCost - radeefFee;
+
     return Scaffold(
       backgroundColor: Color(0xFFE6EAF0),
       appBar: CustomAppbar(title: "Ride Details"),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
-          widget.isParcel ? SizedBox(
-            height: 10,
-          ) : SizedBox(height: 186),
+          widget.isParcel ? SizedBox(height: 10) : SizedBox(height: 186),
           widget.isParcel
               ? Container(
                   padding: const EdgeInsets.symmetric(
@@ -51,22 +56,19 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: Container(
+                        child: CustomNetworkImage(
+                          imageUrl:
+                              "${ApiConstant.imageBaseUrl}${widget.riderHistoryItem?.user?.avatar}",
                           height: 48,
                           width: 48,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                            image: const DecorationImage(
-                              image: AssetImage('assets/images/demo.png'),
-                            ),
-                          ),
+                          boxShape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
                       const SizedBox(height: 12),
                       Center(
                         child: Text(
-                          "Sergio Romasis",
+                          "${widget.riderHistoryItem?.user?.name}",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -75,51 +77,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Center(
-                        child: Container(
-                          width: 158,
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            children: [
-                              SvgPicture.asset("assets/icons/cycle.svg"),
-                              const SizedBox(width: 4),
-                              const Text(
-                                "Trip",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF333333),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                "4",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF333333),
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              const Icon(Icons.star, color: Color(0xFF012F64)),
-                              const SizedBox(width: 4),
-                              const Text(
-                                "4.6",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF333333),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+
                       SizedBox(height: 34),
                       widget.isParcel
                           ? Container(
@@ -137,7 +95,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Take a picture for end trip",
+                                    "Picture for end trip",
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
@@ -145,41 +103,17 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                     ),
                                   ),
 
-                                  Obx(() {
-                                    final image = _driverRiderController
-                                        .parcelImage
-                                        .value;
-                                    return InkWell(
-                                      onTap: () {
-                                        _driverRiderController.pickParcelImage(
-                                          fromCamera: true,
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 28,
-                                        width: 28,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                          border: Border.all(
-                                            color: Color(0xFF11DF7F),
-                                            width: 0.5,
-                                          ),
-                                        ),
-                                        child: image != null
-                                            ? ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                                child: Image.file(
-                                                  image,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              )
-                                            : null,
-                                      ),
-                                    );
-                                  }),
+                                  CustomNetworkImage(
+                                    imageUrl:
+                                        "${ApiConstant.imageBaseUrl}${widget.riderHistoryItem?.deliveryProofFiles}",
+                                    border: Border.all(
+                                      color: Color(0xFF11DF7F),
+                                      width: 0.5,
+                                    ),
+                                    height: 28,
+                                    borderRadius: BorderRadius.circular(4),
+                                    width: 28,
+                                  ),
                                 ],
                               ),
                             )
@@ -204,7 +138,8 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    "Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown ",
+                                    widget.riderHistoryItem?.pickupAddress ??
+                                        "",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -225,7 +160,8 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    "Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown ",
+                                    widget.riderHistoryItem?.dropoffAddress ??
+                                        "",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -243,7 +179,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                       SvgPicture.asset("assets/icons/box.svg"),
                                       SizedBox(width: 12),
                                       Text(
-                                        "228",
+                                        "\$${widget.riderHistoryItem?.totalCost}",
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
@@ -266,12 +202,12 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                             Row(
                               children: [
                                 SvgPicture.asset(
-                                  'assets/icons/location.svg',
+                                  'assets/icons/box.svg',
                                   color: AppColors.textColor,
                                 ),
                                 const SizedBox(width: 12),
-                                const Text(
-                                  "28",
+                                Text(
+                                  "${widget.riderHistoryItem?.amount}",
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
@@ -317,24 +253,21 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                       children: [
                         Row(
                           children: [
-                            Container(
-                              height: 48,
-                              width: 48,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                                image: const DecorationImage(
-                                  image: AssetImage('assets/images/demo.png'),
-                                ),
+                            CustomNetworkImage(
+                              imageUrl:
+                                  "${ApiConstant.imageBaseUrl}${widget.riderHistoryItem?.user?.avatar}",
+                              border: Border.all(
+                                color: Color(0xFF11DF7F),
+                                width: 0.5,
                               ),
+                              height: 48,
+                              borderRadius: BorderRadius.circular(4),
+                              width: 48,
                             ),
                             const SizedBox(width: 12),
                             Center(
                               child: Text(
-                                "Sergio Romasis",
+                                "${widget.riderHistoryItem?.user?.name}",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -366,7 +299,8 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      "Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown ",
+                                      widget.riderHistoryItem?.pickupAddress ??
+                                          "",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w400,
@@ -387,7 +321,8 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      "Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown ",
+                                      widget.riderHistoryItem?.dropoffAddress ??
+                                          "",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w400,
@@ -403,12 +338,14 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                               Row(
                                 children: [
                                   SvgPicture.asset(
-                                    'assets/icons/location.svg',
+                                    'assets/icons/box.svg',
                                     color: AppColors.textColor,
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text(
-                                    "28",
+                                  Text(
+                                    widget.riderHistoryItem?.totalCost
+                                            .toString() ??
+                                        "",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500,
@@ -471,7 +408,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      "26 (XAF)",
+                      "$driverEarn (XAF)",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF012F64),
@@ -496,7 +433,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                     SvgPicture.asset("assets/icons/percentige.svg"),
                     SizedBox(width: 4),
                     Text(
-                      "2",
+                      "$radeefFee",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,

@@ -1,10 +1,29 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:radeef/models/Driver/parcel_request_model.dart';
+import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/service/socket_service.dart';
+import 'package:radeef/utils/location_utils.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
 
 class TripMapScreen extends StatefulWidget {
-  const TripMapScreen({super.key});
+  final bool isParcel;
+  final ParcelRequestModel? parcel;
+  final TripRequestModel? trip;
+  final ParcelUserModel? parcelUserModel;
+  final TripUserModel? tripUserModel;
+
+  const TripMapScreen({
+    super.key,
+    required this.isParcel,
+    this.parcel,
+    this.trip,
+    this.parcelUserModel,
+    this.tripUserModel,
+  });
 
   @override
   _TripMapScreenState createState() => _TripMapScreenState();
@@ -14,64 +33,102 @@ class _TripMapScreenState extends State<TripMapScreen> {
   GoogleMapController? _controller;
   Set<Marker> markers = {};
   Set<Polyline> polylines = {};
-
-  LatLng currentCarLocation = LatLng(23.7770, 90.3800);
-  LatLng destinationLocation = LatLng(23.7500, 90.3890);
-
-  List<LatLng> routeCoordinates = [
-    LatLng(23.7770, 90.3800),
-    LatLng(23.7750, 90.3820),
-    LatLng(23.7720, 90.3840),
-    LatLng(23.7700, 90.3860),
-    LatLng(23.7650, 90.3870),
-    LatLng(23.7600, 90.3850),
-    LatLng(23.7550, 90.3870),
-    LatLng(23.7500, 90.3890),
-  ];
-
-  int currentIndex = 0;
-  Timer? _timer;
   bool tripStarted = false;
+  bool tripCompleted = false;
+  Timer? _timer;
+  int currentIndex = 0;
 
-  String timeKamalparaToTongi = "47 min";
-  String distanceKamalparaToTongi = "15.6 km";
+  int etaMin = 0;
+  double distance = 0;
+  double driverLat = 0;
+  double driverLng = 0;
 
-  String timeCurrentToDestination = "35 min";
-  String distanceCurrentToDestination = "18 km";
+  List<LatLng> routeCoordinates = [];
 
   @override
   void initState() {
     super.initState();
-    _setupMarkers();
-    _setupPolyline();
+    _setupMarkersAndRoute();
+    _calculateEta();
   }
 
-  void _setupMarkers() {
-    markers.add(Marker(
-      markerId: const MarkerId('car'),
-      position: currentCarLocation,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-    ));
+  void _calculateEta() {
+    final userLat = widget.isParcel
+        ? widget.parcel!.pickupLat
+        : widget.trip!.pickupLat;
+    final userLng = widget.isParcel
+        ? widget.parcel!.pickupLng
+        : widget.trip!.pickupLng;
 
-    markers.add(Marker(
-      markerId: const MarkerId('destination'),
-      position: destinationLocation,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    ));
+    if (driverLat == 0 || driverLng == 0 || userLat == 0 || userLng == 0) {
+      setState(() {
+        etaMin = 0;
+        distance = 0;
+      });
+      return;
+    }
+
+    final d = LocationUtils.distanceKm(
+      lat1: driverLat,
+      lng1: driverLng,
+      lat2: userLat,
+      lng2: userLng,
+    );
+
+    final eta = LocationUtils.etaMinutes(distanceKm: d);
+
+    setState(() {
+      distance = d;
+      etaMin = eta;
+    });
+
+    debugPrint("📍 Distance KM: ${d.toStringAsFixed(2)}");
+    debugPrint("⏱ ETA Minutes: $eta");
   }
 
-  void _setupPolyline() {
-    polylines.add(Polyline(
-      polylineId: const PolylineId('route'),
-      points: routeCoordinates,
-      color: Colors.blue,
-      width: 5,
-    ));
+  void _setupMarkersAndRoute() {
+    LatLng start = LatLng(
+      widget.isParcel ? widget.parcel!.pickupLat : widget.trip!.pickupLat,
+      widget.isParcel ? widget.parcel!.pickupLng : widget.trip!.pickupLng,
+    );
+
+    LatLng end = LatLng(
+      widget.isParcel ? widget.parcel!.dropoffLat : widget.trip!.dropoffLat,
+      widget.isParcel ? widget.parcel!.dropoffLng : widget.trip!.dropoffLng,
+    );
+
+    markers.add(
+      Marker(
+        markerId: const MarkerId('car'),
+        position: start,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ),
+    );
+
+    markers.add(
+      Marker(
+        markerId: const MarkerId('destination'),
+        position: end,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ),
+    );
+
+    routeCoordinates = [start, end];
+
+    polylines.add(
+      Polyline(
+        polylineId: const PolylineId('route'),
+        points: routeCoordinates,
+        color: Colors.blue,
+        width: 5,
+      ),
+    );
   }
 
-  void _startTrip() {
+  void _startParcel() {
     setState(() {
       tripStarted = true;
+      tripCompleted = false;
     });
 
     const duration = Duration(milliseconds: 500);
@@ -84,19 +141,72 @@ class _TripMapScreenState extends State<TripMapScreen> {
         double lng = start.longitude + (end.longitude - start.longitude) * 0.2;
 
         setState(() {
-          currentCarLocation = LatLng(lat, lng);
+          LatLng currentPos = LatLng(lat, lng);
 
           markers.removeWhere((m) => m.markerId.value == 'car');
-          markers.add(Marker(
-            markerId: const MarkerId('car'),
-            position: currentCarLocation,
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          ));
+          markers.add(
+            Marker(
+              markerId: const MarkerId('car'),
+              position: currentPos,
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueBlue,
+              ),
+            ),
+          );
         });
 
         if (_controller != null) {
           await _controller!.animateCamera(
-            CameraUpdate.newLatLng(currentCarLocation),
+            CameraUpdate.newLatLng(LatLng(lat, lng)),
+          );
+        }
+
+        if ((lat - end.latitude).abs() < 0.0001 &&
+            (lng - end.longitude).abs() < 0.0001) {
+          currentIndex++;
+        }
+      } else {
+        // _endParcel();
+      }
+    });
+
+    // Socket call for parcel
+    SocketService().emit("parcel:start", data: {"parcel_id": widget.parcel!.id});
+  }
+
+  void _startTrip() {
+    setState(() {
+      tripStarted = true;
+      tripCompleted = false;
+    });
+
+    const duration = Duration(milliseconds: 500);
+    _timer = Timer.periodic(duration, (timer) async {
+      if (currentIndex < routeCoordinates.length - 1) {
+        LatLng start = routeCoordinates[currentIndex];
+        LatLng end = routeCoordinates[currentIndex + 1];
+
+        double lat = start.latitude + (end.latitude - start.latitude) * 0.2;
+        double lng = start.longitude + (end.longitude - start.longitude) * 0.2;
+
+        setState(() {
+          LatLng currentPos = LatLng(lat, lng);
+
+          markers.removeWhere((m) => m.markerId.value == 'car');
+          markers.add(
+            Marker(
+              markerId: const MarkerId('car'),
+              position: currentPos,
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueBlue,
+              ),
+            ),
+          );
+        });
+
+        if (_controller != null) {
+          await _controller!.animateCamera(
+            CameraUpdate.newLatLng(LatLng(lat, lng)),
           );
         }
 
@@ -108,13 +218,29 @@ class _TripMapScreenState extends State<TripMapScreen> {
         _endTrip();
       }
     });
+
+    SocketService().emit("trip:start", data: {"trip_id": widget.trip!.id});
   }
 
   void _endTrip() {
     _timer?.cancel();
-    Get.back(result: 'tripEnded');
-  }
+    SocketService().emit("trip:end", data: {"trip_id": widget.trip!.id});
+    setState(() {
+      tripStarted = false;
+      tripCompleted = true;
+    });
 
+    // Navigate to confirmation
+    Get.to(
+      () => ConfirmationScreen(
+        isParcel: widget.isParcel,
+        parcel: widget.isParcel ? widget.parcel : null,
+        parcelUserModel: widget.isParcel ? widget.parcelUserModel : null,
+        trip: widget.isParcel ? null : widget.trip,
+        tripUserModel: widget.isParcel ? null : widget.tripUserModel,
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -124,90 +250,48 @@ class _TripMapScreenState extends State<TripMapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    LatLng initialCamera = LatLng(
+      widget.isParcel ? widget.parcel!.pickupLat : widget.trip!.pickupLat,
+      widget.isParcel ? widget.parcel!.pickupLng : widget.trip!.pickupLng,
+    );
+
     return Scaffold(
       body: Stack(
         children: [
           GoogleMap(
             initialCameraPosition: CameraPosition(
-              target: currentCarLocation,
+              target: initialCamera,
               zoom: 14,
             ),
             markers: markers,
             polylines: polylines,
-            onMapCreated: (GoogleMapController controller) {
-              _controller = controller;
-            },
+            onMapCreated: (controller) => _controller = controller,
           ),
 
-          /// Back Button
           Positioned(
             top: 40,
             left: 10,
             child: SafeArea(
-              child: Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          spreadRadius: 1,
-                          blurRadius: 3,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
                     ),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                      onPressed: () {
-                        Get.back();
-                      },
-                    ),
-                  ),
-                ],
+                  ],
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                  onPressed: () => Get.back(),
+                ),
               ),
             ),
           ),
 
-          /// Trip Info Top Right
-          Positioned(
-            top: 40,
-            right: 20,
-            child: SafeArea(
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: const Text(
-                      'R301',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Tongi',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          /// Kamarpara Card
           Positioned(
             top: MediaQuery.of(context).size.height * 0.2,
             left: MediaQuery.of(context).size.width * 0.05,
@@ -228,21 +312,33 @@ class _TripMapScreenState extends State<TripMapScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('KAMARPARA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  const Text('কামারপাড়া', style: TextStyle(fontSize: 10, color: Colors.grey)),
-                  const SizedBox(height: 5),
+                  Text(
+                    widget.isParcel
+                        ? widget.parcel!.pickupAddress
+                        : widget.trip!.pickupAddress,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
                   Row(
                     children: [
-                      Icon(Icons.directions_car, size: 18, color: Colors.grey.shade700),
+                      Icon(
+                        Icons.motorcycle,
+                        size: 18,
+                        color: Colors.grey.shade700,
+                      ),
                       const SizedBox(width: 5),
                       Text(
-                        timeKamalparaToTongi,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        etaMin == 0 ? "-- min away" : "$etaMin min away",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                   Text(
-                    distanceKamalparaToTongi,
+                    distance == 0
+                        ? "-- km away"
+                        : "${distance.toStringAsFixed(2)} km away",
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -250,54 +346,89 @@ class _TripMapScreenState extends State<TripMapScreen> {
             ),
           ),
 
-          /// Bottom Card with Start/End Trip
-          Positioned(
-            bottom: 20,
-            left: MediaQuery.of(context).size.width / 2 - 100,
-            child: GestureDetector(
-              onTap: () {
-                if (!tripStarted) {
-                  _startTrip();
-                } else {
-                  _endTrip();
-                }
-              },
-              child: Container(
-                width: 200,
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                decoration: BoxDecoration(
-                  color: tripStarted ? Colors.red : Colors.green,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
+          if (!tripStarted && !tripCompleted)
+            Positioned(
+              bottom: 20,
+              left: MediaQuery.of(context).size.width / 2 - 100,
+              child: GestureDetector(
+                onTap: () {
+                  if (widget.isParcel) {
+                    _startParcel();
+                  } else {
+                    _startTrip();
+                  }
+                },
+                child: Container(
+                  width: 200,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.isParcel ? "Start Parcel" : "Start Trip",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    tripStarted ? 'End Trip' : 'Start Trip',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),
             ),
-          ),
 
-          /// Car Icon above Bottom Card
-          Positioned(
-            bottom: 120,
-            left: MediaQuery.of(context).size.width / 2 - 20,
-            child: const Icon(
-              Icons.directions_car,
-              size: 40,
-              color: Colors.red,
+          if (tripStarted && !tripCompleted)
+            Positioned(
+              bottom: 20,
+              left: MediaQuery.of(context).size.width / 2 - 100,
+              child: GestureDetector(
+                onTap: () {
+                  if (widget.isParcel) {
+                    Get.to(
+                      () => ConfirmationScreen(
+                        isParcel: widget.isParcel,
+                        parcel: widget.isParcel ? widget.parcel : null,
+                        parcelUserModel: widget.isParcel
+                            ? widget.parcelUserModel
+                            : null,
+                        trip: widget.isParcel ? null : widget.trip,
+                        tripUserModel: widget.isParcel
+                            ? null
+                            : widget.tripUserModel,
+                      ),
+                    );
+                  } else {
+                    _endTrip();
+                  }
+                },
+                child: Container(
+                  width: 200,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.isParcel ? "Deliver Parcel" : "End Trip",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );

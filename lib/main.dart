@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/localization_controller.dart';
 import 'package:radeef/controllers/theme_controller.dart';
+import 'package:radeef/helpers/di.dart' as GetStorage;
+import 'package:radeef/service/prefs_helper.dart';
+import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/themes/light_theme.dart';
 import 'package:radeef/utils/app_constants.dart';
 import 'package:radeef/utils/message.dart';
@@ -12,6 +15,13 @@ import 'helpers/route.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await GetStorage.init();
+  final token = await PrefsHelper.getToken();
+
+  if (token != null && token.isNotEmpty) {
+    SocketService().connect(token);
+  }
   Map<String, Map<String, String>> _languages = await di.init();
   runApp(MyApp(languages: _languages));
 }

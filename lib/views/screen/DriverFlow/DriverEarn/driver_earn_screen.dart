@@ -2,8 +2,273 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/earing_controller.dart';
-import 'package:radeef/utils/app_colors.dart';
-import 'package:radeef/views/base/bottom_menu..dart';
+import 'package:radeef/models/Driver/parcel_earn_model.dart';
+import 'package:radeef/models/Driver/trip_earn_model.dart';
+import 'package:radeef/views/base/bottom_menu.dart';
+import 'package:radeef/views/base/format_time.dart';
+
+// class DriverEarnScreen extends StatefulWidget {
+//   const DriverEarnScreen({super.key});
+
+//   @override
+//   State<DriverEarnScreen> createState() => _DriverEarnScreenState();
+// }
+
+// class _DriverEarnScreenState extends State<DriverEarnScreen>
+//     with SingleTickerProviderStateMixin {
+//   late TabController _tabController;
+//   final _earingController = Get.put(EaringController());
+
+//   @override
+//   void initState() {
+//     _tabController = TabController(length: 2, vsync: this);
+//        _earingController.fetchEarnings();
+//     super.initState();
+//   }
+
+//   @override
+//   void dispose() {
+//     _tabController.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       bottomNavigationBar: BottomMenu(2),
+//       body: SafeArea(
+//         child: Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               /// ===== Header + Dropdown =====
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   const Text(
+//                     "Earnings",
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+//                   ),
+//                   Obx(
+//                     () => DropdownButton<String>(
+//                       value: _earingController.selectedOption.value,
+//                       underline: const SizedBox(),
+//                       icon: const Icon(Icons.keyboard_arrow_down),
+//                       onChanged: (value) {
+//                         if (value != null) {
+//                           _earingController.changeOption(value);
+//                         }
+//                       },
+//                       items: _earingController.options
+//                           .map(
+//                             (e) => DropdownMenuItem(value: e, child: Text(e)),
+//                           )
+//                           .toList(),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+
+//               const SizedBox(height: 16),
+
+//               /// ===== Tabs (Dropdown er niche) =====
+//               TabBar(
+//                 onTap: (value) {
+//                   _earingController.changeTab(value == 0 ? 'trip' : 'parcel');
+//                 },
+//                 controller: _tabController,
+//                 indicator: BoxDecoration(
+//                   color: const Color(0xFFE6EAF0),
+//                   borderRadius: BorderRadius.circular(8),
+//                 ),
+//                 indicatorSize: TabBarIndicatorSize.tab,
+//                 indicatorColor: Colors.transparent,
+//                 dividerColor: Colors.transparent,
+//                 labelColor: AppColors.textColor,
+//                 unselectedLabelColor: Colors.grey,
+//                 tabs: const [
+//                   Tab(text: "Trips"),
+//                   Tab(text: "Parcels"),
+//                 ],
+//               ),
+
+//               const SizedBox(height: 16),
+
+//               /// ===== Tab Content =====
+//               Expanded(
+//                 child: TabBarView(
+//                   controller: _tabController,
+//                   children: [buildEarningTab(), buildEarningTab()],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   /// ================= TAB BODY =================
+
+//   Widget buildEarningTab() {
+//     return SingleChildScrollView(
+//       child: Obx(() {
+//         if (_earingController.selectedTab.value != "parcel" ||
+//             _earingController.parcelMeta == null) {
+//           return SizedBox();
+//         }
+//         return Column(
+//           children: [
+//             /// Total Earnings
+//             Container(
+//               width: double.infinity,
+//               padding: const EdgeInsets.symmetric(vertical: 16),
+//               decoration: BoxDecoration(
+//                 color: const Color(0xFFE6EAF0),
+//                 borderRadius: BorderRadius.circular(8),
+//               ),
+//               child: const Column(
+//                 children: [
+//                   Text(
+//                     "Total Earnings",
+//                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+//                   ),
+//                   SizedBox(height: 4),
+//                   Text(
+//                     "\${_earingController.parcelMeta!.totalEarnings}",
+//                     style: TextStyle(
+//                       color: Color(0xFF012F64),
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+
+//             const SizedBox(height: 16),
+
+//             /// Stats
+//             Row(
+//               children: [
+//                 buildInfoCard(
+//                   icon: 'assets/icons/cycle.svg',
+//                   title: "Total Trips",
+//                   value: "\${_earingController.parcelMeta!.totalCount}",
+//                 ),
+//                 const SizedBox(width: 12),
+//                 buildInfoCard(
+//                   icon: 'assets/icons/clock.svg',
+//                   title: "Online Time",
+//                   value: "\${_earingController.parcelMeta!.totalTime} mins",
+//                 ),
+//               ],
+//             ),
+
+//             const SizedBox(height: 20),
+
+//             /// Daily List
+//             Obx(() {
+//               final list = _earingController.selectedTab.value == 'trip'
+//                   ? _earingController.tripList.cast<TripEarnItem>()
+//                   : _earingController.parcelList.cast<ParcelEarnItem>();
+
+//               return ListView.separated(
+//                 shrinkWrap: true,
+//                 physics: const NeverScrollableScrollPhysics(),
+//                 itemCount: list.length + 1,
+//                 separatorBuilder: (_, __) => const SizedBox(height: 8),
+//                 itemBuilder: (_, index) {
+//                   final item = list[index];
+
+//                   return Container(
+//                     padding: const EdgeInsets.symmetric(
+//                       horizontal: 12,
+//                       vertical: 14,
+//                     ),
+//                     decoration: BoxDecoration(
+//                       color: const Color(0xFFE6EAF0).withValues(alpha: 0.24),
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                     child: Row(
+//                       children: [
+//                         Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               item.date,
+//                               style: const TextStyle(
+//                                 fontWeight: FontWeight.w500,
+//                               ),
+//                             ),
+//                             const SizedBox(height: 4),
+//                             Text(
+//                               item.date,
+//                               style: const TextStyle(color: Colors.grey),
+//                             ),
+//                           ],
+//                         ),
+//                         const Spacer(),
+//                         Text(
+//                           "\$${item.totalCost}",
+//                           style: const TextStyle(
+//                             color: Color(0xFF012F64),
+//                             fontWeight: FontWeight.w500,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   );
+//                 },
+//               );
+//             }),
+
+//           ],
+//         );
+//       }),
+//     );
+//   }
+
+//   /// ================= INFO CARD =================
+//   Widget buildInfoCard({
+//     required String icon,
+//     required String title,
+//     required String value,
+//   }) {
+//     return Expanded(
+//       child: Container(
+//         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+//         decoration: BoxDecoration(
+//           color: const Color(0xFFE6E6E6),
+//           borderRadius: BorderRadius.circular(8),
+//         ),
+//         child: Row(
+//           children: [
+//             SvgPicture.asset(icon, width: 22),
+//             const SizedBox(width: 12),
+//             Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   title,
+//                   style: const TextStyle(
+//                     color: Color(0xFF545454),
+//                     fontSize: 14,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 4),
+//                 Text(
+//                   value,
+//                   style: const TextStyle(fontWeight: FontWeight.w600),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class DriverEarnScreen extends StatefulWidget {
   const DriverEarnScreen({super.key});
@@ -12,313 +277,332 @@ class DriverEarnScreen extends StatefulWidget {
   State<DriverEarnScreen> createState() => _DriverEarnScreenState();
 }
 
-class _DriverEarnScreenState extends State<DriverEarnScreen> {
-
+class _DriverEarnScreenState extends State<DriverEarnScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final _earingController = Get.put(EaringController());
-  final List<Map<String, dynamic>> dummyTripList = [
-    {
 
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
+  @override
+  void initState() {
+    _tabController = TabController(length: 2, vsync: this);
+    _earingController.fetchEarnings(); // initial fetch
+    super.initState();
+  }
 
-
-    },
-    {
-
-      "isParcel": true,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-    {
-
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-    {
-
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-    {
-
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-
-  ];
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
+    return Scaffold(
+      bottomNavigationBar: BottomMenu(2),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 23),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /// Header + Dropdown
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Earnings",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textColor
-                    ),),
-                  DropdownButton<String>(
-                    menuWidth: 200,
-                    value: _earingController.selectedOption.value,
-                    icon:
-                    const SizedBox.shrink(),
-                    dropdownColor: Color(0xFFFEF7F6),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        if (newValue != null) {
-                          _earingController.changeOption(newValue);
+                  const Text(
+                    "Earnings",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                  Obx(
+                    () => DropdownButton<String>(
+                      value: _earingController.selectedOption.value,
+                      underline: const SizedBox(),
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      onChanged: (value) {
+                        if (value != null) {
+                          _earingController.changeOption(value);
                         }
-                      });
-                    },
-                    items: _earingController.options
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Column(
-                          children: [
-                            Text(
-                              value,
-                              style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14),
-                            ),
-
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    selectedItemBuilder: (BuildContext context) {
-                      return _earingController.options
-                          .map<Widget>((String item) {
-                        return Row(
-                          spacing: 6,
-                          children: [
-                            if (_earingController.selectedOption.value != "All")
-                              Text(
-                                item,
+                      },
+                      items: _earingController.optionsMap.keys
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(
+                                e,
                                 style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF333333),
                                 ),
                               ),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              color: AppColors.textColor,
-                              size: 18,
                             ),
-                          ],
-                        );
-                      }).toList();
-                    },
+                          )
+                          .toList(),
+                    ),
                   ),
-
                 ],
               ),
-              SizedBox(height: 20,),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  color: Color(0xFFE6EAF0),
-                  borderRadius: BorderRadius.circular(8)
+              const SizedBox(height: 16),
+
+              /// Tabs
+              TabBar(
+                onTap: (index) {
+                  _earingController.changeTab(index == 0 ? 'trip' : 'parcel');
+                },
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  color: const Color(0xFFE6EAF0),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorColor: Colors.transparent,
+                dividerColor: Colors.transparent,
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
+                tabs: const [
+                  Tab(text: "Trips"),
+                  Tab(text: "Parcels"),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              /// Tab Content
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
                   children: [
-                    Text("Total Earnings",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textColor
-                    ),),
-                    SizedBox(height: 4,),
-                    Text("\$847.25",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF012F64)
-                    ),)
+                    buildEarningTab('trip'),
+                    buildEarningTab('parcel'),
                   ],
                 ),
               ),
-              SizedBox(height: 16,),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 23),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFE6E6E6),
-                        borderRadius: BorderRadius.circular(8)
-                      ),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset('assets/icons/cycle.svg'),
-                          SizedBox(width: 20,),
-                          Column(
-                            children: [
-                              Text("Total Trips",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF545454)
-                              ),),
-                              SizedBox(height: 4,),
-                              Text("28",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor
-                              ),)
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16,),
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 23),
-                      decoration: BoxDecoration(
-                          color: Color(0xFFE6E6E6),
-                          borderRadius: BorderRadius.circular(8)
-                      ),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset('assets/icons/clock.svg'),
-                          SizedBox(width: 20,),
-                          Column(
-                            children: [
-                              Text("Online Time",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF545454)
-                                ),),
-                              SizedBox(height: 4,),
-                              Text("100h 20m",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textColor
-                                ),)
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(height: 20,),
-              Expanded(
-                  child: ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index){
-                        return Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              color: Color(0xFFE6E6E6),
-                              borderRadius: BorderRadius.circular(8)
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(dummyTripList[index]["day"],
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.textColor,
-                                          fontSize: 16
-                                      )),
-                                  SizedBox(height: 4,),
-                                  Row(
-                                    children: [
-                                      Text("8 trips",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFF87878A)
-                                        ),),
-                                      SizedBox(width: 4,),
-                                      Container(
-                                        width: 1,
-                                        height: 1,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Color(0xFF87878A)
-                                        ),
-                                      ),
-                                      SizedBox(width: 4,),
-                                      Text("6.5h",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFF87878A)
-                                        ),),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Spacer(),
-                              Text("\$147.80",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF012F64)
-                                ),)
-                            ],
-                          ),
-                        );
-
-                      },
-                      separatorBuilder: (_,_)=> SizedBox(height: 8,),
-                      itemCount: dummyTripList.length)
-              )
             ],
           ),
         ),
       ),
-     bottomNavigationBar: BottomMenu(2),
+    );
+  }
+
+  /// ================= TAB BODY =================
+  Widget buildEarningTab(String tab) {
+    return SingleChildScrollView(
+      child: Obx(() {
+        final list = tab == 'trip'
+            ? _earingController.tripList
+            : _earingController.parcelList;
+
+        // Determine meta for current tab
+        final meta = tab == 'trip'
+            ? _earingController.tripList.isNotEmpty
+                  ? _earingController.tripList.first
+                  : null
+            : _earingController.parcelMeta;
+
+        return Column(
+          children: [
+            /// Total Earnings
+            if (meta != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE6EAF0),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Total Earnings",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      tab == 'trip'
+                          ? "\$${_earingController.tripList.fold<num>(0, (sum, item) => sum + item.totalCost)}"
+                          : "\$${_earingController.parcelMeta!.totalEarnings}",
+                      style: const TextStyle(
+                        color: Color(0xFF012F64),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            const SizedBox(height: 16),
+
+            /// Stats
+            if (meta != null)
+              Row(
+                children: [
+                  buildInfoCard(
+                    icon: 'assets/icons/cycle.svg',
+                    title: "Total Trips",
+                    value: tab == 'trip'
+                        ? "${_earingController.tripList.fold<int>(0, (sum, item) => sum + item.totalCount)}"
+                        : "${_earingController.parcelMeta!.totalCount}",
+                  ),
+                  const SizedBox(width: 12),
+                  buildInfoCard(
+                    icon: 'assets/icons/clock.svg',
+                    title: "Online Time",
+                    value: tab == 'trip'
+                        ? formatTimeFromMs(
+                            _earingController.tripList.fold<int>(
+                              0,
+                              (sum, item) => sum + item.totalTime,
+                            ),
+                          )
+                        : formatTimeFromMs(
+                            _earingController.parcelMeta!.totalTime,
+                          ),
+                  ),
+                ],
+              ),
+
+            const SizedBox(height: 20),
+
+            /// Daily List
+            buildEarningList(tab, list),
+          ],
+        );
+      }),
+    );
+  }
+
+  /// ================= LIST BUILDER =================
+  Widget buildEarningList(String tab, List<dynamic> list) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (scrollNotification.metrics.pixels ==
+                scrollNotification.metrics.maxScrollExtent &&
+            !_earingController.isLoading.value &&
+            _earingController.hasMore) {
+          _earingController.loadMore();
+        }
+        return false;
+      },
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: list.length + 1,
+        separatorBuilder: (_, _) => const SizedBox(height: 8),
+        itemBuilder: (_, index) {
+          if (index < list.length) {
+            final item = list[index];
+
+            String date = '';
+            int count = 0;
+            int time = 0;
+            num cost = 0;
+
+            if (item is TripEarnItem) {
+              date = item.date;
+              count = item.totalCount;
+              time = item.totalTime;
+              cost = item.totalCost;
+            } else if (item is ParcelEarnItem) {
+              date = item.date;
+              count = item.totalCount; // use actual count
+              time = item.totalTime; // use actual parcel time
+              cost = item.totalCost;
+            }
+
+            return buildItem(date: date, count: count, time: time, cost: cost);
+          } else {
+            return Obx(
+              () => _earingController.isLoading.value
+                  ? const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : const SizedBox.shrink(),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  /// ================= ITEM BUILDER =================
+  Widget buildItem({
+    required String date,
+    required int count,
+    required int time,
+    required num cost,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE6EAF0).withValues(alpha: 0.24),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(date, style: const TextStyle(fontWeight: FontWeight.w500)),
+              const SizedBox(height: 4),
+              Text(
+                "Trips: $count, Time: ${formatTimeFromMs(time)}",
+                style: const TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+          const Spacer(),
+          Text(
+            "\$$cost",
+            style: const TextStyle(
+              color: Color(0xFF012F64),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ================= INFO CARD =================
+  Widget buildInfoCard({
+    required String icon,
+    required String title,
+    required String value,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE6E6E6),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            SvgPicture.asset(icon, width: 22),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFF545454),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

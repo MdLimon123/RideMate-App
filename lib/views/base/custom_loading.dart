@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomLoading extends StatelessWidget {
-  const CustomLoading({super.key});
+  final Color? color;
+
+  const CustomLoading({super.key, this.color});
 
   @override
   Widget build(BuildContext context) {
-    return  SizedBox(
-      height: 20.h,
-      width: 20.h,
-      child: const CircularProgressIndicator(color: Colors.white,),
+    return SizedBox(
+      height: 20,
+      width: 20,
+      child: CircularProgressIndicator(color: color ?? Colors.white),
     );
   }
 }

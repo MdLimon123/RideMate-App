@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:radeef/controllers/DriverController/driver_rider_controller.dart';
 import 'package:radeef/utils/app_colors.dart';
-import 'package:radeef/views/base/bottom_menu..dart';
+import 'package:radeef/views/base/bottom_menu.dart';
+import 'package:radeef/views/base/custom_loading.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverRides/driver_rider_details_screen.dart';
 
 class DriverRidersScreen extends StatefulWidget {
@@ -13,63 +15,13 @@ class DriverRidersScreen extends StatefulWidget {
 }
 
 class _DriverRidersScreenState extends State<DriverRidersScreen> {
-
   final _driverRiderController = Get.put(DriverRiderController());
 
-  final List<Map<String, dynamic>> dummyTripList = [
-    {
-
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-    {
-
-      "isParcel": true,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-    {
-
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-    {
-
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-    {
-
-      "isParcel": false,
-      "day": "Monday",
-      "total Trip": 8,
-      "time": "6.5h",
-      "tripFare": 220.0,
-
-
-    },
-
-  ];
-
+  @override
+  void initState() {
+    _driverRiderController.fetchRiderHistory();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,152 +30,148 @@ class _DriverRidersScreenState extends State<DriverRidersScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 22),
           child: Column(
-
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Ride History",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textColor
-                  ),),
-                DropdownButton<String>(
-                  menuWidth: 200,
-                  value: _driverRiderController.selectedOption.value,
-                  icon:
-                  const SizedBox.shrink(),
-                  dropdownColor: Color(0xFFFEF7F6),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      if (newValue != null) {
-                        _driverRiderController.changeOption(newValue);
-                      }
-                    });
-                  },
-                  items: _driverRiderController.options
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Column(
-                        children: [
-                          Text(
-                            value,
-                            style: TextStyle(
-                                color: Color(0xFF333333),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14),
-                          ),
+                  Text(
+                    "Ride History",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textColor,
+                    ),
+                  ),
 
-                        ],
+                  Obx(
+                    () => DropdownButton<String>(
+                      value: _driverRiderController.selectedOption.value.isEmpty
+                          ? null
+                          : _driverRiderController.selectedOption.value,
+
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: AppColors.textColor,
                       ),
-                    );
-                  }).toList(),
-                  selectedItemBuilder: (BuildContext context) {
-                    return _driverRiderController.options
-                        .map<Widget>((String item) {
-                      return Row(
-                        spacing: 6,
-                        children: [
-                          if (_driverRiderController.selectedOption.value != "All")
-                            Text(
-                              item,
-                              style: TextStyle(
-                                  color: Color(0xFF333333),
+                      underline: SizedBox(),
+                      dropdownColor: const Color(0xFFFEF7F6),
+                      onChanged: (String? newValue) {
+                        if (newValue == null) return;
+                        _driverRiderController.changeOption(newValue);
+                      },
+                      items: _driverRiderController.optionsMap.keys
+                          .map(
+                            (value) => DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: const TextStyle(
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w400,
-                                  fontSize: 14
+                                  color: Color(0xFF333333),
+                                ),
                               ),
                             ),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            color: AppColors.textColor,
-                            size: 18,
-                          ),
-                        ],
-                      );
-                    }).toList();
-                  },
-                ),
-
+                          )
+                          .toList(),
+                    ),
+                  ),
                 ],
               ),
-              SizedBox(height: 20,),
-              Expanded(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                    itemBuilder: (context, index){
-                      return InkWell(
-                        onTap: (){
-                          Get.to(()=> DriverRiderDetailsScreen(
-                            isParcel: dummyTripList[index]["isParcel"],
-                          ));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Color(0xFFE6E6E6),
-                            borderRadius: BorderRadius.circular(8)
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(dummyTripList[index]["day"],
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor,
-                                    fontSize: 16
-                                  )),
-                                  SizedBox(height: 4,),
-                                  Row(
-                                    children: [
-                                      Text("8 trips",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFF87878A)
-                                        ),),
-                                      SizedBox(width: 4,),
-                                      Container(
-                                        width: 1,
-                                        height: 1,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Color(0xFF87878A)
-                                        ),
-                                      ),
-                                      SizedBox(width: 4,),
-                                      Text("6.5h",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFF87878A)
-                                        ),),
-                                    ],
+              SizedBox(height: 20),
+              Obx(
+                () => _driverRiderController.isLoading.value
+                    ? Center(
+                        child: CustomLoading(color: AppColors.primaryColor),
+                      )
+                    : Expanded(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item =
+                                _driverRiderController.riderHistoryList[index];
+                            return InkWell(
+                              onTap: () {
+                                Get.to(
+                                  () => DriverRiderDetailsScreen(
+                                    isParcel: item.isParcel,
+                                    riderHistoryItem: item,
                                   ),
-                                ],
-                              ),
-                              Spacer(),
-                              Text("\$147.80",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF012F64)
-                              ),)
-                            ],
-                          ),
-                        ),
-                      );
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 13,
+                                ),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFE6E6E6),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.completedAt != null
+                                              ? DateFormat(
+                                                  'yyyy-MM-dd',
+                                                ).format(item.completedAt!)
+                                              : item.date ?? 'N/A',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: Color(0xFF333333),
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "From :${item.pickupAddress}",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                            color: Color(0xFF87878A),
+                                          ),
+                                        ),
 
-                    },
-                    separatorBuilder: (_,_)=> SizedBox(height: 8,),
-                    itemCount: dummyTripList.length)
-              )
+                                        SizedBox(width: 4),
+                                        Text(
+                                          "To :${item.dropoffAddress}",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                            color: Color(0xFF87878A),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      "\$${item.totalCost}",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF012F64),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (_, _) => SizedBox(height: 8),
+                          itemCount:
+                              _driverRiderController.riderHistoryList.length,
+                        ),
+                      ),
+              ),
             ],
           ),
         ),

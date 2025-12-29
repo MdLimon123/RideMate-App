@@ -23,7 +23,7 @@ class _DriverForgetPasswordScreenState extends State<DriverForgetPasswordScreen>
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
           SizedBox(height: 100,),
-          Text("Forget Password",
+          Text("forget".tr,
           style: TextStyle(
             fontSize: 25,
             fontWeight: FontWeight.w500,
@@ -37,7 +37,7 @@ class _DriverForgetPasswordScreenState extends State<DriverForgetPasswordScreen>
           CustomButton(onTap: (){
             Get.offAllNamed(AppRoutes.driverOtpVerifyScreen);
           },
-              text: "Send OTP")
+              text: "sendOTP".tr)
         ],
       ),
     );

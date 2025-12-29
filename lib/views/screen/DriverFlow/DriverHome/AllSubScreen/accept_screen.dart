@@ -3,31 +3,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:radeef/controllers/DriverController/driver_chat_controller.dart';
+import 'package:radeef/models/Driver/parcel_request_model.dart';
+import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
+import 'package:radeef/views/base/custom_network_image.dart';
 import 'trip_map_screen.dart';
 
 class AcceptScreen extends StatefulWidget {
-
+  final ParcelRequestModel? parcel;
+  final TripRequestModel? trip;
+  final ParcelUserModel? parcelUserModel;
+  final TripUserModel? tripUserModel;
   final bool isParcel;
 
-  const AcceptScreen({super.key, required this.isParcel});
+  const AcceptScreen({
+    super.key,
+    required this.isParcel,
+    this.parcel,
+    this.trip,
+    this.parcelUserModel,
+    this.tripUserModel,
+  });
 
   @override
   State<AcceptScreen> createState() => _AcceptScreenState();
 }
 
 class _AcceptScreenState extends State<AcceptScreen> {
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
+  final _driverChatController = Get.put(DriverChatController());
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(23.8041, 90.4152),
     zoom: 14.4746,
   );
 
-  bool tripStarted = false;
-
-
+  bool tripStarted = true;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +89,10 @@ class _AcceptScreenState extends State<AcceptScreen> {
                     left: 20,
                     right: 20,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 30,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF345983),
                         borderRadius: BorderRadius.circular(12),
@@ -84,29 +101,28 @@ class _AcceptScreenState extends State<AcceptScreen> {
                             color: Colors.black.withOpacity(0.1),
                             blurRadius: 10,
                             offset: const Offset(0, -3),
-                          )
+                          ),
                         ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Center(
-                            child: Container(
+                            child: CustomNetworkImage(
+                              imageUrl:
+                                  "${ApiConstant.imageBaseUrl}${widget.isParcel ? widget.parcelUserModel!.avatar : widget.tripUserModel!.avatar}",
+                              boxShape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
                               height: 48,
                               width: 48,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
-                                image: const DecorationImage(
-                                  image: AssetImage('assets/images/demo.png'),
-                                ),
-                              ),
                             ),
                           ),
                           const SizedBox(height: 12),
-                           Center(
+                          Center(
                             child: Text(
-                             "Sergio Romasis",
+                              widget.isParcel
+                                  ? widget.parcelUserModel!.name
+                                  : widget.tripUserModel!.name,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -121,8 +137,9 @@ class _AcceptScreenState extends State<AcceptScreen> {
                               width: 158,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16)),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                               child: Row(
                                 children: [
                                   SvgPicture.asset("assets/icons/cycle.svg"),
@@ -130,17 +147,19 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                   const Text(
                                     "Trip",
                                     style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF333333)),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF333333),
+                                    ),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Text(
-                                    "4",
+                                  Text(
+                                    "${widget.isParcel ? widget.parcelUserModel!.tripReceivedCount : widget.tripUserModel!.tripReceivedCount}",
                                     style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF333333)),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF333333),
+                                    ),
                                   ),
                                   const SizedBox(width: 20),
                                   const Icon(
@@ -148,13 +167,14 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                     color: Color(0xFF012F64),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Text(
-                                    "4.6",
+                                  Text(
+                                    "${widget.isParcel ? widget.parcelUserModel!.ratingCount : widget.tripUserModel!.ratingCount}",
                                     style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF333333)),
-                                  )
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF333333),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -163,7 +183,10 @@ class _AcceptScreenState extends State<AcceptScreen> {
                           const SizedBox(height: 20),
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
@@ -176,80 +199,100 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown ",
-                                        style:  TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.textColor),
+                                        widget.isParcel
+                                            ? widget.parcel!.pickupAddress
+                                            : widget.trip!.pickupAddress,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.textColor,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
-                                    SvgPicture.asset('assets/icons/location.svg',
-                                        color: AppColors.textColor),
+                                    SvgPicture.asset(
+                                      'assets/icons/location.svg',
+                                      color: AppColors.textColor,
+                                    ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown Pizza Burge Main St, Maintown ",
-                                        style:  TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.textColor),
+                                        widget.isParcel
+                                            ? widget.parcel!.dropoffAddress
+                                            : widget.trip!.dropoffAddress,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.textColor,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
-                                SizedBox(height: 12,),
-                                widget.isParcel ? Row(
-                                    children: [
-                                      SvgPicture.asset("assets/icons/box.svg"),
-                                      SizedBox(width: 12,),
-                                      Text( "228",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xFF012F64)
-                                        ),
-                                      ),
-                                      SizedBox(width: 4,),
-                                      Text("(XAF)",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w200,
-                                            color: AppColors.textColor
-                                        ),)
-                                    ]): SizedBox(),
+                                SizedBox(height: 12),
+                                widget.isParcel
+                                    ? Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            "assets/icons/box.svg",
+                                          ),
+                                          SizedBox(width: 12),
+                                          Text(
+                                            "${widget.isParcel ? widget.parcel!.totalCost : widget.trip!.totalCost}",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF012F64),
+                                            ),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            "(XAF)",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w200,
+                                              color: AppColors.textColor,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : SizedBox(),
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
-                                    SvgPicture.asset('assets/icons/location.svg',
-                                        color: AppColors.textColor),
+                                    SvgPicture.asset(
+                                      'assets/icons/dollar_fill.svg',
+                                      color: AppColors.textColor,
+                                    ),
                                     const SizedBox(width: 12),
-                                    const Text(
-                                      "28",
+                                    Text(
+                                      "${widget.isParcel ? widget.parcel!.amount : widget.trip!.totalCost}",
                                       style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF012F64)),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF012F64),
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
-                                     Text(
+                                    Text(
                                       "(XAF)",
                                       style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w200,
-                                          color: AppColors.textColor),
-                                    )
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w200,
+                                        color: AppColors.textColor,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -261,140 +304,103 @@ class _AcceptScreenState extends State<AcceptScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                     height: 40,
                     width: 40,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: const Color(0xFFE6EAF0)),
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFE6EAF0),
+                    ),
                     child: SvgPicture.asset('assets/icons/phone.svg'),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 50),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async {
+                      await _driverChatController.createChatRoom(
+                        userId: widget.isParcel
+                            ? widget.parcel!.userId
+                            : widget.trip!.userId,
+                      );
+                    },
                     child: Container(
                       height: 40,
                       width: 40,
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          shape: BoxShape.circle, color: const Color(0xFFE6EAF0)),
+                        shape: BoxShape.circle,
+                        color: const Color(0xFFE6EAF0),
+                      ),
                       child: SvgPicture.asset('assets/icons/message.svg'),
                     ),
                   ),
-                  const SizedBox(width: 22),
+                  const SizedBox(width: 50),
+
+                  // InkWell(
+                  //   onTap: () {
+                  //     Get.to(() => TripMapScreen(isParcel: widget.isParcel));
+                  //   },
+                  //   child: Container(
+                  //     height: 46,
+                  //     padding: const EdgeInsets.symmetric(horizontal: 10),
+                  //     decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(24),
+                  //       color: const Color(0xFFE6EAF0),
+                  //     ),
+                  //     child: Center(
+                  //       child: Text(
+                  //         "Navigate",
+                  //         style: TextStyle(
+                  //           fontSize: 12,
+                  //           fontWeight: FontWeight.w500,
+                  //           color: AppColors.textColor,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   InkWell(
                     onTap: () {
-                      Get.to(() => const TripMapScreen());
+                      Get.to(
+                        () => TripMapScreen(
+                          isParcel: widget.isParcel,
+
+                          parcel: widget.isParcel ? widget.parcel : null,
+                          parcelUserModel: widget.isParcel
+                              ? widget.parcelUserModel
+                              : null,
+
+                          trip: widget.isParcel ? null : widget.trip,
+                          tripUserModel: widget.isParcel
+                              ? null
+                              : widget.tripUserModel,
+                        ),
+                      );
                     },
                     child: Container(
                       height: 46,
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          color: const Color(0xFFE6EAF0)),
+                        borderRadius: BorderRadius.circular(24),
+                        color: const Color(0xFF345983),
+                      ),
                       child: Center(
-                          child: Text(
-                            "Navigate",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor),
-                          )),
+                        child: Text(
+                          widget.isParcel ? "Picked Parcel" : "Start Trip",
+                          style: TextStyle(
+                            fontSize: widget.isParcel ? 12 : 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-
-                  /// Start/End Trip button
-
-                  // Start Trip button
-              widget.isParcel
-                  ? InkWell(
-                onTap: () async {
-                  if (!tripStarted) {
-                    /// Start delivery
-                    tripStarted = true;
-                    setState(() {});
-
-                    /// Navigate to TripMapScreen
-                    final result = await Get.to(() => const TripMapScreen());
-
-                    /// When trip ends in TripMapScreen
-                    if (result == 'tripEnded') {
-                      tripStarted = false;
-                      setState(() {});
-
-                      /// Navigate to ConfirmScreen after delivery ends
-                      Get.to(() =>  ConfirmationScreen(
-                        isParcel: widget.isParcel,
-                      ));
-                    }
-                  }
-                },
-                child: Container(
-                  height: 46,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    color: Color(0xFF345983),
-                  ),
-                  child: Center(
-                    child: Text(
-                      tripStarted ? "Picked Parcel" : "Deliver Parcel",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
-                    ),
-                  ),
-                ),
-              )
-                  : InkWell(
-                onTap: () async {
-                  if (!tripStarted) {
-                    /// Start trip
-                    tripStarted = true;
-                    setState(() {});
-
-                    /// Navigate to TripMapScreen
-                    final result = await Get.to(() => const TripMapScreen());
-
-                    /// When trip ends
-                    if (result == 'tripEnded') {
-                      tripStarted = false;
-                      setState(() {});
-
-                      /// Navigate to ConfirmScreen after trip ends
-                      Get.to(() =>  ConfirmationScreen(
-                        isParcel: widget.isParcel,
-                      ));
-                    }
-                  }
-                },
-                child: Container(
-                  height: 46,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    color: Color(0xFF345983),
-                  ),
-                  child: Center(
-                    child: Text(
-                      tripStarted ? "End Trip" : "Start Trip",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
-                    ),
-                  ),
-                ),
-              )
-
-
-
-              ],
+                ],
               ),
-            )
+            ),
           ],
         ),
       ),

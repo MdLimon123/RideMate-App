@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:radeef/controllers/UserController/user_setup_profile_controller.
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_page_loading.dart';
-import 'package:radeef/views/screen/UserFLow/SetupProfile/verify_success_screen.dart';
 
 class VerifyIdentityScreen extends StatefulWidget {
   const VerifyIdentityScreen({super.key});
@@ -17,7 +15,6 @@ class VerifyIdentityScreen extends StatefulWidget {
 }
 
 class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
-
   final _setupProfileController = Get.put(UserSetupProfileController());
 
   @override
@@ -37,25 +34,28 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Get.back(),
         ),
-        actions:  [
+        actions: [
           Padding(
             padding: EdgeInsets.only(right: 16.0),
-            child: Text('3 Of 3', style: TextStyle(color: Color(0xFF012F64),
-            fontWeight: FontWeight.w500,
-            fontSize: 16)),
+            child: Text(
+              '3 Of 3',
+              style: TextStyle(
+                color: Color(0xFF012F64),
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Obx(() {
-    
           if (!_setupProfileController.isPermissionGranted.value) {
-            return  Center(
+            return Center(
               child: Text(
                 "Camera permission required to continue.",
-                style: TextStyle(fontSize: 16,
-                fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
             );
@@ -63,33 +63,68 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
           // Camera initializing
           if (_setupProfileController.isCameraInitialized.value) {
+            final controller = _setupProfileController.cameraController!;
+            // safe aspect (avoid zero)
+            final double aspectRatio =
+                (controller.value.isInitialized &&
+                    controller.value.aspectRatio > 0)
+                ? controller.value.aspectRatio
+                : MediaQuery.of(context).size.aspectRatio;
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
+                // Expanded(
+                //   child: Stack(
+                //     alignment: Alignment.bottomCenter,
+                //     children: [
+                //       CameraPreview(_setupProfileController.cameraController!,
+                //       ),
+                //       Padding(
+                //         padding: const EdgeInsets.only(bottom: 20.0),
+                //         child: FloatingActionButton(
+                //           backgroundColor: Colors.white,
+                //           onPressed: _setupProfileController.captureSelfie,
+                //           child: const Icon(Icons.camera_alt,
+                //               color: Colors.black, size: 30),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                Flexible(
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
-                      CameraPreview(_setupProfileController.cameraController!,
+                      // Center + AspectRatio keeps the camera feed centered on the screen
+                      Center(
+                        child: AspectRatio(
+                          aspectRatio: aspectRatio,
+                          child: CameraPreview(controller),
+                        ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
+
+                      // FloatingActionButton stays overlaid at bottom
+                      Positioned(
+                        bottom: 20,
                         child: FloatingActionButton(
                           backgroundColor: Colors.white,
                           onPressed: _setupProfileController.captureSelfie,
-                          child: const Icon(Icons.camera_alt,
-                              color: Colors.black, size: 30),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.black,
+                            size: 30,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
 
+                const SizedBox(height: 20),
               ],
             );
           }
-
           /// Selfie captured
           else if (_setupProfileController.capturedImage != null) {
             return Column(
@@ -109,31 +144,39 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                 Text(
-                  "Verify Your Identity",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500,
-                  color: AppColors.textColor),
+                Text(
+                  "verifyIdentity".tr,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textColor,
+                  ),
                 ),
                 const SizedBox(height: 16),
-                 Text(
-                  "Take a quick selfie to complete your profile",
-                  style: TextStyle(fontSize: 16, color: AppColors.textColor,
-                  fontWeight: FontWeight.w400,
+                Text(
+                  "quickSelfie".tr,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textColor,
+                    fontWeight: FontWeight.w400,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 240),
 
-
-                CustomButton(
-                  onTap: () {
-                    Get.to(()=> VerifySuccessScreen());
-                  },
-                  text: "Confirm & Continue",
+                Obx(
+                  () => CustomButton(
+                    loading: _setupProfileController.isLoading.value,
+                    onTap: () {
+                      _setupProfileController.uploadCaptureImage(
+                        imagePath: _setupProfileController.capturedImage!.path,
+                      );
+                    },
+                    text: "Confrim".tr,
+                  ),
                 ),
 
                 const SizedBox(height: 16),
-
 
                 TextButton(
                   onPressed: _setupProfileController.retakeSelfie,
@@ -148,10 +191,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                 ),
               ],
             );
-          }
-
-
-          else {
+          } else {
             return const Center(child: CustomPageLoading());
           }
         }),
