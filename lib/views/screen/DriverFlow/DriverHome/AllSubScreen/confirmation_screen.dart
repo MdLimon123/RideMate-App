@@ -414,20 +414,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 InkWell(
                   onTap: () {
                     if (widget.isParcel) {
-                      /// socket emit hobe image upload korte hobe
-                      // final files = await _driverParcelController
-                      //     .uplaodParcelImage(
-                      //       imagePath:
-                      //           _driverParcelController.parcelImage.value!.path,
-                      //     );
-
-                      // if (files != null && files.isNotEmpty) {
-                      //   SocketService().emit('parcel:deliver', {
-                      //     'parcel_id': widget.parcel!.id,
-                      //     'files': files,
-                      //     'delivery_lat': widget.parcel!.dropoffLat,
-                      //     'delivery_lng': widget.parcel!.dropoffLng,
-                      //   });
+                   
 
                       deliverParcel();
                     } else {

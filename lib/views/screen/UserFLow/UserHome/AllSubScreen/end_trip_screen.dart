@@ -103,7 +103,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("user id: ${widget.trip.id}");
+
     codeController.text = widget.trip.slug;
     return Scaffold(
       body: SafeArea(

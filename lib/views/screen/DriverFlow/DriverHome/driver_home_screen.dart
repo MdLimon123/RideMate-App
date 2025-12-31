@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:radeef/controllers/DriverController/driver_home_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/service/socket_service.dart';
@@ -21,6 +22,8 @@ class DriverHomeScreen extends StatefulWidget {
 
 class _DriverHomeScreenState extends State<DriverHomeScreen>
     with TickerProviderStateMixin {
+  final _driverHomeController = Get.put(DriverHomeController());
+
   bool isSwitch = true;
   bool _activeRequestExists = false;
   final Completer<GoogleMapController> _controller =
@@ -41,6 +44,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
   @override
   void initState() {
+    _driverHomeController.fetchHomeData();
     isSwitch = true;
     toggleOnlineStatus(isSwitch);
 
@@ -113,13 +117,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       }
     });
 
- 
-
     super.initState();
   }
 
   void toggleOnlineStatus(bool status) {
-    SocketService().emit('driver:toggle_online',data:  {'online': status});
+    SocketService().emit('driver:toggle_online', data: {'online': status});
 
     print('Online status ===========>: $status');
   }
@@ -220,7 +222,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1), //(0.1),
                             blurRadius: 10,
                             offset: const Offset(0, -3),
                           ),
@@ -264,7 +266,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.white
-                                                      .withOpacity(0.4),
+                                                      .withValues(alpha: 0.4),
                                                   blurRadius: 30,
                                                   spreadRadius: 4,
                                                 ),
@@ -332,35 +334,45 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                   ],
                                 ),
                                 const SizedBox(height: 6),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: const [
-                                    Text(
-                                      "14",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF333333),
+                                Obx(
+                                  () => Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _driverHomeController
+                                            .homeModel
+                                            .value
+                                            .totalCount
+                                            .toString(),
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF333333),
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      "3h 45m",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF333333),
+                                      Text(
+                                        _driverHomeController
+                                            .homeModel
+                                            .value
+                                            .totalTime
+                                            .toString(),
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF333333),
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      "128.50 XAF",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF333333),
+                                      Text(
+                                        "${_driverHomeController.homeModel.value.totalEarnings} XAF",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF333333),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

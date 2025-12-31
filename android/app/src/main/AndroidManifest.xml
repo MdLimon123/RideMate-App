@@ -21,7 +21,7 @@
 
 
     <application
-        android:label="radeef"
+        android:label="Radeef"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

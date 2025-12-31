@@ -116,11 +116,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-
-                 
-
-
-                                Text(
+                               Text(
                                   item.completedAt != null
                                       ? DateFormat('yyyy-MM-dd').format(item.completedAt!)
                                       : item.date ?? 'N/A',
