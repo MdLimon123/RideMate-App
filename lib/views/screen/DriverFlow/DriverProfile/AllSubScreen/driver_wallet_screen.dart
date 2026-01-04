@@ -1,0 +1,130 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:radeef/controllers/DriverController/driver_profile_controller.dart';
+import 'package:radeef/views/base/custom_appbar.dart';
+import 'package:radeef/views/base/custom_button.dart';
+import 'package:radeef/views/base/custom_text_field.dart';
+
+class DriverWalletScreen extends StatefulWidget {
+  const DriverWalletScreen({super.key});
+
+  @override
+  State<DriverWalletScreen> createState() => _DriverWalletScreenState();
+}
+
+class _DriverWalletScreenState extends State<DriverWalletScreen> {
+  final _driverProfileController = Get.put(DriverProfileController());
+
+  final amountController = TextEditingController();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _driverProfileController.fetchDriverProfile();
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppbar(title: "Wallet"),
+      body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        children: [
+          Container(
+            width: double.infinity,
+            height: 191,
+            decoration: BoxDecoration(
+              color: Color(0xFFE6EAF0),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Obx(
+                () => Text(
+                  " + ${_driverProfileController.driverProfileModel.value.wallet!.balance} XAF",
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF012F64),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: Color(0xFFE6E6E6),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Amount",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF545454),
+                  ),
+                ),
+                SizedBox(height: 10),
+                CustomTextField(
+                  filColor: Color(0xFFFFFFFF),
+                  controller: amountController,
+                  hintText: "Enter amount",
+                ),
+                // SizedBox(height: 16),
+                // Text(
+                //   "A/C",
+                //   style: TextStyle(
+                //     fontSize: 18,
+                //     fontWeight: FontWeight.w400,
+                //     color: Color(0xFF545454),
+                //   ),
+                // ),
+                // SizedBox(height: 10),
+                // CustomTextField(
+                //   filColor: Color(0xFFFFFFFF),
+                //   hintText: 'Enter A/C',
+                // ),
+              ],
+            ),
+          ),
+          SizedBox(height: 112),
+
+          _driverProfileController.driverProfileModel.value.isStripeConnected ==
+                  true
+              ? SizedBox.shrink()
+              : Obx(
+                  () => CustomButton(
+                    loading: _driverProfileController.isConnectLoading.value,
+                    onTap: () {
+                      _driverProfileController.connectStripeAccount();
+                    },
+                    text: "Connect Stripe Account",
+                  ),
+                ),
+          SizedBox(height: 16),
+
+          Obx(
+            () => CustomButton(
+              loading: _driverProfileController.isWithdrawLoading.value,
+              onTap: () {
+                _driverProfileController.withdrawFunds(
+                  amount: amountController.text,
+                );
+              },
+              text: "Withdraw Now",
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

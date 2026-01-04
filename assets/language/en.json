@@ -1,0 +1,49 @@
+{
+  "app_name": "Test theme and language",
+  "choose" :  "Choose Your Language",
+  "select":   "Select your preferred language to get started",
+  "next": "Next",
+  "login": "Log In",
+  "forget": "Forgot Password?",
+  "dontHaveAccount": "Don’t have account? ",
+  "signup": "Sign Up",
+  "alreadyHaveAndAccount" : "Already have an account? ",
+  "start" : "Start",
+  "sendOTP": "Send OTP",
+  "enterOTP": "Enter OTP",
+  "verify" : "Verify",
+  "new_Password": "Set New Password",
+  "changeNow": "Change Now",
+  "letSetUpProfile": "Let’s Set Up Your User Profile",
+  "quickEran": "A few quick steps to start earning with us",
+  "Confrim": "Confirm & Continue",
+  "verifyIdentity": "Verify Your Identity",
+  "quickSelfie": "Take a quick selfie to complete your profile",
+  "verificationSuccessful": "Verification Successful",
+  "bookRide": "Book a Ride",
+  "sendParcel": " Send Parcel",
+  "recentDestination": "Recent Destination",
+  "needHelp": "Need Help?",
+  "support" : "Chat with our support",
+  "confirm" : "Confirm",
+  "cancel" : "Cancel",
+  "searching" : "We’re searching a Driver for you!",
+  "save": "Save Now",
+  "liveChat": "Live Chat",
+  "logOut": "Log Out",
+  "doYouHaveLogOut" : "Do you have Log Out ?",
+  "proceed": "Proceed",
+  "youareNowOffline": "You are now Offline",
+  "decline" : "Decline",
+  "accept" : "Accept",
+  "newRideRequest": "New Ride Request"
+
+
+
+
+
+
+
+
+
+}
