@@ -9,6 +9,7 @@ import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 
 class RatePessengersScreen extends StatefulWidget {
   final bool isParcel;
@@ -119,8 +120,11 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                           const SizedBox(width: 4),
                           Text(
                             widget.isParcel
-                                ? widget.parcelUserModel!.rating.toString()
-                                : widget.tripUserModel!.rating.toString(),
+                                ? widget.parcelUserModel!.rating
+                                      .toStringAsFixed(1)
+                                : widget.tripUserModel!.rating.toStringAsFixed(
+                                    1,
+                                  ),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
@@ -167,20 +171,25 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    height: 52,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFE6E6E6),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Skip",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textColor,
+                  child: InkWell(
+                    onTap: () {
+                      Get.to(() => DriverHomeScreen());
+                    },
+                    child: Container(
+                      height: 52,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE6E6E6),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Skip",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textColor,
+                          ),
                         ),
                       ),
                     ),

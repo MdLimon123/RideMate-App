@@ -1,6 +1,8 @@
 class ApiConstant {
-  static String baseUrl = "http://10.10.12.126:3008/api/v1"; // test server
-  static String imageBaseUrl = "http://10.10.12.126:3008/api/v1";
+  //static String baseUrl = "http://10.10.12.126:3008/api/v1"; // test server
+  /// live http://72.62.135.128:8000/api/v1
+  static String baseUrl = "https://api.radeefz.com/api/v1"; // live server
+  static String imageBaseUrl = "https://api.radeefz.com/";
 
   ///AIzaSyDNgiiIj_2_L6IHDymfGvVzOA9Jz-iFeA4
   /// google api key

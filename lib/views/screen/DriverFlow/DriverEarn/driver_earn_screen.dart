@@ -231,10 +231,10 @@ class _DriverEarnScreenState extends State<DriverEarnScreen>
           if (index < list.length) {
             final item = list[index];
 
-            String date = '';
-            int count = 0;
-            int time = 0;
-            num cost = 0;
+             String date = '';
+             int count = 0;
+             int time = 0;
+             num cost = 0;
 
             if (item is TripEarnItem) {
               date = item.date;

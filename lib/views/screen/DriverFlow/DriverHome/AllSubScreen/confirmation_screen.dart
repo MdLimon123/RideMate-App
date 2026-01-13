@@ -161,8 +161,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         const SizedBox(width: 4),
                         Text(
                           widget.isParcel
-                              ? widget.parcelUserModel!.rating.toString()
-                              : widget.tripUserModel!.rating.toString(),
+                              ? widget.parcelUserModel!.rating.toStringAsFixed(
+                                  1
+                                )
+                              : widget.tripUserModel!.rating.toStringAsFixed(1),
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -414,8 +416,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 InkWell(
                   onTap: () {
                     if (widget.isParcel) {
-                   
-
                       deliverParcel();
                     } else {
                       _handleTripPaymentConfirmation();
@@ -472,12 +472,15 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     if (files != null && files.isNotEmpty) {
       // Ensure socket is connected
       if (SocketService().isConnected) {
-        SocketService().emit('parcel:deliver', data: {
-          'parcel_id': widget.parcel!.id,
-          'files': files,
-          'delivery_lat': widget.parcel!.dropoffLat,
-          'delivery_lng': widget.parcel!.dropoffLng,
-        });
+        SocketService().emit(
+          'parcel:deliver',
+          data: {
+            'parcel_id': widget.parcel!.id,
+            'files': files,
+            'delivery_lat': widget.parcel!.dropoffLat,
+            'delivery_lng': widget.parcel!.dropoffLng,
+          },
+        );
         onDeliveryCompleted(context);
       } else {
         debugPrint('❌ Socket not connected');

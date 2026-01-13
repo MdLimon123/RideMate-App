@@ -4,7 +4,7 @@ class LanguageController extends GetxController {
   var isExpanded = false.obs;
   var selectedLanguage = 'French'.obs;
 
-  List<String> languages = ['French', 'English', 'Português'];
+  List<String> languages = ['French', 'English', 'Português','Arabic'];
 
   void selectLanguage(String lang) {
     selectedLanguage.value = lang;

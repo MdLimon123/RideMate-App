@@ -35,7 +35,7 @@ class _SupportScreenState extends State<SupportScreen> {
           ),
           SizedBox(height: 8,),
           Center(
-            child: Text("Support@approlling.com",
+            child: Text("Contact@radeefs.com",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w500,

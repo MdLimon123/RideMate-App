@@ -180,50 +180,6 @@ static Future<Response> postMultipartData1(
     }
   }
 
-  // static Future<Response> patchMultipartData(
-  //     String uri, Map<String, String> body,
-  //     {required List<MultipartBody> multipartBody,
-  //       Map<String, String>? headers}) async {
-  //   try {
-  //     String? bearerToken = await PrefsHelper.getString(AppConstants.bearerToken);
-
-  //     var mainHeaders = {
-  //       'Content-Type': 'multipart/form-data',
-  //       'Authorization': 'Bearer $bearerToken',
-  //     };
-
-  //     debugPrint('====> API Call: $uri\nHeader: ${headers ?? mainHeaders}');
-  //     debugPrint('====> API Body: $body with ${multipartBody.length} files');
-
-  //     var request =
-  //     http.MultipartRequest('PATCH', Uri.parse(ApiConstant.baseUrl + uri));
-  //     request.headers.addAll(headers ?? mainHeaders);
-
-  //     // Add files to the request
-  //     for (MultipartBody element in multipartBody) {
-  //       String extension = element.file.path.split('.').last.toLowerCase();
-  //       request.files.add(
-  //         await http.MultipartFile.fromPath(
-  //           element.key,
-  //           element.file.path,
-  //           contentType: MediaType('image', extension),
-  //         ),
-  //       );
-  //     }
-
-  //     debugPrint("=============> Body text : $body");
-  //     // Add fields to the request
-  //     request.fields.addAll(body);
-
-  //     // Send the request
-  //     http.Response _response =
-  //     await http.Response.fromStream(await request.send());
-  //     return handleResponse(_response, uri);
-  //   } catch (e) {
-  //     return const Response(statusCode: 1, statusText: noInternetMessage);
-  //   }
-  // }
-
   static Future<Response> patchMultipartData(
     String uri,
     Map<String, String> body, {

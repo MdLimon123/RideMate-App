@@ -22,7 +22,7 @@ class SocketService {
 
     debugPrint('🟡 Trying to connect socket...');
     socket = IO.io(
-      'http://10.10.12.126:3008',
+      'https://api.radeefz.com',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .setExtraHeaders({'Authorization': 'Bearer $token'})

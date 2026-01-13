@@ -109,7 +109,7 @@ class UserProfileController extends GetxController {
       final paymentUrl = response.body['url'];
 
       if (paymentUrl != null && paymentUrl.isNotEmpty) {
-        // Launch the URL in the browser
+
         await _openPayementUrl(paymentUrl);
         fetchUserInfo();
       } else {
@@ -138,7 +138,7 @@ class UserProfileController extends GetxController {
       final stripeUrl = response.body['url'];
 
       if (stripeUrl != null && stripeUrl.isNotEmpty) {
-        // Launch the URL in the browser
+
         await _openPayementUrl(stripeUrl);
         fetchUserInfo();
       } else {

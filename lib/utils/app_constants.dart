@@ -33,5 +33,10 @@ class AppConstants {
       countryCode: 'PT',
       languageCode: 'pt',
     ),
+     LanguageModel(
+      languageName: 'Arabic',
+      countryCode: 'AR',
+      languageCode: 'ar',
+    ),
   ];
 }
