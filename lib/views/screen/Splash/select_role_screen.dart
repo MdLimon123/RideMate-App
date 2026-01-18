@@ -69,7 +69,8 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                   ),),
                 ),
               ),
-            )
+            ),
+            SizedBox(height: 40,)
           ],
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_home_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/bottom_menu.dart';
@@ -38,18 +39,17 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     _driverHomeController.fetchHomeData();
     isSwitch = true;
     toggleOnlineStatus(isSwitch);
+    subscribleId();
 
     _xController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-
     _yController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
-
 
     _rotationController = AnimationController(
       vsync: this,
@@ -117,6 +117,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     print('Online status ===========>: $status');
   }
 
+  void subscribleId() async {
+    await _driverHomeController.subscribleId();
+    OneSignalHelper.optIn();
+  }
+
   @override
   void dispose() {
     _xController.dispose();
@@ -170,9 +175,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-
                   Image.asset("assets/images/maps.png"),
-              
 
                   Positioned(
                     bottom: -60, //
@@ -188,7 +191,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1), 
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 10,
                             offset: const Offset(0, -3),
                           ),
@@ -224,9 +227,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                         scaleX: _xScale.value,
                                         scaleY: _yScale.value,
                                         child: Transform.rotate(
-                                          angle:
-                                              _rotation.value *
-                                              6.28319, 
+                                          angle: _rotation.value * 6.28319,
                                           child: Container(
                                             decoration: BoxDecoration(
                                               boxShadow: [

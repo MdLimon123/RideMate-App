@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:radeef/models/User/recent_destination.dart';
 import 'package:radeef/service/api_client.dart';
 import 'package:radeef/service/api_constant.dart';
+import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/show_amount_screen.dart';
 
@@ -21,7 +22,6 @@ class HomeController extends GetxController {
   final parcelAmount = TextEditingController();
 
   RxString selectedParcelType = "".obs;
-
 
   final box = GetStorage();
 
@@ -186,9 +186,6 @@ class HomeController extends GetxController {
     }
   }
 
-
-
-
   Future<void> calculateAccount() async {
     if (pickCoordinates.length < 2 || dropCoordinates.length < 2) {
       showCustomSnackBar(
@@ -228,5 +225,24 @@ class HomeController extends GetxController {
       showCustomSnackBar(response.statusText, isError: true);
     }
     isShowAnountLoading(false);
+  }
+
+  Future<void> subscribleId() async {
+    String? subscriptionId = await OneSignalHelper.getSubscriptionId();
+
+    if (subscriptionId == null || subscriptionId.isEmpty) {
+      print("OneSignal ID not available");
+    }
+
+    final response = await ApiClient.postData("/profile/onesignal-id", {
+      "onesignal_id": subscriptionId,
+    });
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      showCustomSnackBar(response.statusText, isError: false);
+    } else {
+      showCustomSnackBar(response.statusText, isError: true);
+    }
+
+    print("OneSignal ID: $subscriptionId");
   }
 }

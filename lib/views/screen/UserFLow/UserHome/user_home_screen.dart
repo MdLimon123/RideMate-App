@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/home_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/service/api_constant.dart';
+import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/book_a_ride_screen.dart';
@@ -25,7 +26,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+     await _homeController.subscribleId();
+       OneSignalHelper.optIn();
       _userProfileController.fetchUserInfo();
       _homeController.loadRecentDestinations();
     });
@@ -139,109 +142,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         ),
                       ),
                       SizedBox(height: 28),
-
-                      // Row(
-                      //   children: [
-                      //     /// Book a Ride Button
-                      //     Expanded(
-                      //       child: InkWell(
-                      //         onTap: () {
-                      //           setState(() {
-                      //             selectedIndex = 0;
-                      //           });
-                      //           Get.to(() => BookARideScreen());
-                      //         },
-                      //         child: Container(
-                      //           width: double.infinity,
-                      //           height: 64,
-                      //           decoration: BoxDecoration(
-                      //             color: selectedIndex == 0
-                      //                 ? const Color(0xFF345983)
-                      //                 : const Color(0xFFE6E6E6),
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //           child: Row(
-                      //             mainAxisAlignment: MainAxisAlignment.center,
-                      //             children: [
-                      //               SvgPicture.asset(
-                      //                 'assets/icons/bike.svg',
-                      //                 color: selectedIndex == 0
-                      //                     ? Colors.white
-                      //                     : const Color(0xFF333333),
-                      //               ),
-                      //               const SizedBox(width: 10),
-                      //               Text(
-                      //                 "bookRide".tr,
-                      //                 style: TextStyle(
-                      //                   fontSize: 18,
-                      //                   fontWeight: FontWeight.w500,
-                      //                   color: selectedIndex == 0
-                      //                       ? Colors.white
-                      //                       : const Color(0xFF333333),
-                      //                 ),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     const SizedBox(width: 20),
-
-                      //     /// Send Parcel Button
-                      //     Expanded(
-                      //       child: InkWell(
-                      //         onTap: () {
-                      //           setState(() {
-                      //             selectedIndex = 1;
-                      //           });
-                      //           Get.to(() => ParcelDetailsScreen());
-                      //         },
-                      //         child: Container(
-                      //           width: double.infinity,
-                      //           height: 64,
-                      //           decoration: BoxDecoration(
-                      //             color: selectedIndex == 1
-                      //                 ? const Color(0xFF345983)
-                      //                 : const Color(0xFFE6E6E6),
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //           child: Row(
-                      //             mainAxisAlignment: MainAxisAlignment.center,
-                      //             children: [
-                      //               SvgPicture.asset(
-                      //                 'assets/icons/box.svg',
-                      //                 color: selectedIndex == 1
-                      //                     ? Colors.white
-                      //                     : const Color(0xFF333333),
-                      //               ),
-                      //               const SizedBox(width: 10),
-                      //               Text(
-                      //                 "sendParcel".tr,
-                      //                 style: TextStyle(
-                      //                   fontSize: 18,
-                      //                   fontWeight: FontWeight.w500,
-                      //                   color: selectedIndex == 1
-                      //                       ? Colors.white
-                      //                       : const Color(0xFF333333),
-                      //                 ),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                      // SizedBox(height: 28),
-                      // Text(
-                      //   "recentDestination".tr,
-                      //   style: TextStyle(
-                      //     fontWeight: FontWeight.w500,
-                      //     fontSize: 24,
-                      //     color: Color(0xFF545454),
-                      //   ),
-                      // ),
-                      // SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(

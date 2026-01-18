@@ -24,8 +24,8 @@ class _SelectUserLanguageScreenState extends State<SelectUserLanguageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+      body: SingleChildScrollView(
+        padding:EdgeInsets.symmetric(horizontal: 20) ,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

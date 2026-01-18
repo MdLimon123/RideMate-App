@@ -32,6 +32,7 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
 
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Checkbox(
                   value: isCheck,
@@ -83,7 +84,7 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
                       text: TextSpan(
                           children: [
                             TextSpan(
-                                text: " acknowledge you have read the ",
+                                text: "acknowledge you have read the ",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 14,
@@ -91,7 +92,7 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
                                 )
                             ),
                             TextSpan(
-                                text: "Privacy Policy ",
+                                text: "\nPrivacy Policy ",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,

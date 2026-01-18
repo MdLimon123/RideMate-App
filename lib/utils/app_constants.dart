@@ -9,6 +9,7 @@ class AppConstants {
   static const String LANGUAGE_CODE = "languageCode";
   static const String COUNTRY_CODE = "countryCode";
   static const String bearerToken = "bearerToken";
+  static const String onesignalAppId = "9743816a-f803-4c95-9a66-06e0d19851a4";
 
   static RegExp emailValidator = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
@@ -18,7 +19,7 @@ class AppConstants {
     r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
   );
   static List<LanguageModel> languages = [
-     LanguageModel(
+    LanguageModel(
       languageName: 'French',
       countryCode: 'FR',
       languageCode: 'fr',
@@ -33,7 +34,7 @@ class AppConstants {
       countryCode: 'PT',
       languageCode: 'pt',
     ),
-     LanguageModel(
+    LanguageModel(
       languageName: 'Arabic',
       countryCode: 'AR',
       languageCode: 'ar',

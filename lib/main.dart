@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/localization_controller.dart';
 import 'package:radeef/controllers/theme_controller.dart';
 import 'package:radeef/helpers/di.dart' as GetStorage;
+import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/service/prefs_helper.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/themes/light_theme.dart';
@@ -15,6 +16,8 @@ import 'helpers/route.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await OneSignalHelper.initialize();
 
   await GetStorage.init();
   final token = await PrefsHelper.getToken();
