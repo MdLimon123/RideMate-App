@@ -18,10 +18,12 @@ class FindParcelDriverScreen extends StatefulWidget {
   final ParcelDriverModel driver;
   final ParcelModel parcel;
 
+
   const FindParcelDriverScreen({
     super.key,
     required this.driver,
     required this.parcel,
+
   });
 
   @override
@@ -445,6 +447,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                 dropAddress: widget.parcel.dropoffAddress!,
                                 driver: widget.driver,
                                 parcel: widget.parcel,
+                               
                               ),
                             );
                           },
@@ -501,8 +504,6 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                         //     ),
                         //   ),
                         // ),
-                     
-                     
                       ],
                     ),
                   ],

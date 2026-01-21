@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/instance_manager.dart';
+import 'package:get/state_manager.dart';
+import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/models/User/parcel_response_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
@@ -14,6 +17,7 @@ class ParcelUserRatingScreen extends StatefulWidget {
   final double rating;
   final ParcelDriverModel driver;
   final ParcelModel parcelModel;
+
   const ParcelUserRatingScreen({
     super.key,
     required this.driver,
@@ -29,6 +33,7 @@ class ParcelUserRatingScreen extends StatefulWidget {
 }
 
 class _ParcelUserRatingScreenState extends State<ParcelUserRatingScreen> {
+  final _userProfileController = Get.put(UserProfileController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,17 +137,21 @@ class _ParcelUserRatingScreenState extends State<ParcelUserRatingScreen> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  Center(
-                    child: RatingBar.builder(
-                      initialRating: 3,
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, _) =>
-                          Icon(Icons.star, color: Color(0xFFFFFFFF)),
-                      onRatingUpdate: (rating) {},
+                  Obx(
+                    () => Center(
+                      child: RatingBar.builder(
+                        initialRating: _userProfileController.rating.value,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                        itemBuilder: (context, _) =>
+                            Icon(Icons.star, color: Color(0xFFFFFFFF)),
+                        onRatingUpdate: (rating) {
+                          _userProfileController.updateRating(rating);
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -173,7 +182,22 @@ class _ParcelUserRatingScreenState extends State<ParcelUserRatingScreen> {
                 ),
                 SizedBox(width: 22),
                 Expanded(
-                  child: CustomButton(onTap: () {}, text: "Rate Now"),
+                  child: Obx(
+                    () => CustomButton(
+                      loading: _userProfileController.isLaoding.value,
+                      onTap: () {
+                        _userProfileController.submitRatingParcel(
+                          userId: _userProfileController
+                              .userProfileModel
+                              .value
+                              .id
+                              .toString(),
+                          parcelId: widget.parcelModel.id.toString(),
+                        );
+                      },
+                      text: "Rate Now",
+                    ),
+                  ),
                 ),
               ],
             ),

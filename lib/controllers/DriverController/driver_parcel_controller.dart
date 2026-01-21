@@ -100,7 +100,7 @@ class DriverParcelController extends GetxController {
     final response = await ApiClient.postData("/reviews/give-review", body);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      showCustomSnackBar(response.statusText, isError: false);
+      showCustomSnackBar("Review Submitted", isError: false);
       Get.to(
         () => EarnScreen(
           isParcel: isParcel,

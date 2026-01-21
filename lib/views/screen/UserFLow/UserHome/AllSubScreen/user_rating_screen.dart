@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get_instance/get_instance.dart';
+import 'package:get/state_manager.dart';
+import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
@@ -13,15 +16,19 @@ class UserRatingScreen extends StatefulWidget {
   final String driverName;
   final int trip;
   final double rating;
-    final DriverModel driver;
+  final DriverModel driver;
   final TripModel tripModel;
+
 
   const UserRatingScreen({
     super.key,
     required this.drivierImage,
     required this.driverName,
     required this.trip,
-    required this.rating, required this.driver, required this.tripModel,
+    required this.rating,
+    required this.driver,
+    required this.tripModel,
+
   });
 
   @override
@@ -29,6 +36,8 @@ class UserRatingScreen extends StatefulWidget {
 }
 
 class _RatePessengersScreenState extends State<UserRatingScreen> {
+  final _userProfileController = Get.put(UserProfileController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,17 +141,21 @@ class _RatePessengersScreenState extends State<UserRatingScreen> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  Center(
-                    child: RatingBar.builder(
-                      initialRating: 3,
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, _) =>
-                          Icon(Icons.star, color: Color(0xFFFFFFFF)),
-                      onRatingUpdate: (rating) {},
+                  Obx(
+                    () => Center(
+                      child: RatingBar.builder(
+                        initialRating: _userProfileController.rating.value,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                        itemBuilder: (context, _) =>
+                            Icon(Icons.star, color: Color(0xFFFFFFFF)),
+                        onRatingUpdate: (rating) {
+                          _userProfileController.updateRating(rating);
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -173,7 +186,23 @@ class _RatePessengersScreenState extends State<UserRatingScreen> {
                 ),
                 SizedBox(width: 22),
                 Expanded(
-                  child: CustomButton(onTap: () {}, text: "Rate Now"),
+                  child: Obx(
+                    () => CustomButton(
+                      loading: _userProfileController.isLaoding.value,
+                      onTap: () {
+                        _userProfileController.submitRating(
+                          userId: _userProfileController
+                              .userProfileModel
+                              .value
+                              .id
+                              .toString(),
+
+                          tripId: widget.tripModel.id.toString(),
+                        );
+                      },
+                      text: "Rate Now",
+                    ),
+                  ),
                 ),
               ],
             ),

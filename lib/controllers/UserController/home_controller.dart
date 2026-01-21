@@ -179,6 +179,7 @@ class HomeController extends GetxController {
           dropLan: dropCoordinates[1],
           pickLocation: pickAddress.value,
           dropLocation: dropAddress.value,
+   
         ),
       );
     } else {
@@ -219,6 +220,7 @@ class HomeController extends GetxController {
           dropLan: dropCoordinates[1],
           pickLocation: pickAddress.value,
           dropLocation: dropAddress.value,
+     
         ),
       );
     } else {
@@ -238,7 +240,7 @@ class HomeController extends GetxController {
       "onesignal_id": subscriptionId,
     });
     if (response.statusCode == 200 || response.statusCode == 201) {
-      showCustomSnackBar(response.statusText, isError: false);
+
     } else {
       showCustomSnackBar(response.statusText, isError: true);
     }

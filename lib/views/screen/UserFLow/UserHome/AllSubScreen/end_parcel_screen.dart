@@ -18,10 +18,12 @@ import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dar
 class EndParcelScreen extends StatefulWidget {
   final ParcelDriverModel driver;
   final ParcelModel parcel;
+
   const EndParcelScreen({
     super.key,
     required this.driver,
     required this.parcel,
+ 
   });
 
   @override
@@ -449,6 +451,8 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                 rating: widget.driver.ratingCount!.toDouble(),
                                 driver: widget.driver,
                                 parcelModel: widget.parcel,
+                          
+                            
                               ),
                             );
                           },
@@ -482,6 +486,4 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
       ),
     );
   }
-
-
 }

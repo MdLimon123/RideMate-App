@@ -1,5 +1,9 @@
+
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_home_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
@@ -34,12 +38,19 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
   late Animation<double> _yScale;
   late Animation<double> _rotation;
 
+  // Location tracking
+  Timer? _locationTimer;
+  Position? _currentPosition;
+
   @override
   void initState() {
     _driverHomeController.fetchHomeData();
     isSwitch = true;
     toggleOnlineStatus(isSwitch);
     subscribleId();
+
+    // Initialize location tracking
+    _initializeLocationTracking();
 
     _xController = AnimationController(
       vsync: this,
@@ -111,10 +122,108 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     super.initState();
   }
 
+  // Initialize location tracking
+  Future<void> _initializeLocationTracking() async {
+    // Check location permission
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print('Location services are disabled.');
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print('Location permissions are permanently denied');
+      return;
+    }
+
+    // Get initial location
+    await _updateLocation();
+
+    // Start periodic location updates (every 30 seconds)
+    _locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      _updateLocation();
+    });
+  }
+
+  // Update and send location to socket
+  Future<void> _updateLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      _currentPosition = position;
+
+      // Get address from coordinates
+      String address = await _getAddressFromLatLng(
+        position.latitude,
+        position.longitude,
+      );
+
+      // Send location to socket
+      _sendLocationToSocket(
+        position.latitude,
+        position.longitude,
+        address,
+      );
+
+      print('Location updated: ${position.latitude}, ${position.longitude}');
+    } catch (e) {
+      print('Error getting location: $e');
+    }
+  }
+
+  // Get address from latitude and longitude
+  Future<String> _getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        return place.locality ?? place.subAdministrativeArea ?? 'Unknown';
+      }
+      return 'Unknown';
+    } catch (e) {
+      print('Error getting address: $e');
+      return 'Unknown';
+    }
+  }
+
+  // Send location data to socket
+  void _sendLocationToSocket(double lat, double lng, String address) {
+    final locationData = {
+      'location_lat': lat,
+      'location_lng': lng,
+      'location_address': address,
+    };
+
+    SocketService().emit('driver:refresh_location', data: locationData);
+
+    print('Location sent to socket: $locationData');
+  }
+
   void toggleOnlineStatus(bool status) {
     SocketService().emit('driver:toggle_online', data: {'online': status});
 
     print('Online status ===========>: $status');
+
+    // Start or stop location tracking based on online status
+    if (status) {
+      if (_locationTimer == null || !_locationTimer!.isActive) {
+        _initializeLocationTracking();
+      }
+    } else {
+      _locationTimer?.cancel();
+      _locationTimer = null;
+    }
   }
 
   void subscribleId() async {
@@ -127,6 +236,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     _xController.dispose();
     _yController.dispose();
     _rotationController.dispose();
+    _locationTimer?.cancel();
     //SocketService().socket?.disconnect();
     super.dispose();
   }
@@ -178,7 +288,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                   Image.asset("assets/images/maps.png"),
 
                   Positioned(
-                    bottom: -60, //
+                    bottom: -60,
                     left: 20,
                     right: 20,
                     child: Container(
@@ -203,7 +313,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                           Center(
                             child: Text(
                               isSwitch
-                                  ? "We’re searching a request for you!"
+                                  ? "We're searching a request for you!"
                                   : 'You are Now Offline',
                               style: const TextStyle(
                                 color: Colors.white,

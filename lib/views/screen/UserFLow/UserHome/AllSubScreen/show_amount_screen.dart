@@ -21,6 +21,7 @@ class ShowAmountScreen extends StatefulWidget {
   final int? amount;
   final String pickLocation;
   final String dropLocation;
+
   const ShowAmountScreen({
     super.key,
 
@@ -31,6 +32,7 @@ class ShowAmountScreen extends StatefulWidget {
     required this.dropLan,
     required this.pickLocation,
     required this.dropLocation,
+
     this.weight,
     this.amount,
   });
@@ -259,6 +261,7 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                                   () => SearchADriverScreen(
                                     pickLocation: widget.pickLocation,
                                     dropLocation: widget.dropLocation,
+                                
                                   ),
                                 );
                               } else if (_homeController.selectedIndex.value ==
@@ -280,6 +283,7 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                                   () => SearchADriverScreen(
                                     pickLocation: widget.pickLocation,
                                     dropLocation: widget.dropLocation,
+                                 
                                   ),
                                 );
                               }

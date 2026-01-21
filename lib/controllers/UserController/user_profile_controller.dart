@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:radeef/models/Driver/parcel_request_model.dart';
+import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/models/User/user_profile_model.dart';
 import 'package:radeef/models/about_us_model.dart';
 import 'package:radeef/service/api_client.dart';
@@ -10,13 +12,14 @@ import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UserProfileController extends GetxController {
-  
   var userProfileModel = UserProfileModel().obs;
 
   var aboutUsModel = AboutUsModel().obs;
 
   var isLaoding = false.obs;
   var changePasswordLoading = false.obs;
+
+  final RxDouble rating = 0.0.obs;
 
   var isTopUpLoading = false.obs;
 
@@ -27,6 +30,10 @@ class UserProfileController extends GetxController {
   var uploadProfileLoading = false.obs;
 
   Rx<File?> userProfileImage = Rx<File?>(null);
+
+  void updateRating(double value) {
+    rating.value = value;
+  }
 
   Future<void> pickUserProfileImage({bool fromCamera = false}) async {
     final pickedFile = await ImageUtils.pickAndCropImage(
@@ -109,7 +116,6 @@ class UserProfileController extends GetxController {
       final paymentUrl = response.body['url'];
 
       if (paymentUrl != null && paymentUrl.isNotEmpty) {
-
         await _openPayementUrl(paymentUrl);
         fetchUserInfo();
       } else {
@@ -138,7 +144,6 @@ class UserProfileController extends GetxController {
       final stripeUrl = response.body['url'];
 
       if (stripeUrl != null && stripeUrl.isNotEmpty) {
-
         await _openPayementUrl(stripeUrl);
         fetchUserInfo();
       } else {
@@ -175,6 +180,56 @@ class UserProfileController extends GetxController {
       aboutUsModel.value = AboutUsModel.fromJson(response.body);
     } else {
       debugPrint("soemting we want wrong ======> ${response.statusText}");
+    }
+    isLaoding(false);
+  }
+
+  Future<void> submitRating({
+    required String userId,
+
+    required String tripId,
+  }) async {
+    isLaoding(true);
+
+    final Map<String, dynamic> body = {
+      "user_id": userId,
+      "rating": rating.value.toInt(),
+      "comment": "Good",
+      "ref_trip_id": tripId,
+    };
+
+    final response = await ApiClient.postData("/reviews/give-review", body);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+        showCustomSnackBar("Review Submitted", isError: false);
+    } else {
+      debugPrint(response.body);
+      showCustomSnackBar(response.statusText, isError: true);
+    }
+    isLaoding(false);
+  }
+
+  Future<void> submitRatingParcel({
+    required String userId,
+    required String parcelId,
+    String? tripId,
+  }) async {
+    isLaoding(true);
+
+    final Map<String, dynamic> body = {
+      "user_id": userId,
+      "rating": rating.value.toInt(),
+      "comment": "Good",
+      "ref_parcel_id": parcelId,
+    };
+
+    final response = await ApiClient.postData("/reviews/give-review", body);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      showCustomSnackBar("Review Submitted", isError: false);
+    } else {
+      debugPrint(response.body);
+      showCustomSnackBar(response.statusText, isError: true);
     }
     isLaoding(false);
   }

@@ -18,8 +18,7 @@ class DriverHomeController extends GetxController {
     }
   }
 
-
-   Future<void> subscribleId() async {
+  Future<void> subscribleId() async {
     String? subscriptionId = await OneSignalHelper.getSubscriptionId();
 
     if (subscriptionId == null || subscriptionId.isEmpty) {
@@ -30,7 +29,6 @@ class DriverHomeController extends GetxController {
       "onesignal_id": subscriptionId,
     });
     if (response.statusCode == 200 || response.statusCode == 201) {
-      showCustomSnackBar(response.statusText, isError: false);
     } else {
       showCustomSnackBar(response.statusText, isError: true);
     }

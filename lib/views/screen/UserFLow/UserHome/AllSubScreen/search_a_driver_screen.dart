@@ -16,10 +16,12 @@ import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dar
 class SearchADriverScreen extends StatefulWidget {
   final String pickLocation;
   final String dropLocation;
+
   const SearchADriverScreen({
     super.key,
     required this.pickLocation,
     required this.dropLocation,
+
   });
 
   @override
@@ -40,8 +42,6 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
   final dropLocationController = TextEditingController();
 
   final _userProfileController = Get.put(UserProfileController());
-
-
 
   @override
   void initState() {
@@ -107,7 +107,8 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
       final parcel = ParcelModel.fromJson(data['parcel']);
 
       Get.off(
-        () => FindParcelDriverScreen(driver: parcelDriverModel, parcel: parcel),
+        () => FindParcelDriverScreen(driver: parcelDriverModel, parcel: parcel,
+           ),
       );
     });
 
@@ -327,13 +328,14 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
                                 scaleX: _xScale.value,
                                 scaleY: _yScale.value,
                                 child: Transform.rotate(
-                                  angle:
-                                      _rotation.value * 6.28319, 
+                                  angle: _rotation.value * 6.28319,
                                   child: Container(
                                     decoration: BoxDecoration(
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.white.withValues(alpha:  0.4),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.4,
+                                          ),
                                           blurRadius: 30,
                                           spreadRadius: 4,
                                         ),
@@ -369,7 +371,6 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
                       ),
                     ),
 
-           
                     SizedBox(height: 169),
                     Container(
                       width: double.infinity,

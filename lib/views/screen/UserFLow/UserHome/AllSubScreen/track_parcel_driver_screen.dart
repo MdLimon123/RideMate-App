@@ -13,6 +13,7 @@ class TrackParcelDriverScreen extends StatefulWidget {
   final String dropAddress;
   final ParcelDriverModel driver;
   final ParcelModel parcel;
+
   const TrackParcelDriverScreen({
     super.key,
     required this.pickLat,
@@ -22,6 +23,7 @@ class TrackParcelDriverScreen extends StatefulWidget {
     required this.dropAddress,
     required this.driver,
     required this.parcel,
+
   });
 
   @override
@@ -103,7 +105,6 @@ class _TrackParcelDriverScreenState extends State<TrackParcelDriverScreen> {
       distanceKm = d;
       etaMin = eta;
     });
-
 
     debugPrint("📍 Route Distance: ${d.toStringAsFixed(2)} km");
     debugPrint("⏱ Estimated Time: $eta min");
@@ -229,6 +230,7 @@ class _TrackParcelDriverScreenState extends State<TrackParcelDriverScreen> {
                   () => EndParcelScreen(
                     driver: widget.driver,
                     parcel: widget.parcel,
+               
                   ),
                 );
               },

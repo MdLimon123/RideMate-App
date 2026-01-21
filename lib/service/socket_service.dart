@@ -22,7 +22,7 @@ class SocketService {
 
     debugPrint('🟡 Trying to connect socket...');
     socket = IO.io(
-      'https://api.radeefz.com',
+      'https://plbck79v-3008.inc1.devtunnels.ms/',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .setExtraHeaders({'Authorization': 'Bearer $token'})
@@ -60,20 +60,15 @@ class SocketService {
   }
 
   // Emit event
-void emit(
-  String event, {
-  dynamic data,
-  Function(dynamic response)? ack,
-}) {
-  if (socket == null) return;
+  void emit(String event, {dynamic data, Function(dynamic response)? ack}) {
+    if (socket == null) return;
 
-  if (ack != null) {
-    socket!.emitWithAck(event, data, ack: ack);
-  } else {
-    socket!.emit(event, data);
+    if (ack != null) {
+      socket!.emitWithAck(event, data, ack: ack);
+    } else {
+      socket!.emit(event, data);
+    }
   }
-}
-
 
   // Attach listener (will attach immediately if connected, or pending)
   void on(String event, Function(dynamic) handler) {

@@ -14,8 +14,6 @@ class TripHistoryScreen extends StatefulWidget {
 }
 
 class _TripHistoryScreenState extends State<TripHistoryScreen> {
-
-
   final _driverRiderController = Get.put(DriverRiderController());
 
   @override
@@ -116,9 +114,11 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                               Text(
+                                Text(
                                   item.completedAt != null
-                                      ? DateFormat('yyyy-MM-dd').format(item.completedAt!)
+                                      ? DateFormat(
+                                          'yyyy-MM-dd',
+                                        ).format(item.completedAt!)
                                       : item.date ?? 'N/A',
                                   style: TextStyle(
                                     fontSize: 16,
@@ -133,12 +133,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                   children: [
                                     SvgPicture.asset('assets/icons/pick.svg'),
                                     SizedBox(width: 12),
-                                    Text(
-                                      "From: ${item.pickupAddress} ",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF8A8A8A),
+                                    Expanded(
+                                      child: Text(
+                                        "From: ${item.pickupAddress} ",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF8A8A8A),
+                                        ),
                                       ),
                                     ),
                                     SizedBox(width: 20),
@@ -159,12 +161,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                       'assets/icons/location.svg',
                                     ),
                                     SizedBox(width: 12),
-                                    Text(
-                                      "${item.dropoffAddress}",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF8A8A8A),
+                                    Expanded(
+                                      child: Text(
+                                        "${item.dropoffAddress}",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF8A8A8A),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -187,5 +191,3 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     );
   }
 }
-
-
