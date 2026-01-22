@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/instance_manager.dart';
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/models/User/parcel_response_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
+import 'package:radeef/views/screen/UserFLow/UserHome/user_home_screen.dart';
 
 class ParcelUserRatingScreen extends StatefulWidget {
   final String drivierImage;
@@ -161,20 +161,25 @@ class _ParcelUserRatingScreenState extends State<ParcelUserRatingScreen> {
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    height: 52,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFE6E6E6),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Later",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textColor,
+                  child: InkWell(
+                    onTap: () {
+                      Get.to(() => UserHomeScreen());
+                    },
+                    child: Container(
+                      height: 52,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE6E6E6),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Later",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textColor,
+                          ),
                         ),
                       ),
                     ),

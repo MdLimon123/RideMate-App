@@ -49,7 +49,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     toggleOnlineStatus(isSwitch);
     subscribleId();
 
-    // Initialize location tracking
+ 
     _initializeLocationTracking();
 
     _xController = AnimationController(
@@ -124,7 +124,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
   // Initialize location tracking
   Future<void> _initializeLocationTracking() async {
-    // Check location permission
+ 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       print('Location services are disabled.');
@@ -145,16 +145,19 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       return;
     }
 
-    // Get initial location
+
+
     await _updateLocation();
 
-    // Start periodic location updates (every 30 seconds)
+   
+   
     _locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       _updateLocation();
     });
   }
 
-  // Update and send location to socket
+
+
   Future<void> _updateLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -163,13 +166,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
       _currentPosition = position;
 
-      // Get address from coordinates
+
+
       String address = await _getAddressFromLatLng(
         position.latitude,
         position.longitude,
       );
 
-      // Send location to socket
+ 
+ 
       _sendLocationToSocket(
         position.latitude,
         position.longitude,
@@ -182,7 +187,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     }
   }
 
-  // Get address from latitude and longitude
+
+
   Future<String> _getAddressFromLatLng(double lat, double lng) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
@@ -215,7 +221,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
     print('Online status ===========>: $status');
 
-    // Start or stop location tracking based on online status
+
     if (status) {
       if (_locationTimer == null || !_locationTimer!.isActive) {
         _initializeLocationTracking();

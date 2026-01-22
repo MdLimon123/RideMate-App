@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:radeef/models/Driver/parcel_request_model.dart';
-import 'package:radeef/models/Driver/trip_request_model.dart';
+
 import 'package:radeef/models/User/user_profile_model.dart';
 import 'package:radeef/models/about_us_model.dart';
 import 'package:radeef/service/api_client.dart';

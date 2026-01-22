@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:radeef/models/User/parcel_response_model.dart';
-import 'package:radeef/utils/location_utils.dart';
+import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/end_parcel_screen.dart';
+import 'package:http/http.dart' as http;
 
 class TrackParcelDriverScreen extends StatefulWidget {
   final double pickLat;
@@ -23,7 +27,6 @@ class TrackParcelDriverScreen extends StatefulWidget {
     required this.dropAddress,
     required this.driver,
     required this.parcel,
-
   });
 
   @override
@@ -42,8 +45,7 @@ class _TrackParcelDriverScreenState extends State<TrackParcelDriverScreen> {
   void initState() {
     super.initState();
     _setupMarkers();
-    _setupPolyline();
-    _calculateDistanceAndTime();
+    _getDirections();
   }
 
   void _setupMarkers() {
@@ -64,50 +66,57 @@ class _TrackParcelDriverScreenState extends State<TrackParcelDriverScreen> {
     );
   }
 
-  void _setupPolyline() {
-    polylines.add(
-      Polyline(
-        polylineId: const PolylineId('route'),
-        points: [
-          LatLng(widget.pickLat, widget.pickLan),
-          LatLng(widget.dropLat, widget.dropLan),
-        ],
-        color: Colors.red,
-        width: 5,
-      ),
-    );
-  }
+  Future<void> _getDirections() async {
+    final String url =
+        'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${widget.pickLat},${widget.pickLan}&'
+        'destination=${widget.dropLat},${widget.dropLan}&'
+        'key=${ApiConstant.googleApiKey}';
 
-  void _calculateDistanceAndTime() {
-    final pickLat = widget.pickLat;
-    final pickLng = widget.pickLan;
-    final dropLat = widget.dropLat;
-    final dropLng = widget.dropLan;
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    if (pickLat == 0 || pickLng == 0 || dropLat == 0 || dropLng == 0) {
-      setState(() {
-        etaMin = 0;
-        distanceKm = 0;
-      });
-      return;
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['routes'].isNotEmpty) {
+          final String encodedPolyline =
+              data['routes'][0]['overview_polyline']['points'];
+
+          List<PointLatLng> decodedPoints = PolylinePoints.decodePolyline(
+            encodedPolyline,
+          );
+
+          List<LatLng> routePoints = decodedPoints
+              .map((point) => LatLng(point.latitude, point.longitude))
+              .toList();
+
+          final int distanceMeters =
+              data['routes'][0]['legs'][0]['distance']['value'];
+          final int durationSeconds =
+              data['routes'][0]['legs'][0]['duration']['value'];
+
+          setState(() {
+            polylines.add(
+              Polyline(
+                polylineId: const PolylineId('route'),
+                points: routePoints,
+                color: Colors.red,
+                width: 5,
+              ),
+            );
+
+            distanceKm = distanceMeters / 1000;
+            etaMin = (durationSeconds / 60).round();
+          });
+
+          print("📍 Route Distance: ${distanceKm.toStringAsFixed(2)} km");
+          print("⏱ Estimated Time: $etaMin min");
+        }
+      }
+    } catch (e) {
+      print("Error fetching directions: $e");
     }
-
-    final d = LocationUtils.distanceKm(
-      lat1: pickLat,
-      lng1: pickLng,
-      lat2: dropLat,
-      lng2: dropLng,
-    );
-
-    final eta = LocationUtils.etaMinutes(distanceKm: d);
-
-    setState(() {
-      distanceKm = d;
-      etaMin = eta;
-    });
-
-    debugPrint("📍 Route Distance: ${d.toStringAsFixed(2)} km");
-    debugPrint("⏱ Estimated Time: $eta min");
   }
 
   @override
@@ -230,7 +239,6 @@ class _TrackParcelDriverScreenState extends State<TrackParcelDriverScreen> {
                   () => EndParcelScreen(
                     driver: widget.driver,
                     parcel: widget.parcel,
-               
                   ),
                 );
               },
