@@ -22,7 +22,8 @@ class SocketService {
 
     debugPrint('🟡 Trying to connect socket...');
     socket = IO.io(
-      'https://api.radeefz.com',
+      'https://plbck79v-3008.inc1.devtunnels.ms',
+      // 'https://api.radeefz.com',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .setExtraHeaders({'Authorization': 'Bearer $token'})

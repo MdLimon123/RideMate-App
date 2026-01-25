@@ -44,12 +44,10 @@ class BottomMenu extends StatelessWidget {
     ];
 
     return Container(
-
       decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(20.r),topLeft: Radius.circular(20.r)
-          ),
-         
+          ),   
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.only(
@@ -58,7 +56,7 @@ class BottomMenu extends StatelessWidget {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor:Color(0xFFfafafa),//0xFFfafafa
+          backgroundColor:Color(0xFFfafafa),
           selectedItemColor: Color(0xFF012F64),
           unselectedItemColor: Color(0xFF333333),
           selectedLabelStyle: TextStyle(

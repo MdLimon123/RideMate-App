@@ -40,9 +40,11 @@ class UserAuthController extends GetxController {
         AppConstants.bearerToken,
         response.body['access_token'],
       );
+      print("status text ====> ${response.statusText}");
       showCustomSnackBar(response.statusText, isError: false);
       Get.to(() => TermsConditionScreen());
     } else {
+      print("status text ====> ${response.statusText}");
       showCustomSnackBar(response.statusText, isError: true);
     }
     isLoading(false);
@@ -62,7 +64,6 @@ class UserAuthController extends GetxController {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      
       final userInfo = UserInfoModel.fromJson(response.body);
 
       final token = response.body['access_token'];

@@ -11,12 +11,10 @@ import 'package:radeef/models/error_response.dart';
 import 'package:radeef/service/prefs_helper.dart';
 import 'package:radeef/utils/app_constants.dart';
 
-
-
 class ApiClient extends GetxService {
   static var client = http.Client();
   static const String noInternetMessage =
-      "Sorry! Something went wrong please try again";
+      "Sorry! Something went wrong please try again 2";
   static const int timeoutInSeconds = 30;
 
   static String bearerToken = "";
@@ -52,14 +50,13 @@ class ApiClient extends GetxService {
     Map<String, dynamic> body, {
     Map<String, String>? headers,
   }) async {
-    bearerToken = await PrefsHelper.getString(AppConstants.bearerToken);
-
-    var mainHeaders = {
-      // 'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $bearerToken',
-    };
     try {
+      bearerToken = await PrefsHelper.getString(AppConstants.bearerToken);
+      var mainHeaders = {
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $bearerToken',
+      };
       debugPrint('====> API Call: $uri\nHeader: ${headers ?? mainHeaders}');
       debugPrint('====> API Body: $body');
       debugPrint("Full API URL: ${ApiConstant.baseUrl + uri}");
@@ -77,72 +74,61 @@ class ApiClient extends GetxService {
       );
       return handleResponse(response, uri);
     } catch (e) {
+      print(" ==========> Error Post Method :------ : ${e.toString()}");
       return const Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
+  static Future<Response> postMultipartData1(
+    String uri,
+    Map<String, String> body, {
+    required List<MultipartBody> multipartBody,
+    Map<String, String>? headers,
+  }) async {
+    try {
+      final bearerToken = await PrefsHelper.getString(AppConstants.bearerToken);
 
-static Future<Response> postMultipartData1(
-  String uri,
-  Map<String, String> body, {
-  required List<MultipartBody> multipartBody,
-  Map<String, String>? headers,
-}) async {
-  try {
-    final bearerToken =
-        await PrefsHelper.getString(AppConstants.bearerToken);
+      final mainHeaders = {
+        'Authorization': 'Bearer $bearerToken',
+        // ❌ NEVER set Content-Type manually for multipart
+      };
 
-    final mainHeaders = {
-      'Authorization': 'Bearer $bearerToken',
-      // ❌ NEVER set Content-Type manually for multipart
-    };
+      debugPrint('====> API Call: $uri');
+      debugPrint('====> Headers: $mainHeaders');
+      debugPrint('====> Fields: $body');
+      debugPrint('====> Files count: ${multipartBody.length}');
 
-    debugPrint('====> API Call: $uri');
-    debugPrint('====> Headers: $mainHeaders');
-    debugPrint('====> Fields: $body');
-    debugPrint('====> Files count: ${multipartBody.length}');
-
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ApiConstant.baseUrl + uri),
-    );
-
-    request.headers.addAll(headers ?? mainHeaders);
-    request.fields.addAll(body);
-
-    for (final file in multipartBody) {
-      debugPrint(
-        'Uploading → ${file.key}: ${file.file.path} '
-        '(exists: ${file.file.existsSync()})',
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiConstant.baseUrl + uri),
       );
 
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          file.key,
-          file.file.path,
-        ),
-      );
+      request.headers.addAll(headers ?? mainHeaders);
+      request.fields.addAll(body);
+
+      for (final file in multipartBody) {
+        debugPrint(
+          'Uploading → ${file.key}: ${file.file.path} '
+          '(exists: ${file.file.existsSync()})',
+        );
+
+        request.files.add(
+          await http.MultipartFile.fromPath(file.key, file.file.path),
+        );
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('====> Response Code: ${response.statusCode}');
+      debugPrint('====> Response Body: ${response.body}');
+
+      return handleResponse(response, uri);
+    } catch (e) {
+      debugPrint('❌ Multipart Exception: $e');
+      return const Response(statusCode: 1, statusText: noInternetMessage);
     }
-
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
-
-    debugPrint('====> Response Code: ${response.statusCode}');
-    debugPrint('====> Response Body: ${response.body}');
-
-    return handleResponse(response, uri);
-  } catch (e) {
-    debugPrint('❌ Multipart Exception: $e');
-    return const Response(
-      statusCode: 1,
-      statusText: noInternetMessage,
-    );
   }
-}
-
-
-
-
 
   static Future<Response> postMultipartData(
     String uri,
@@ -444,12 +430,11 @@ static Future<Response> postMultipartData1(
         response0.body != null &&
         response0.body is! String) {
       debugPrint("response ${response0.body.runtimeType}");
-      ErrorResponse errorResponse = ErrorResponse.fromJson(response0.body);
-      debugPrint("${errorResponse.statusCode}");
+
       response0 = Response(
         statusCode: response0.statusCode,
         body: response0.body,
-        statusText: errorResponse.message,
+        statusText: response0.statusText,
       );
 
       // if(_response.body.toString().startsWith('{errors: [{code:')) {

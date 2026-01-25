@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -122,7 +121,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     super.initState();
   }
 
-  // Initialize location tracking
+
   Future<void> _initializeLocationTracking() async {
  
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -144,8 +143,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       print('Location permissions are permanently denied');
       return;
     }
-
-
 
     await _updateLocation();
 
@@ -172,9 +169,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
         position.latitude,
         position.longitude,
       );
-
- 
- 
       _sendLocationToSocket(
         position.latitude,
         position.longitude,
@@ -203,7 +197,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     }
   }
 
-  // Send location data to socket
+
   void _sendLocationToSocket(double lat, double lng, String address) {
     final locationData = {
       'location_lat': lat,
@@ -292,7 +286,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                 clipBehavior: Clip.none,
                 children: [
                   Image.asset("assets/images/maps.png"),
-
                   Positioned(
                     bottom: -60,
                     left: 20,

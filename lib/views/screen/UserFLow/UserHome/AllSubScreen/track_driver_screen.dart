@@ -7,7 +7,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
-import 'package:radeef/utils/location_utils.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/end_trip_screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,83 +35,7 @@ class TrackDriverScreen extends StatefulWidget {
 }
 
 class _TrackDriverScreenState extends State<TrackDriverScreen> {
-  // Set<Marker> markers = {};
-  // Set<Polyline> polylines = {};
 
-  // int etaMin = 0;
-  // double distanceKm = 0;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _setupMarkers();
-  //   _setupPolyline();
-  //   _calculateDistanceAndTime();
-  // }
-
-  // void _setupMarkers() {
-  //   markers.add(
-  //     Marker(
-  //       markerId: const MarkerId('bike'),
-  //       position: LatLng(widget.pickLat, widget.pickLan),
-  //       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-  //     ),
-  //   );
-
-  //   markers.add(
-  //     Marker(
-  //       markerId: const MarkerId('destination'),
-  //       position: LatLng(widget.dropLat, widget.dropLan),
-  //       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-  //     ),
-  //   );
-  // }
-
-  // void _setupPolyline() {
-  //   polylines.add(
-  //     Polyline(
-  //       polylineId: const PolylineId('route'),
-  //       points: [
-  //         LatLng(widget.pickLat, widget.pickLan),
-  //         LatLng(widget.dropLat, widget.dropLan),
-  //       ],
-  //       color: Colors.red,
-  //       width: 5,
-  //     ),
-  //   );
-  // }
-
-  // void _calculateDistanceAndTime() {
-  //   final pickLat = widget.pickLat;
-  //   final pickLng = widget.pickLan;
-  //   final dropLat = widget.dropLat;
-  //   final dropLng = widget.dropLan;
-
-  //   if (pickLat == 0 || pickLng == 0 || dropLat == 0 || dropLng == 0) {
-  //     setState(() {
-  //       etaMin = 0;
-  //       distanceKm = 0;
-  //     });
-  //     return;
-  //   }
-
-  //   final d = LocationUtils.distanceKm(
-  //     lat1: pickLat,
-  //     lng1: pickLng,
-  //     lat2: dropLat,
-  //     lng2: dropLng,
-  //   );
-
-  //   final eta = LocationUtils.etaMinutes(distanceKm: d);
-
-  //   setState(() {
-  //     distanceKm = d;
-  //     etaMin = eta;
-  //   });
-
-  //   print("📍 Route Distance: ${d.toStringAsFixed(2)} km");
-  //   print("⏱ Estimated Time: $eta min");
-  // }
 
   Set<Marker> markers = {};
   Set<Polyline> polylines = {};
