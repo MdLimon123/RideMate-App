@@ -7,6 +7,7 @@ import 'package:radeef/models/User/parcel_response_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
+import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/find_driver_screen.dart';
@@ -16,12 +17,15 @@ import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dar
 class SearchADriverScreen extends StatefulWidget {
   final String pickLocation;
   final String dropLocation;
+  final String? parcelId;
+  final String? tripId;
 
   const SearchADriverScreen({
     super.key,
     required this.pickLocation,
     required this.dropLocation,
-
+    this.parcelId,
+    this.tripId,
   });
 
   @override
@@ -107,8 +111,7 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
       final parcel = ParcelModel.fromJson(data['parcel']);
 
       Get.off(
-        () => FindParcelDriverScreen(driver: parcelDriverModel, parcel: parcel,
-           ),
+        () => FindParcelDriverScreen(driver: parcelDriverModel, parcel: parcel),
       );
     });
 
@@ -370,8 +373,33 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
                         ],
                       ),
                     ),
+                    SizedBox(height: 32),
 
-                    SizedBox(height: 169),
+                    CustomButton(
+                      onTap: () {
+                        if (widget.parcelId != null) {
+                          SocketService().emit(
+                            'parcel:parcel:cancel',
+                            data: {"parcel_id": widget.parcelId!},
+                          );
+                          debugPrint("Parcel declined: ${widget.parcelId}");
+                        } else if (widget.tripId != null) {
+                          SocketService().emit(
+                            'trip:cancel',
+                            data: {"trip_id": widget.tripId!},
+                          );
+                          debugPrint("Trip canceled: ${widget.tripId}");
+                        } else {
+                          debugPrint("Nothing to cancel");
+                          return;
+                        }
+
+                        Get.back();
+                      },
+                      text: "cancel".tr,
+                    ),
+
+                    SizedBox(height: 90),
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(

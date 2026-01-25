@@ -21,6 +21,7 @@ class HomeController extends GetxController {
   final parcelWeightController = TextEditingController();
   final parcelAmount = TextEditingController();
 
+
   RxString selectedParcelType = "".obs;
 
   final box = GetStorage();
@@ -179,6 +180,7 @@ class HomeController extends GetxController {
           dropLan: dropCoordinates[1],
           pickLocation: pickAddress.value,
           dropLocation: dropAddress.value,
+          
    
         ),
       );

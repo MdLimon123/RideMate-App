@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/home_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
+import 'package:radeef/models/User/parcel_response_model.dart';
+import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_button.dart';
@@ -12,13 +14,16 @@ import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/search_a_driv
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class ShowAmountScreen extends StatefulWidget {
-  final int showAmount;
+  final double showAmount;
   final double pickLat;
   final double pickLng;
   final double dropLat;
   final double dropLan;
   final int? weight;
   final int? amount;
+  final ParcelModel? parcelModel;
+  final TripModel? tripModel;
+
   final String pickLocation;
   final String dropLocation;
 
@@ -32,6 +37,8 @@ class ShowAmountScreen extends StatefulWidget {
     required this.dropLan,
     required this.pickLocation,
     required this.dropLocation,
+    this.parcelModel,
+    this.tripModel,
 
     this.weight,
     this.amount,
@@ -237,62 +244,75 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                         Expanded(
                           child: CustomButton(
                             onTap: () {
-
-                              if(_userProfileController.userProfileModel.value.wallet!.balance! < widget.showAmount){
-                                Get.snackbar("Insufficient Balance", "Please top up your wallet to proceed.",
+                              if (_userProfileController
+                                      .userProfileModel
+                                      .value
+                                      .wallet!
+                                      .balance! <
+                                  widget.showAmount) {
+                                Get.snackbar(
+                                  "Insufficient Balance",
+                                  "Please top up your wallet to proceed.",
                                   backgroundColor: Colors.redAccent,
                                   colorText: Colors.white,
                                 );
                                 return;
                               }
                               if (_homeController.selectedIndex.value == 0) {
-
-
-                                SocketService().emit('trip:new_request', data: {
-                                  "pickup_lat": widget.pickLat,
-                                  "pickup_lng": widget.pickLng,
-                                  "pickup_address": widget.pickLocation,
-                                  "dropoff_lat": widget.dropLat,
-                                  "dropoff_lng": widget.dropLan,
-                                  "dropoff_address": widget.dropLocation,
-                                });
-
-                                Get.to(
+                                SocketService().emit(
+                                  'trip:new_request',
+                                  data: {
+                                    "pickup_lat": widget.pickLat,
+                                    "pickup_lng": widget.pickLng,
+                                    "pickup_address": widget.pickLocation,
+                                    "dropoff_lat": widget.dropLat,
+                                    "dropoff_lng": widget.dropLan,
+                                    "dropoff_address": widget.dropLocation,
+                                  },
+                                  ack: (res) {
+                                      
+                                    debugPrint(" socekt request =====> $res");
+                                      Get.to(
                                   () => SearchADriverScreen(
+                                    parcelId: res['id'],
                                     pickLocation: widget.pickLocation,
                                     dropLocation: widget.dropLocation,
-                                
                                   ),
                                 );
+                                  },
+                                );
+
+                               
                               } else if (_homeController.selectedIndex.value ==
                                   1) {
-                                SocketService().emit('parcel:new_request', data: {
-                                  "weight": widget.weight!,
-                                  "amount": widget.amount!,
-                                  "pickup_lat": widget.pickLat,
-                                  "pickup_lng": widget.pickLng,
-                                  "pickup_address": widget.pickLocation,
-                                  "dropoff_lat": widget.dropLat,
-                                  "dropoff_lng": widget.dropLan,
-                                  "dropoff_address": widget.dropLocation,
-                                });
-
-                                debugPrint(" socekt request =====>");
-
-                                Get.to(
-                                  () => SearchADriverScreen(
-                                    pickLocation: widget.pickLocation,
-                                    dropLocation: widget.dropLocation,
-                                 
-                                  ),
+                                SocketService().emit(
+                                  'parcel:new_request',
+                                  data: {
+                                    "weight": widget.weight!,
+                                    "amount": widget.amount!,
+                                    "pickup_lat": widget.pickLat,
+                                    "pickup_lng": widget.pickLng,
+                                    "pickup_address": widget.pickLocation,
+                                    "dropoff_lat": widget.dropLat,
+                                    "dropoff_lng": widget.dropLan,
+                                    "dropoff_address": widget.dropLocation,
+                                  },
+                                  ack: (res) {
+                                    debugPrint(" socekt request =====> $res");
+                                    Get.to(
+                                      () => SearchADriverScreen(
+                                        parcelId: res['id'],
+                                        pickLocation: widget.pickLocation,
+                                        dropLocation: widget.dropLocation,
+                                      ),
+                                    );
+                                  },
                                 );
                               }
                             },
                             text: "confirm".tr,
                           ),
                         ),
-                     
-                     
                       ],
                     ),
                     SizedBox(height: 74),

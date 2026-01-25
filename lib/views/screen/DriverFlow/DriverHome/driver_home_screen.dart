@@ -12,6 +12,7 @@ import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/bottom_menu.dart';
 import 'package:radeef/views/base/custom_switch.dart';
+import 'package:radeef/views/base/home_state_shimmer.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/new_request_screen.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
 
@@ -48,7 +49,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     toggleOnlineStatus(isSwitch);
     subscribleId();
 
- 
     _initializeLocationTracking();
 
     _xController = AnimationController(
@@ -121,9 +121,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     super.initState();
   }
 
-
   Future<void> _initializeLocationTracking() async {
- 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       print('Location services are disabled.');
@@ -146,14 +144,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
     await _updateLocation();
 
-   
-   
     _locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       _updateLocation();
     });
   }
-
-
 
   Future<void> _updateLocation() async {
     try {
@@ -163,25 +157,17 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
       _currentPosition = position;
 
-
-
       String address = await _getAddressFromLatLng(
         position.latitude,
         position.longitude,
       );
-      _sendLocationToSocket(
-        position.latitude,
-        position.longitude,
-        address,
-      );
+      _sendLocationToSocket(position.latitude, position.longitude, address);
 
       print('Location updated: ${position.latitude}, ${position.longitude}');
     } catch (e) {
       print('Error getting location: $e');
     }
   }
-
-
 
   Future<String> _getAddressFromLatLng(double lat, double lng) async {
     try {
@@ -196,7 +182,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       return 'Unknown';
     }
   }
-
 
   void _sendLocationToSocket(double lat, double lng, String address) {
     final locationData = {
@@ -214,7 +199,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     SocketService().emit('driver:toggle_online', data: {'online': status});
 
     print('Online status ===========>: $status');
-
 
     if (status) {
       if (_locationTimer == null || !_locationTimer!.isActive) {
@@ -410,8 +394,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                   ],
                                 ),
                                 const SizedBox(height: 6),
-                                Obx(
-                                  () => Row(
+                                Obx(() {
+                                  if (_driverHomeController.isLoading.value) {
+                                    return const HomeStatsShimmer();
+                                  }
+
+                                  return Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
@@ -421,7 +409,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                             .value
                                             .totalCount
                                             .toString(),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF333333),
@@ -433,7 +421,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                             .value
                                             .totalTime
                                             .toString(),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF333333),
@@ -441,15 +429,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                       ),
                                       Text(
                                         "${_driverHomeController.homeModel.value.totalEarnings} XAF",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF333333),
                                         ),
                                       ),
                                     ],
-                                  ),
-                                ),
+                                  );
+                                }),
                               ],
                             ),
                           ),

@@ -6,9 +6,11 @@ import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 
 class DriverHomeController extends GetxController {
+  var isLoading = false.obs;
   var homeModel = HomeModel().obs;
 
   Future<void> fetchHomeData() async {
+    isLoading(true);
     final response = await ApiClient.getData("/drivers");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -16,6 +18,7 @@ class DriverHomeController extends GetxController {
     } else {
       debugPrint("soemthing we want wrong ======> ${response.statusText}");
     }
+    isLoading(false);
   }
 
   Future<void> subscribleId() async {
