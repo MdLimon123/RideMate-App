@@ -24,11 +24,14 @@ class SocketService {
     socket = IO.io(
       'https://plbck79v-3008.inc1.devtunnels.ms',
       // 'https://api.radeefz.com',
-      IO.OptionBuilder()
+    IO.OptionBuilder()
           .setTransports(['websocket'])
-          .setExtraHeaders({'Authorization': 'Bearer $token'})
-          .enableAutoConnect()
-          .setTimeout(10000000)
+          .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(20)
+          .setReconnectionDelay(2000)
+          .setReconnectionDelayMax(8000)
+          .setAuth({"token": token})
           .build(),
     );
 
@@ -61,7 +64,7 @@ class SocketService {
   }
 
   // Emit event
-  void emit(String event, {dynamic data, Function(dynamic response)? ack}) {
+   void emit(String event, {dynamic data, Function(dynamic response)? ack}) {
     if (socket == null) return;
 
     if (ack != null) {
@@ -85,3 +88,16 @@ class SocketService {
     socket?.off(event);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

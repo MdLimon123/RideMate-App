@@ -1,14 +1,16 @@
-import 'dart:convert';
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
+import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/end_trip_screen.dart';
-import 'package:http/http.dart' as http;
 
 class TrackDriverScreen extends StatefulWidget {
   final double pickLat;
@@ -31,35 +33,54 @@ class TrackDriverScreen extends StatefulWidget {
   });
 
   @override
-  _TrackDriverScreenState createState() => _TrackDriverScreenState();
+  State<TrackDriverScreen> createState() => _TrackDriverScreenState();
 }
 
 class _TrackDriverScreenState extends State<TrackDriverScreen> {
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
 
+  LatLng? _driverLatLng;
 
-  Set<Marker> markers = {};
-  Set<Polyline> polylines = {};
-
-  int etaMin = 0;
-  double distanceKm = 0;
+  bool _isPickupStarted = false;
 
   @override
   void initState() {
     super.initState();
+
+    _driverLatLng = LatLng(
+      widget.driver.locationLat,
+      widget.driver.locationLng,
+    );
+
+    debugPrint("driver location : ${_driverLatLng}");
     _setupMarkers();
-    _getDirections(); 
+    _drawPickupToDestination();
+    _listenDriverLocation();
+    _drawDriverToPickup();
   }
 
+  /// ================= MARKERS =================
   void _setupMarkers() {
-    markers.add(
+    _markers.clear();
+
+    _markers.add(
       Marker(
-        markerId: const MarkerId('bike'),
-        position: LatLng(widget.pickLat, widget.pickLan),
+        markerId: const MarkerId('driver'),
+        position: _driverLatLng!,
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
     );
 
-    markers.add(
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('pickup'),
+        position: LatLng(widget.pickLat, widget.pickLan),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+    );
+
+    _markers.add(
       Marker(
         markerId: const MarkerId('destination'),
         position: LatLng(widget.dropLat, widget.dropLan),
@@ -68,67 +89,114 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
     );
   }
 
-  Future<void> _getDirections() async {
-    final String url =
-        'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${widget.pickLat},${widget.pickLan}&'
-        'destination=${widget.dropLat},${widget.dropLan}&'
-        'key=${ApiConstant.googleApiKey}';
+  /// ================= SOCKET =================
+  void _listenDriverLocation() {
+    SocketService().on('trip:refresh_location', (data) async {
+      _driverLatLng = LatLng(data['lat'], data['lng']);
 
-    try {
-      final response = await http.get(Uri.parse(url));
+      _setupMarkers();
+      await _drawDriverToPickup();
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+      // if (!_isPickupStarted) {
+      //   await _drawDriverToPickup();
+      // } else {
+      //    _isPickupStarted = true; // 🔴 STOP driver → pickup logic
 
-        if (data['routes'].isNotEmpty) {
-          final String encodedPolyline =
-              data['routes'][0]['overview_polyline']['points'];
+      // _polylines.removeWhere((p) => p.polylineId.value == 'driver_to_pickup');
 
-          List<PointLatLng> decodedPoints = PolylinePoints.decodePolyline(
-            encodedPolyline,
-          );
+      // _markers.removeWhere((m) => m.markerId.value == 'driver_eta');
 
-          List<LatLng> routePoints = decodedPoints
-              .map((point) => LatLng(point.latitude, point.longitude))
-              .toList();
+      // driverEta = null;
+      // driverDistance = null;
+      // }
 
-          final int distanceMeters =
-              data['routes'][0]['legs'][0]['distance']['value'];
-          final int durationSeconds =
-              data['routes'][0]['legs'][0]['duration']['value'];
-
-          setState(() {
-            polylines.add(
-              Polyline(
-                polylineId: const PolylineId('route'),
-                points: routePoints,
-                color: Colors.red,
-                width: 5,
-              ),
-            );
-
-      
-            distanceKm = distanceMeters / 1000;
-            etaMin = (durationSeconds / 60).round();
-          });
-
-          print("📍 Route Distance: ${distanceKm.toStringAsFixed(2)} km");
-          print("⏱ Estimated Time: $etaMin min");
-        }
-      }
-    } catch (e) {
-      print("Error fetching directions: $e");
-    }
+      setState(() {});
+    });
   }
 
+  /// ================= ROUTE =================
+  Future<RouteData?> _fetchRoute(
+    double startLat,
+    double startLng,
+    double endLat,
+    double endLng,
+  ) async {
+    final url =
+        'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=$startLat,$startLng&'
+        'destination=$endLat,$endLng&'
+        'key=${ApiConstant.googleApiKey}';
 
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
+
+    if (data['routes'].isEmpty) return null;
+
+    final route = data['routes'][0];
+    final leg = route['legs'][0];
+
+    final encoded = route['overview_polyline']['points'];
+    final decoded = PolylinePoints.decodePolyline(encoded);
+
+    return RouteData(
+      points: decoded.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+      duration: leg['duration']['text'],
+      distance: leg['distance']['text'],
+    );
+  }
+
+  /// ================= POLYLINES =================
+  Future<void> _drawDriverToPickup() async {
+    _polylines.removeWhere((p) => p.polylineId.value == 'driver_to_pickup');
+
+    final route = await _fetchRoute(
+      _driverLatLng!.latitude,
+      _driverLatLng!.longitude,
+      widget.pickLat,
+      widget.pickLan,
+    );
+
+    if (route == null) return;
+
+    _polylines.add(
+      Polyline(
+        polylineId: const PolylineId('driver_to_pickup'),
+        points: route.points,
+        color: Colors.blue,
+        width: 5,
+      ),
+    );
+  }
+
+  Future<void> _drawPickupToDestination() async {
+    final route = await _fetchRoute(
+      widget.pickLat,
+      widget.pickLan,
+      widget.dropLat,
+      widget.dropLan,
+    );
+
+    if (route == null) return;
+
+    _polylines.add(
+      Polyline(
+        polylineId: const PolylineId('pickup_to_destination'),
+        points: route.points,
+        color: Colors.red,
+        width: 5,
+      ),
+    );
+
+    setState(() {});
+  }
 
   @override
   void dispose() {
+    SocketService().off('driver:location:update');
     super.dispose();
   }
 
+  /// ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,108 +204,30 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
         children: [
           GoogleMap(
             initialCameraPosition: CameraPosition(
-              target: LatLng(widget.pickLat, widget.pickLan),
+              target: _driverLatLng!,
               zoom: 14,
             ),
-            markers: markers,
-            polylines: polylines,
-            onMapCreated: (GoogleMapController controller) {},
+
+            markers: _markers,
+            polylines: _polylines,
+            myLocationEnabled: false,
           ),
 
-          /// Back Button
           Positioned(
             top: 40,
             left: 10,
             child: SafeArea(
-              child: Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          spreadRadius: 1,
-                          blurRadius: 3,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {
-                        Get.back();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          /// Kamarpara Card
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.2,
-            left: MediaQuery.of(context).size.width * 0.05,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.dropAddress,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.motorcycle,
-                        size: 18,
-                        color: Colors.grey.shade700,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        etaMin == 0 ? "-- min" : "$etaMin min",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    distanceKm == 0
-                        ? "-- km"
-                        : "${distanceKm.toStringAsFixed(1)} km",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: Get.back,
               ),
             ),
           ),
 
           Positioned(
             bottom: 30,
-            left: MediaQuery.of(context).size.width * 0.1,
-            right: MediaQuery.of(context).size.width * 0.1,
+            left: 30,
+            right: 30,
             child: InkWell(
               onTap: () {
                 Get.to(
@@ -245,22 +235,18 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
                 );
               },
               child: Container(
-                width: 200,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     "End Trip",
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -271,4 +257,17 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
       ),
     );
   }
+}
+
+/// ================= DATA MODEL =================
+class RouteData {
+  final List<LatLng> points;
+  final String duration;
+  final String distance;
+
+  RouteData({
+    required this.points,
+    required this.duration,
+    required this.distance,
+  });
 }

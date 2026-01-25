@@ -21,7 +21,6 @@ class HomeController extends GetxController {
   final parcelWeightController = TextEditingController();
   final parcelAmount = TextEditingController();
 
-
   RxString selectedParcelType = "".obs;
 
   final box = GetStorage();
@@ -180,8 +179,6 @@ class HomeController extends GetxController {
           dropLan: dropCoordinates[1],
           pickLocation: pickAddress.value,
           dropLocation: dropAddress.value,
-          
-   
         ),
       );
     } else {
@@ -215,14 +212,13 @@ class HomeController extends GetxController {
       showCustomSnackBar(response.statusText, isError: false);
       Get.to(
         () => ShowAmountScreen(
-          showAmount: response.body['estimated_fare'],
+          showAmount: response.body['estimated_fare'].toDouble(),
           pickLat: pickCoordinates[0],
           pickLng: pickCoordinates[1],
           dropLat: dropCoordinates[0],
           dropLan: dropCoordinates[1],
           pickLocation: pickAddress.value,
           dropLocation: dropAddress.value,
-     
         ),
       );
     } else {
@@ -242,7 +238,6 @@ class HomeController extends GetxController {
       "onesignal_id": subscriptionId,
     });
     if (response.statusCode == 200 || response.statusCode == 201) {
-
     } else {
       showCustomSnackBar(response.statusText, isError: true);
     }

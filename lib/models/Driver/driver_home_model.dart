@@ -1,7 +1,7 @@
 class HomeModel {
-  final int? totalCount;
-  final int? totalEarnings;
-  final int? totalTime;
+  final double? totalCount;
+  final double? totalEarnings;
+  final double? totalTime;
 
   HomeModel({
     this.totalCount,
@@ -12,9 +12,9 @@ class HomeModel {
  
   factory HomeModel.fromJson(Map<String, dynamic> json) {
     return HomeModel(
-      totalCount: json['total_count'] != null ? json['total_count'] as int : null,
-      totalEarnings: json['total_earnings'] != null ? json['total_earnings'] as int : null,
-      totalTime: json['total_time'] != null ? json['total_time'] as int : null,
+      totalCount: json['total_count'] == null ?0.0 :json['total_count'].runtimeType==int ?double.parse(json['total_count'].toString()):json['total_count'],
+      totalEarnings: json['total_earnings'] == null ? 0.0: json['total_earnings'].runtimeType==int ?double.parse(json['total_earnings'].toString()):json['total_earnings'],
+      totalTime: json['total_time'] == null ?0.0 : json['total_time'].runtimeType==int ?double.parse(json['total_time'].toString()):json['total_time'],
     );
   }
 

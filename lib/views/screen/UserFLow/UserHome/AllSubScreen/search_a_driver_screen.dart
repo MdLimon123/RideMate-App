@@ -379,7 +379,7 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
                       onTap: () {
                         if (widget.parcelId != null) {
                           SocketService().emit(
-                            'parcel:parcel:cancel',
+                            'parcel:cancel',
                             data: {"parcel_id": widget.parcelId!},
                           );
                           debugPrint("Parcel declined: ${widget.parcelId}");

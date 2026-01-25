@@ -155,17 +155,23 @@ class UserProfileModel {
 }
 
 class Wallet {
-  final int? balance;
-  final int? totalExpend;
-  final int? totalIncome;
+  final double? balance;
+  final double? totalExpend;
+  final double? totalIncome;
 
   Wallet({this.balance, this.totalExpend, this.totalIncome});
 
   factory Wallet.fromJson(Map<String, dynamic> json) {
     return Wallet(
-      balance: json['balance'] ?? 0,
-      totalExpend: json['total_expend'] ?? 0,
-      totalIncome: json['total_income'] ?? 0,
+      balance: json['balance'].runtimeType == int
+          ? json['balance'].toDouble()
+          : json['balance'] ?? 0.0,
+      totalExpend: json['total_expend'].runtimeType == int
+          ? json['total_expend'].toDouble()
+          : json['total_expend'] ?? 0.0,
+      totalIncome: json['total_income'].runtimeType == int
+          ? json['total_income'].toDouble()
+          : json['total_income'] ?? 0.0,
     );
   }
 

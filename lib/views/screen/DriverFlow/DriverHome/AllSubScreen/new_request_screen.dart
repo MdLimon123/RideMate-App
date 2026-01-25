@@ -28,13 +28,32 @@ class NewRequestScreen extends StatefulWidget {
 }
 
 class _NewRequestScreenState extends State<NewRequestScreen> {
-
-
-
-
   @override
   void initState() {
+    cancelTrip();
     super.initState();
+  }
+
+  cancelTrip() {
+    // if (widget.isParcel) {
+    //   SocketService().emit(
+    //     "parcel:cancel",
+    //     data: {"parcel_id": widget.parcel!.id},
+    //   );
+    // } else {
+    //   SocketService().emit("trip:cancel", data: {"trip_id": widget.trip!.id});
+    // }
+
+    if (widget.isParcel) {
+      SocketService().on("parcel:canceled", (data) {
+        Get.back();
+      });
+    } else {
+      SocketService().on("trip:canceled", (data) {
+        print("trip:canceled : $data");
+        Get.back();
+      });
+    }
   }
 
   @override
@@ -51,7 +70,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                 children: [
                   Image.asset("assets/images/maps.png"),
 
-               
                   Positioned(
                     bottom: -60,
                     left: 20,
