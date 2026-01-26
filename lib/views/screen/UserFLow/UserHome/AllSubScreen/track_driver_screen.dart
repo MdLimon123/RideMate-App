@@ -1,10 +1,10 @@
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 
 import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
@@ -40,24 +40,25 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
 
-  LatLng? _driverLatLng;
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );
 
-  bool _isPickupStarted = false;
+  LatLng? _driverLatLng;
 
   @override
   void initState() {
-    super.initState();
-
     _driverLatLng = LatLng(
       widget.driver.locationLat,
       widget.driver.locationLng,
     );
-
-    debugPrint("driver location : ${_driverLatLng}");
     _setupMarkers();
     _drawPickupToDestination();
     _listenDriverLocation();
-    _drawDriverToPickup();
+    print("====== isTripStarted ${_tripSocketController.isTripStarted.value}");
+    if (!_tripSocketController.isTripStarted.value) _drawDriverToPickup();
+    listenStartedTrip();
+    super.initState();
   }
 
   /// ================= MARKERS =================
@@ -90,28 +91,73 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
   }
 
   /// ================= SOCKET =================
-  void _listenDriverLocation() {
-    SocketService().on('trip:refresh_location', (data) async {
-      _driverLatLng = LatLng(data['lat'], data['lng']);
+  void _listenDriverLocation() async {
+    _tripSocketController.listenDriverLocation(
+      onLocationUpdate: (newLatLng) async {
+        setState(() {
+          _driverLatLng = newLatLng;
+          // 🔴 ONLY update driver marker
+          _markers.removeWhere((m) => m.markerId.value == 'driver');
 
-      _setupMarkers();
-      await _drawDriverToPickup();
+          _markers.add(
+            Marker(
+              markerId: const MarkerId('driver'),
+              position: _driverLatLng!,
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueBlue,
+              ),
+            ),
+          );
+        });
+        // pickup শুরু না হলে route draw করো
+        if (!_tripSocketController.isTripStarted.value) {
+          await _drawDriverToPickup();
+        }
+      },
+    );
 
-      // if (!_isPickupStarted) {
-      //   await _drawDriverToPickup();
-      // } else {
-      //    _isPickupStarted = true; // 🔴 STOP driver → pickup logic
+    // SocketService().on('trip:refresh_location', (data) async {
+    //   final newLatLng = LatLng(data['location_lat'], data['location_lng']);
 
-      // _polylines.removeWhere((p) => p.polylineId.value == 'driver_to_pickup');
+    //   setState(() {
+    //     _driverLatLng = newLatLng;
 
-      // _markers.removeWhere((m) => m.markerId.value == 'driver_eta');
+    //     // 🔴 ONLY update driver marker
+    //     _markers.removeWhere((m) => m.markerId.value == 'driver');
 
-      // driverEta = null;
-      // driverDistance = null;
-      // }
+    //     _markers.add(
+    //       Marker(
+    //         markerId: const MarkerId('driver'),
+    //         position: _driverLatLng!,
+    //         icon: BitmapDescriptor.defaultMarkerWithHue(
+    //           BitmapDescriptor.hueBlue,
+    //         ),
+    //       ),
+    //     );
+    //   });
+    //   // pickup শুরু না হলে route draw করো
+    //   if (!_isPickupStarted) {
+    //     await _drawDriverToPickup();
+    //   }
+    // });
+  }
 
-      setState(() {});
-    });
+  void listenStartedTrip() {
+    _tripSocketController.listenStartedTrip(
+      onTripStarted: () {
+        setState(() {
+          _tripSocketController.isTripStarted.value = true;
+          print(
+            "====== TRIP STARTED ${_tripSocketController.isTripStarted.value}",
+          );
+
+          // 🔴 FORCE REMOVE
+          _polylines.removeWhere(
+            (p) => p.polylineId.value == 'driver_to_pickup',
+          );
+        });
+      },
+    );
   }
 
   /// ================= ROUTE =================
@@ -147,6 +193,9 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
 
   /// ================= POLYLINES =================
   Future<void> _drawDriverToPickup() async {
+    if (_tripSocketController.isTripStarted.value) return;
+
+    // 🔴 REMOVE FIRST
     _polylines.removeWhere((p) => p.polylineId.value == 'driver_to_pickup');
 
     final route = await _fetchRoute(
@@ -156,7 +205,8 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
       widget.pickLan,
     );
 
-    if (route == null) return;
+    // 🔴 CHECK AGAIN AFTER AWAIT
+    if (route == null || _tripSocketController.isTripStarted.value) return;
 
     _polylines.add(
       Polyline(
@@ -166,8 +216,11 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
         width: 5,
       ),
     );
+
+    setState(() {});
   }
 
+  /// ================= POLYLINES =================
   Future<void> _drawPickupToDestination() async {
     final route = await _fetchRoute(
       widget.pickLat,
@@ -224,35 +277,35 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
             ),
           ),
 
-          Positioned(
-            bottom: 30,
-            left: 30,
-            right: 30,
-            child: InkWell(
-              onTap: () {
-                Get.to(
-                  () => EndTripScreen(driver: widget.driver, trip: widget.trip),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(
-                  child: Text(
-                    "End Trip",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   bottom: 30,
+          //   left: 30,
+          //   right: 30,
+          //   child: InkWell(
+          //     onTap: () {
+          //       Get.to(
+          //         () => EndTripScreen(driver: widget.driver, trip: widget.trip),
+          //       );
+          //     },
+          //     child: Container(
+          //       padding: const EdgeInsets.all(14),
+          //       decoration: BoxDecoration(
+          //         color: Colors.red,
+          //         borderRadius: BorderRadius.circular(10),
+          //       ),
+          //       child: const Center(
+          //         child: Text(
+          //           "End Trip",
+          //           style: TextStyle(
+          //             color: Colors.white,
+          //             fontSize: 18,
+          //             fontWeight: FontWeight.bold,
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/chat_controller.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
@@ -30,6 +31,9 @@ class _EndTripScreenState extends State<EndTripScreen> {
   final _chatController = Get.put(ChatController());
 
   final _userProfileController = Get.put(UserProfileController());
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );
 
   double driverLat = 0;
   double driverLng = 0;
@@ -467,16 +471,13 @@ class _EndTripScreenState extends State<EndTripScreen> {
   }
 
   void _payTrip() {
-    if (!SocketService().isConnected) {
-      _showErrorPopup("Socket not connected");
-      return;
-    }
-    SocketService().emit(
-      "trip:pay",
-      data: {"trip_id": widget.trip.id},
-      ack: (response) {
-        if (response['status'] == 'success') {
-          final balance = response['balance'] ?? 0;
+    _tripSocketController.payForTrip(
+      tripId: widget.trip.id,
+      callback: (response) {
+        if (response['success']) {
+          final balance =
+              response['data']['balance'] ??
+              0; // Extract the balance from the response
           _showSuccessPopup(
             balance,
             widget.driver.avatar,
@@ -487,7 +488,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
             widget.trip,
           );
         } else {
-          final message = response['message'] ?? "Payment failed";
+          final message = "Payment failed";
           _showErrorPopup(message);
         }
       },

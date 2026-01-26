@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/parcel_response_model.dart';
@@ -46,6 +47,8 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
   final dropLocationController = TextEditingController();
 
   final _userProfileController = Get.put(UserProfileController());
+  final TripSocketController _tripSocketController =
+      Get.put(TripSocketController());
 
   @override
   void initState() {
@@ -94,22 +97,14 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
     }
 
     // Handling 'trip:accepted' event
-    SocketService().on('trip:accepted', (data) {
-      if (!mounted) return;
+  _tripSocketController.listenOnAcceptedTrip();
 
-      final driver = DriverModel.fromJson(data['driver']);
-      final trip = TripModel.fromJson(data['trip']);
-
-      // Navigate to FindDriverScreen
-      Get.off(() => FindDriverScreen(driver: driver, trip: trip));
-    });
 
     // Handling 'parcel:accepted' event
     SocketService().on('parcel:accepted', (data) {
       if (!mounted) return;
       final parcelDriverModel = ParcelDriverModel.fromJson(data['driver']);
       final parcel = ParcelModel.fromJson(data['parcel']);
-
       Get.off(
         () => FindParcelDriverScreen(driver: parcelDriverModel, parcel: parcel),
       );
@@ -131,8 +126,8 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
     _rotationController.dispose();
 
     // 🔴 Remove socket listener
-    SocketService().off('trip:accepted');
-    SocketService().off('parcel:accepted');
+    // SocketService().off('trip:accepted');
+    // SocketService().off('parcel:accepted');
 
     super.dispose();
   }

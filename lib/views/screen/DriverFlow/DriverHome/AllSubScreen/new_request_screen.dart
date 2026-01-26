@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/service/socket_service.dart';
@@ -28,6 +29,14 @@ class NewRequestScreen extends StatefulWidget {
 }
 
 class _NewRequestScreenState extends State<NewRequestScreen> {
+
+
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );  
+
+
+
   @override
   void initState() {
     cancelTrip();
@@ -312,21 +321,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             ),
                           );
                         } else {
-                          //  Trip accept
-                          SocketService().emit(
-                            'trip:accept',
-                            data: {"trip_id": widget.trip!.id},
-                          );
-
-                          debugPrint("Trip accepted: ${widget.trip!.id}");
-
-                          //  Trip model pass
-                          Get.to(
-                            () => AcceptScreen(
-                              isParcel: false,
-                              trip: widget.trip,
-                              tripUserModel: widget.tripUserModel,
-                            ),
+                          _tripSocketController.acceptTripRequest(
+                            widget.trip!.id,
+                            widget.trip,
+                            widget.tripUserModel,
                           );
                         }
                       },

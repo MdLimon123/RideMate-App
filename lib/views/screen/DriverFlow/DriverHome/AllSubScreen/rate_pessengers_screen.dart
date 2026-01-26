@@ -12,18 +12,20 @@ import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 
 class RatePessengersScreen extends StatefulWidget {
-  final bool isParcel;
-  final ParcelRequestModel? parcel;
-  final TripRequestModel? trip;
-  final ParcelUserModel? parcelUserModel;
-  final TripUserModel? tripUserModel;
+  final String userId;
+  final String userName;
+  final String userImage;
+  final double rating;
+  final int totalTrips;
+  final String tripId;
   const RatePessengersScreen({
     super.key,
-    required this.isParcel,
-    this.parcel,
-    this.trip,
-    this.parcelUserModel,
-    this.tripUserModel,
+    required this.userId,
+    required this.userName,
+    required this.userImage,
+    required this.rating,
+    required this.totalTrips,
+    required this.tripId,
   });
 
   @override
@@ -60,7 +62,7 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                   Center(
                     child: CustomNetworkImage(
                       imageUrl:
-                          "${ApiConstant.imageBaseUrl}${widget.isParcel ? widget.parcelUserModel!.avatar : widget.tripUserModel!.avatar}",
+                          "${ApiConstant.imageBaseUrl}${widget.userImage}",
                       boxShape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                       height: 48,
@@ -70,9 +72,7 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                   const SizedBox(height: 12),
                   Center(
                     child: Text(
-                      widget.isParcel
-                          ? widget.parcelUserModel!.name
-                          : widget.tripUserModel!.name,
+                      widget.userName,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -104,11 +104,7 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            widget.isParcel
-                                ? widget.parcelUserModel!.tripReceivedCount
-                                      .toString()
-                                : widget.tripUserModel!.tripReceivedCount
-                                      .toString(),
+                            widget.totalTrips.toString(),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
@@ -119,12 +115,7 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                           const Icon(Icons.star, color: Color(0xFF012F64)),
                           const SizedBox(width: 4),
                           Text(
-                            widget.isParcel
-                                ? widget.parcelUserModel!.rating
-                                      .toStringAsFixed(1)
-                                : widget.tripUserModel!.rating.toStringAsFixed(
-                                    1,
-                                  ),
+                            widget.rating.toStringAsFixed(1),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
@@ -173,7 +164,7 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      Get.to(() => DriverHomeScreen());
+                      Get.offAll(() => DriverHomeScreen());
                     },
                     child: Container(
                       height: 52,
@@ -202,16 +193,8 @@ class _RatePessengersScreenState extends State<RatePessengersScreen> {
                       loading: _driverController.isLoading.value,
                       onTap: () {
                         _driverController.submitRating(
-                          isParcel: widget.isParcel,
-                          userId: widget.isParcel
-                              ? widget.parcel!.userId
-                              : widget.trip!.userId,
-                          parcelId: widget.isParcel ? widget.parcel!.id : null,
-                          tripId: widget.isParcel ? null : widget.trip!.id,
-                          parcel: widget.parcel,
-                          parcelUserModel: widget.parcelUserModel,
-                          trip: widget.trip,
-                          tripUserModel: widget.tripUserModel,
+                          userId: widget.userId,
+                          tripId: widget.tripId,
                         );
                       },
                       text: "Rate Now",

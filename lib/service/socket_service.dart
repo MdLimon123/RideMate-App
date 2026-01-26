@@ -69,6 +69,7 @@ class SocketService {
 
     if (ack != null) {
       socket!.emitWithAck(event, data, ack: ack);
+        debugPrint("============================ Emit Ack : $ack ============================");
     } else {
       socket!.emit(event, data);
     }

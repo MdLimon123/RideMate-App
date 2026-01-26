@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/home_controller.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/models/User/parcel_response_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
@@ -53,6 +54,7 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
   final dropLocationController = TextEditingController();
   final _userProfileController = Get.put(UserProfileController());
   final _homeController = Get.put(HomeController());
+  final _tripSocketController = Get.put(TripSocketController());
 
   @override
   void initState() {
@@ -259,30 +261,14 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                                 return;
                               }
                               if (_homeController.selectedIndex.value == 0) {
-                                SocketService().emit(
-                                  'trip:new_request',
-                                  data: {
-                                    "pickup_lat": widget.pickLat,
-                                    "pickup_lng": widget.pickLng,
-                                    "pickup_address": widget.pickLocation,
-                                    "dropoff_lat": widget.dropLat,
-                                    "dropoff_lng": widget.dropLan,
-                                    "dropoff_address": widget.dropLocation,
-                                  },
-                                  ack: (res) {
-                                      
-                                    debugPrint(" socekt request =====> $res");
-                                      Get.to(
-                                  () => SearchADriverScreen(
-                                    parcelId: res['id'],
-                                    pickLocation: widget.pickLocation,
-                                    dropLocation: widget.dropLocation,
-                                  ),
-                                );
-                                  },
-                                );
-
-                               
+                             _tripSocketController.requestForTrip({
+                                  "pickup_lat": widget.pickLat,
+                                  "pickup_lng": widget.pickLng,
+                                  "pickup_address": widget.pickLocation,
+                                  "dropoff_lat": widget.dropLat,
+                                  "dropoff_lng": widget.dropLan,
+                                  "dropoff_address": widget.dropLocation,
+                                });
                               } else if (_homeController.selectedIndex.value ==
                                   1) {
                                 SocketService().emit(

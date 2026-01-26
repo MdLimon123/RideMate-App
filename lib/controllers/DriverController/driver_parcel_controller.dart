@@ -9,6 +9,7 @@ import 'package:radeef/service/api_client.dart';
 import 'package:radeef/utils/image_utils.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/earn_screen.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 
 class DriverParcelController extends GetxController {
   var isLoading = false.obs;
@@ -73,43 +74,23 @@ class DriverParcelController extends GetxController {
     }
   }
 
-  Future<void> submitRating({
-    required bool isParcel,
-    required String userId,
-    String? parcelId,
-    String? tripId,
-    ParcelRequestModel? parcel,
-    ParcelUserModel? parcelUserModel,
-    TripRequestModel? trip,
-    TripUserModel? tripUserModel,
-  }) async {
+  Future<void> submitRating({required String userId, String? tripId}) async {
     isLoading(true);
-
     final Map<String, dynamic> body = {
       "user_id": userId,
       "rating": rating.value.toInt(),
       "comment": "Good",
+      "ref_trip_id": tripId,
     };
-
-    if (isParcel) {
-      body["ref_parcel_id"] = parcelId;
-    } else {
-      body["ref_trip_id"] = tripId;
-    }
 
     final response = await ApiClient.postData("/reviews/give-review", body);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       showCustomSnackBar("Review Submitted", isError: false);
-      Get.to(
-        () => EarnScreen(
-          isParcel: isParcel,
-          tripUserModel: tripUserModel,
-          trip: trip,
-          parcel: parcel,
-          parcelUserModel: parcelUserModel,
-        ),
-      );
+      // Get.to(
+      //   () => EarnScreen(amount: 2.5, vat: 0.0),
+      // );
+      Get.offAll(() => DriverHomeScreen());
     } else {
       debugPrint(response.body);
       showCustomSnackBar(response.statusText, isError: true);

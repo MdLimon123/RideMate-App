@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/home_controller.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/notification_service.dart';
@@ -23,15 +24,20 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   final _userProfileController = Get.put(UserProfileController());
   final _homeController = Get.put(HomeController());
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
-     await _homeController.subscribleId();
-       OneSignalHelper.optIn();
+    _tripSocketController.allUserListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _homeController.subscribleId();
+      OneSignalHelper.optIn();
       _userProfileController.fetchUserInfo();
       _homeController.loadRecentDestinations();
     });
+
     super.initState();
   }
 

@@ -5,6 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_home_controller.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/service/notification_service.dart';
@@ -26,6 +27,9 @@ class DriverHomeScreen extends StatefulWidget {
 class _DriverHomeScreenState extends State<DriverHomeScreen>
     with TickerProviderStateMixin {
   final _driverHomeController = Get.put(DriverHomeController());
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );
 
   bool isSwitch = true;
   bool _activeRequestExists = false;
@@ -44,13 +48,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
   @override
   void initState() {
+    _tripSocketController.allDriverListeners();
     _driverHomeController.fetchHomeData();
     isSwitch = true;
     toggleOnlineStatus(isSwitch);
     subscribleId();
-
-    _initializeLocationTracking();
-
     _xController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -99,24 +101,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       }
     });
 
-    SocketService().on('trip:request', (data) {
-      final socketModel = TripRequestSocketModel.fromJson(data);
-
-      if (_activeRequestExists) return;
-
-      if (socketModel.trip != null) {
-        _activeRequestExists = true;
-        Get.to(
-          () => NewRequestScreen(
-            isParcel: false,
-            trip: socketModel.trip,
-            tripUserModel: socketModel.user,
-          ),
-        )?.then((value) {
-          _activeRequestExists = false;
-        });
-      }
-    });
+    _tripSocketController.listenOnRequestForTrip();
 
     super.initState();
   }
@@ -142,45 +127,47 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       return;
     }
 
-    await _updateLocation();
-
-    _locationTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      _updateLocation();
-    });
+    startLocationUpdates();
   }
 
-  Future<void> _updateLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+  StreamSubscription<Position>? _positionStream;
 
-      _currentPosition = position;
+  void startLocationUpdates() {
+    if (_positionStream != null) return; // prevent duplicate stream
 
-      String address = await _getAddressFromLatLng(
-        position.latitude,
-        position.longitude,
-      );
-      _sendLocationToSocket(position.latitude, position.longitude, address);
+    LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    );
 
-      print('Location updated: ${position.latitude}, ${position.longitude}');
-    } catch (e) {
-      print('Error getting location: $e');
-    }
+    _positionStream =
+        Geolocator.getPositionStream(
+          locationSettings: locationSettings,
+        ).listen((Position position) async {
+          _currentPosition = position;
+
+          String address = await getOptimizedAddress(
+            position.latitude,
+            position.longitude,
+          );
+
+          _sendLocationToSocket(position.latitude, position.longitude, address);
+        });
   }
 
-  Future<String> _getAddressFromLatLng(double lat, double lng) async {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
-        return place.locality ?? place.subAdministrativeArea ?? 'Unknown';
-      }
-      return 'Unknown';
-    } catch (e) {
-      print('Error getting address: $e');
-      return 'Unknown';
+  String? _lastAddress;
+  DateTime? _lastAddressTime;
+
+  Future<String> getOptimizedAddress(double lat, double lng) async {
+    if (_lastAddressTime != null &&
+        DateTime.now().difference(_lastAddressTime!).inMinutes < 2) {
+      return _lastAddress!;
     }
+
+    final placemarks = await placemarkFromCoordinates(lat, lng);
+    _lastAddress = placemarks.first.locality ?? 'Unknown';
+    _lastAddressTime = DateTime.now();
+    return _lastAddress!;
   }
 
   void _sendLocationToSocket(double lat, double lng, String address) {
@@ -201,12 +188,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     print('Online status ===========>: $status');
 
     if (status) {
-      if (_locationTimer == null || !_locationTimer!.isActive) {
-        _initializeLocationTracking();
-      }
+      _initializeLocationTracking();
     } else {
-      _locationTimer?.cancel();
-      _locationTimer = null;
+      _positionStream?.cancel();
+      _positionStream = null;
     }
   }
 
@@ -220,7 +205,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     _xController.dispose();
     _yController.dispose();
     _rotationController.dispose();
-    _locationTimer?.cancel();
+    _positionStream?.cancel();
     //SocketService().socket?.disconnect();
     super.dispose();
   }

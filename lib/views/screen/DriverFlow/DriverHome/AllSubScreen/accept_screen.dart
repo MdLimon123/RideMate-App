@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_chat_controller.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/service/api_constant.dart';
@@ -30,9 +31,10 @@ class AcceptScreen extends StatefulWidget {
 }
 
 class _AcceptScreenState extends State<AcceptScreen> {
- 
-
   final _driverChatController = Get.put(DriverChatController());
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );
 
   bool tripStarted = true;
 
@@ -269,7 +271,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                     height: 40,
@@ -281,7 +283,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                     ),
                     child: SvgPicture.asset('assets/icons/phone.svg'),
                   ),
-                  const SizedBox(width: 50),
+
                   InkWell(
                     onTap: () async {
                       await _driverChatController.createChatRoom(
@@ -301,35 +303,11 @@ class _AcceptScreenState extends State<AcceptScreen> {
                       child: SvgPicture.asset('assets/icons/message.svg'),
                     ),
                   ),
-                  const SizedBox(width: 50),
 
-                  // InkWell(
-                  //   onTap: () {
-                  //     Get.to(() => TripMapScreen(isParcel: widget.isParcel));
-                  //   },
-                  //   child: Container(
-                  //     height: 46,
-                  //     padding: const EdgeInsets.symmetric(horizontal: 10),
-                  //     decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(24),
-                  //       color: const Color(0xFFE6EAF0),
-                  //     ),
-                  //     child: Center(
-                  //       child: Text(
-                  //         "Navigate",
-                  //         style: TextStyle(
-                  //           fontSize: 12,
-                  //           fontWeight: FontWeight.w500,
-                  //           color: AppColors.textColor,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   InkWell(
                     onTap: () {
                       Get.to(
-                        () => TripMapScreen(
+                        () => TrackDriverMapScreen(
                           isParcel: widget.isParcel,
 
                           parcel: widget.isParcel ? widget.parcel : null,
@@ -349,15 +327,66 @@ class _AcceptScreenState extends State<AcceptScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(24),
-                        color: const Color(0xFF345983),
+                        color: const Color(0xFFE6EAF0),
                       ),
                       child: Center(
                         child: Text(
-                          widget.isParcel ? "Picked Parcel" : "Start Trip",
+                          "View Map",
                           style: TextStyle(
-                            fontSize: widget.isParcel ? 12 : 16,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                            color: AppColors.textColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Obx(
+                    () => InkWell(
+                      onTap: () {
+                        if (_tripSocketController.isTripStarted.value) {
+                          _tripSocketController.tripEnded(widget.trip!.id);
+                          return;
+                        }
+                        _tripSocketController.tripStarted(
+                          tripId: widget.trip!.id,
+                          onTripStarted: () {
+                            Get.to(
+                              () => TrackDriverMapScreen(
+                                isParcel: widget.isParcel,
+
+                                parcel: widget.isParcel ? widget.parcel : null,
+                                parcelUserModel: widget.isParcel
+                                    ? widget.parcelUserModel
+                                    : null,
+
+                                trip: widget.isParcel ? null : widget.trip,
+                                tripUserModel: widget.isParcel
+                                    ? null
+                                    : widget.tripUserModel,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        height: 46,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          color: const Color(0xFF345983),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _tripSocketController.isTripStarted.value
+                                ? "End Trip"
+                                : "Start Trip",
+                            style: TextStyle(
+                              fontSize: widget.isParcel ? 12 : 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

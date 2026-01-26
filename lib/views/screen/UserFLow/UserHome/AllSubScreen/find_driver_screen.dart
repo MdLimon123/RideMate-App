@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/chat_controller.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
@@ -25,12 +26,12 @@ class FindDriverScreen extends StatefulWidget {
 }
 
 class _FindDriverScreenState extends State<FindDriverScreen> {
-
   final codeController = TextEditingController(text: "");
 
   final _chatController = Get.put(ChatController());
 
   final _userProfileController = Get.put(UserProfileController());
+  final _tripSocketController = Get.put(TripSocketController());
 
   double driverLat = 0;
   double driverLng = 0;
@@ -43,8 +44,10 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
     _userProfileController.fetchUserInfo();
     driverLat = widget.driver.locationLat;
     driverLng = widget.driver.locationLng;
+
     _calculateEta();
     _listenDriverLocation();
+    _tripSocketController.listenOnTripEnded();
     super.initState();
   }
 
@@ -104,7 +107,6 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     codeController.text = widget.trip.slug;
     return Scaffold(
       body: SafeArea(
@@ -467,7 +469,6 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                           ),
                         ),
 
-
                         // InkWell(
                         //   onTap: () {
                         //     Get.to(
@@ -500,9 +501,6 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                         //     ),
                         //   ),
                         // ),
-                     
-                     
-                     
                       ],
                     ),
                   ],

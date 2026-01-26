@@ -1,499 +1,565 @@
+// import 'dart:async';
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+// import 'package:geocoding/geocoding.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:get/get.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
+// import 'package:radeef/models/Driver/parcel_request_model.dart';
+// import 'package:radeef/models/Driver/trip_request_model.dart';
+
+// import 'package:radeef/service/api_constant.dart';
+
+// class TrackDriverMapScreen extends StatefulWidget {
+//   final bool isParcel;
+//   final ParcelRequestModel? parcel;
+//   final TripRequestModel? trip;
+//   final ParcelUserModel? parcelUserModel;
+//   final TripUserModel? tripUserModel;
+
+//   const TrackDriverMapScreen({
+//     super.key,
+//     required this.isParcel,
+//     this.parcel,
+//     this.parcelUserModel,
+//     this.trip,
+//     this.tripUserModel,
+//   });
+
+//   @override
+//   State<TrackDriverMapScreen> createState() => _TrackDriverMapScreenState();
+// }
+
+// class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
+//   final Set<Marker> _markers = {};
+//   final Set<Polyline> _polylines = {};
+
+//   final TripSocketController _tripSocketController = Get.put(
+//     TripSocketController(),
+//   );
+//   Position? _currentPosition;
+
+//   @override
+//   void initState() {
+//     _setupMarkers();
+//     _drawPickupToDestination();
+//     _initializeLocationTracking();
+//     super.initState();
+//   }
+
+//   Future<void> _initializeLocationTracking() async {
+//     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+//     if (!serviceEnabled) {
+//       print('Location services are disabled.');
+//       return;
+//     }
+
+//     LocationPermission permission = await Geolocator.checkPermission();
+//     if (permission == LocationPermission.denied) {
+//       permission = await Geolocator.requestPermission();
+//       if (permission == LocationPermission.denied) {
+//         print('Location permissions are denied');
+//         return;
+//       }
+//     }
+
+//     if (permission == LocationPermission.deniedForever) {
+//       print('Location permissions are permanently denied');
+//       return;
+//     }
+//     startLocationUpdates();
+//   }
+
+//   StreamSubscription<Position>? _positionStream;
+
+//   void startLocationUpdates()async{
+
+//     if (_positionStream != null) return;
+
+//   // Get the current position first → immediate update
+//   Position position = await Geolocator.getCurrentPosition(
+//     desiredAccuracy: LocationAccuracy.high,
+//   );
+//   _currentPosition = position;
+
+//     LocationSettings locationSettings = const LocationSettings(
+//       accuracy: LocationAccuracy.high,
+//       distanceFilter: 10,
+//     );
+
+//     _positionStream =
+//         Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+//           (Position position) async {
+//             _currentPosition = position;
+
+//             String address = await getOptimizedAddress(
+//               position.latitude,
+//               position.longitude,
+//             );
+//             _tripSocketController.updateDriverLocation(
+//               position.latitude,
+//               position.longitude,
+//               address,
+//               widget.trip!.id,
+//             );
+//           },
+//         );
+//   }
+
+//   String? _lastAddress;
+//   DateTime? _lastAddressTime;
+
+//   Future<String> getOptimizedAddress(double lat, double lng) async {
+//     if (_lastAddressTime != null &&
+//         DateTime.now().difference(_lastAddressTime!).inMinutes < 2) {
+//       return _lastAddress!;
+//     }
+
+//     final placemarks = await placemarkFromCoordinates(lat, lng);
+//     _lastAddress = placemarks.first.locality ?? 'Unknown';
+//     _lastAddressTime = DateTime.now();
+//     return _lastAddress!;
+//   }
+
+//   /// ================= MARKERS =================
+//   void _setupMarkers() {
+//     _markers.clear();
+//     _markers.add(
+//       Marker(
+//         markerId: const MarkerId('driver'),
+//         position: _currentPosition == null
+//             ? LatLng(0, 0)
+//             : LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+//         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+//       ),
+//     );
+
+//     _markers.add(
+//       Marker(
+//         markerId: const MarkerId('pickup'),
+//         position: LatLng(widget.trip!.pickupLat, widget.trip!.pickupLng),
+//         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+//       ),
+//     );
+
+//     _markers.add(
+//       Marker(
+//         markerId: const MarkerId('destination'),
+//         position: LatLng(widget.trip!.dropoffLat, widget.trip!.dropoffLng),
+//         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+//       ),
+//     );
+//   }
+
+//   /// ================= ROUTE =================
+//   Future<RouteData?> _fetchRoute(
+//     double startLat,
+//     double startLng,
+//     double endLat,
+//     double endLng,
+//   ) async {
+//     final url =
+//         'https://maps.googleapis.com/maps/api/directions/json?'
+//         'origin=$startLat,$startLng&'
+//         'destination=$endLat,$endLng&'
+//         'key=${ApiConstant.googleApiKey}';
+
+//     final response = await http.get(Uri.parse(url));
+//     final data = json.decode(response.body);
+
+//     if (data['routes'].isEmpty) return null;
+
+//     final route = data['routes'][0];
+//     final leg = route['legs'][0];
+
+//     final encoded = route['overview_polyline']['points'];
+//     final decoded = PolylinePoints.decodePolyline(encoded);
+
+//     return RouteData(
+//       points: decoded.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+//       duration: leg['duration']['text'],
+//       distance: leg['distance']['text'],
+//     );
+//   }
+
+//   /// ================= POLYLINES =================
+
+//   /// ================= POLYLINES =================
+//   Future<void> _drawPickupToDestination() async {
+//     final route = await _fetchRoute(
+//       widget.trip!.pickupLat,
+//       widget.trip!.pickupLng,
+//       widget.trip!.dropoffLat,
+//       widget.trip!.dropoffLng,
+//     );
+
+//     if (route == null) return;
+
+//     _polylines.add(
+//       Polyline(
+//         polylineId: const PolylineId('pickup_to_destination'),
+//         points: route.points,
+//         color: Colors.red,
+//         width: 5,
+//       ),
+//     );
+
+//     setState(() {});
+//   }
+
+//   @override
+//   void dispose() {
+//     _positionStream?.cancel();
+//     super.dispose();
+//   }
+
+//   /// ================= UI =================
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Stack(
+//         children: [
+//           GoogleMap(
+//             initialCameraPosition: CameraPosition(
+//               target: _currentPosition == null
+//                   ? LatLng(0, 0)
+//                   : LatLng(
+//                       _currentPosition!.latitude,
+//                       _currentPosition!.longitude,
+//                     ),
+//               zoom: 14,
+//             ),
+
+//             markers: _markers,
+//             polylines: _polylines,
+//             myLocationEnabled: false,
+//           ),
+
+//           Positioned(
+//             top: 40,
+//             left: 10,
+//             child: SafeArea(
+//               child: IconButton(
+//                 icon: const Icon(Icons.arrow_back_ios),
+//                 onPressed: Get.back,
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// /// ================= DATA MODEL =================
+// class RouteData {
+//   final List<LatLng> points;
+//   final String duration;
+//   final String distance;
+
+//   RouteData({
+//     required this.points,
+//     required this.duration,
+//     required this.distance,
+//   });
+// }
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/service/api_constant.dart';
-import 'package:radeef/service/socket_service.dart';
-import 'package:radeef/utils/location_utils.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
-import 'package:http/http.dart' as http;
 
-class TripMapScreen extends StatefulWidget {
+class TrackDriverMapScreen extends StatefulWidget {
   final bool isParcel;
   final ParcelRequestModel? parcel;
   final TripRequestModel? trip;
   final ParcelUserModel? parcelUserModel;
   final TripUserModel? tripUserModel;
 
-  const TripMapScreen({
+  const TrackDriverMapScreen({
     super.key,
     required this.isParcel,
     this.parcel,
-    this.trip,
     this.parcelUserModel,
+    this.trip,
     this.tripUserModel,
   });
 
   @override
-  _TripMapScreenState createState() => _TripMapScreenState();
+  State<TrackDriverMapScreen> createState() => _TrackDriverMapScreenState();
 }
 
-class _TripMapScreenState extends State<TripMapScreen> {
+class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
 
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );
 
-  GoogleMapController? _controller;
-  Set<Marker> markers = {};
-  Set<Polyline> polylines = {};
-  bool tripStarted = false;
-  bool tripCompleted = false;
-  Timer? _timer;
-  int currentIndex = 0;
+  Position? _currentPosition;
+  StreamSubscription<Position>? _positionStream;
+  final Completer<GoogleMapController> _mapController = Completer();
 
-  int etaMin = 0;
-  double distance = 0;
-  double driverLat = 0;
-  double driverLng = 0;
-
-  List<LatLng> routeCoordinates = [];
+  // Address caching
+  String? _lastAddress;
+  DateTime? _lastAddressTime;
 
   @override
   void initState() {
     super.initState();
     _setupMarkers();
-    _getDirections();
-    _calculateEta();
+    _drawPickupToDestination();
+    _initializeLocationTracking();
   }
 
-  void _calculateEta() {
-    final userLat = widget.isParcel
-        ? widget.parcel!.pickupLat
-        : widget.trip!.pickupLat;
-    final userLng = widget.isParcel
-        ? widget.parcel!.pickupLng
-        : widget.trip!.pickupLng;
+  @override
+  void dispose() {
+    _positionStream?.cancel();
+    super.dispose();
+  }
 
-    if (driverLat == 0 || driverLng == 0 || userLat == 0 || userLng == 0) {
-      setState(() {
-        etaMin = 0;
-        distance = 0;
-      });
+  /// ================= LOCATION =================
+  Future<void> _initializeLocationTracking() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print('Location services are disabled.');
       return;
     }
 
-    final d = LocationUtils.distanceKm(
-      lat1: driverLat,
-      lng1: driverLng,
-      lat2: userLat,
-      lng2: userLng,
-    );
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied');
+        return;
+      }
+    }
 
-    final eta = LocationUtils.etaMinutes(distanceKm: d);
+    if (permission == LocationPermission.deniedForever) {
+      print('Location permissions are permanently denied');
+      return;
+    }
 
-    setState(() {
-      distance = d;
-      etaMin = eta;
-    });
-
-    debugPrint("📍 Distance KM: ${d.toStringAsFixed(2)}");
-    debugPrint("⏱ ETA Minutes: $eta");
+    startLocationUpdates();
   }
 
-  void _setupMarkers() {
-    LatLng start = LatLng(
-      widget.isParcel ? widget.parcel!.pickupLat : widget.trip!.pickupLat,
-      widget.isParcel ? widget.parcel!.pickupLng : widget.trip!.pickupLng,
+  void startLocationUpdates() async {
+    if (_positionStream != null) return; // prevent duplicate stream
+
+    // 1️⃣ Immediate first update
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
     );
-    LatLng end = LatLng(
-      widget.isParcel ? widget.parcel!.dropoffLat : widget.trip!.dropoffLat,
-      widget.isParcel ? widget.parcel!.dropoffLng : widget.trip!.dropoffLng,
+    _currentPosition = position;
+    _updateDriverMarkerAndServer(position);
+
+    // 2️⃣ Continuous updates every 10 meters
+    LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10, // update only if moved 10m
     );
 
-    markers.add(
+    _positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (Position position) {
+            _currentPosition = position;
+            _updateDriverMarkerAndServer(position);
+          },
+        );
+  }
+
+  Future<void> _updateDriverMarkerAndServer(Position position) async {
+    final driverLatLng = LatLng(position.latitude, position.longitude);
+
+    // Update marker
+    setState(() {
+      _markers.removeWhere((m) => m.markerId.value == 'driver');
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('driver'),
+          position: driverLatLng,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        ),
+      );
+    });
+
+    // Move camera to follow driver
+    final GoogleMapController controller = await _mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLng(driverLatLng));
+
+    // Send location to server
+    String address = await _getOptimizedAddress(
+      position.latitude,
+      position.longitude,
+    );
+    _tripSocketController.updateDriverLocation(
+      position.latitude,
+      position.longitude,
+      address,
+      widget.trip!.id,
+    );
+  }
+
+  Future<String> _getOptimizedAddress(double lat, double lng) async {
+    if (_lastAddressTime != null &&
+        DateTime.now().difference(_lastAddressTime!).inSeconds < 30 &&
+        _lastAddress != null) {
+      return _lastAddress!;
+    }
+
+    final placemarks = await placemarkFromCoordinates(lat, lng);
+    _lastAddress = placemarks.first.locality ?? 'Unknown';
+    _lastAddressTime = DateTime.now();
+    return _lastAddress!;
+  }
+
+  /// ================= MARKERS =================
+  void _setupMarkers() {
+    _markers.clear();
+
+    // Driver marker placeholder, will update on first location
+    _markers.add(
       Marker(
-        markerId: const MarkerId('car'),
-        position: start,
+        markerId: const MarkerId('driver'),
+        position: _currentPosition == null
+            ? LatLng(widget.trip!.pickupLat, widget.trip!.pickupLng)
+            : LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
     );
 
-    markers.add(
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('pickup'),
+        position: LatLng(widget.trip!.pickupLat, widget.trip!.pickupLng),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+    );
+
+    _markers.add(
       Marker(
         markerId: const MarkerId('destination'),
-        position: end,
+        position: LatLng(widget.trip!.dropoffLat, widget.trip!.dropoffLng),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
     );
   }
 
-  Future<void> _getDirections() async {
-    LatLng start = LatLng(
-      widget.isParcel ? widget.parcel!.pickupLat : widget.trip!.pickupLat,
-      widget.isParcel ? widget.parcel!.pickupLng : widget.trip!.pickupLng,
-    );
-    LatLng end = LatLng(
-      widget.isParcel ? widget.parcel!.dropoffLat : widget.trip!.dropoffLat,
-      widget.isParcel ? widget.parcel!.dropoffLng : widget.trip!.dropoffLng,
-    );
-
-    final String url =
+  /// ================= ROUTE =================
+  Future<RouteData?> _fetchRoute(
+    double startLat,
+    double startLng,
+    double endLat,
+    double endLng,
+  ) async {
+    final url =
         'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${start.latitude},${start.longitude}&'
-        'destination=${end.latitude},${end.longitude}&'
+        'origin=$startLat,$startLng&'
+        'destination=$endLat,$endLng&'
         'key=${ApiConstant.googleApiKey}';
 
-    try {
-      final response = await http.get(Uri.parse(url));
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+    if (data['routes'].isEmpty) return null;
 
-        if (data['routes'].isNotEmpty) {
-          final String encodedPolyline =
-              data['routes'][0]['overview_polyline']['points'];
+    final route = data['routes'][0];
+    final leg = route['legs'][0];
 
-          List<PointLatLng> decodedPoints = PolylinePoints.decodePolyline(
-            encodedPolyline,
-          );
+    final encoded = route['overview_polyline']['points'];
+    final decoded = PolylinePoints.decodePolyline(encoded);
 
-          List<LatLng> routePoints = decodedPoints
-              .map((point) => LatLng(point.latitude, point.longitude))
-              .toList();
-
-          setState(() {
-            routeCoordinates = routePoints;
-
-            polylines.add(
-              Polyline(
-                polylineId: const PolylineId('route'),
-                points: routePoints,
-                color: Colors.blue,
-                width: 5,
-              ),
-            );
-          });
-
-          debugPrint("✅ Route loaded with ${routePoints.length} points");
-        }
-      }
-    } catch (e) {
-      debugPrint("❌ Error fetching directions: $e");
-
-      setState(() {
-        routeCoordinates = [start, end];
-        polylines.add(
-          Polyline(
-            polylineId: const PolylineId('route'),
-            points: routeCoordinates,
-            color: Colors.blue,
-            width: 5,
-          ),
-        );
-      });
-    }
-  }
-
-  void _startParcel() {
-    setState(() {
-      tripStarted = true;
-      tripCompleted = false;
-    });
-
-    const duration = Duration(milliseconds: 500);
-    _timer = Timer.periodic(duration, (timer) async {
-      if (currentIndex < routeCoordinates.length - 1) {
-        LatLng start = routeCoordinates[currentIndex];
-        LatLng end = routeCoordinates[currentIndex + 1];
-
-        double lat = start.latitude + (end.latitude - start.latitude) * 0.2;
-        double lng = start.longitude + (end.longitude - start.longitude) * 0.2;
-
-        setState(() {
-          LatLng currentPos = LatLng(lat, lng);
-
-          markers.removeWhere((m) => m.markerId.value == 'car');
-          markers.add(
-            Marker(
-              markerId: const MarkerId('car'),
-              position: currentPos,
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueBlue,
-              ),
-            ),
-          );
-        });
-
-        if (_controller != null) {
-          await _controller!.animateCamera(
-            CameraUpdate.newLatLng(LatLng(lat, lng)),
-          );
-        }
-
-        if ((lat - end.latitude).abs() < 0.0001 &&
-            (lng - end.longitude).abs() < 0.0001) {
-          currentIndex++;
-        }
-      } else {
-        // _endParcel();
-      }
-    });
-
-    // Socket call for parcel
-    SocketService().emit(
-      "parcel:start",
-      data: {"parcel_id": widget.parcel!.id},
+    return RouteData(
+      points: decoded.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+      duration: leg['duration']['text'],
+      distance: leg['distance']['text'],
     );
   }
 
-  void _startTrip() {
-    setState(() {
-      tripStarted = true;
-      tripCompleted = false;
-    });
+  /// ================= POLYLINES =================
+  Future<void> _drawPickupToDestination() async {
+    final route = await _fetchRoute(
+      widget.trip!.pickupLat,
+      widget.trip!.pickupLng,
+      widget.trip!.dropoffLat,
+      widget.trip!.dropoffLng,
+    );
 
-    const duration = Duration(milliseconds: 500);
-    _timer = Timer.periodic(duration, (timer) async {
-      if (currentIndex < routeCoordinates.length - 1) {
-        LatLng start = routeCoordinates[currentIndex];
-        LatLng end = routeCoordinates[currentIndex + 1];
+    if (route == null) return;
 
-        double lat = start.latitude + (end.latitude - start.latitude) * 0.2;
-        double lng = start.longitude + (end.longitude - start.longitude) * 0.2;
-
-        setState(() {
-          LatLng currentPos = LatLng(lat, lng);
-
-          markers.removeWhere((m) => m.markerId.value == 'car');
-          markers.add(
-            Marker(
-              markerId: const MarkerId('car'),
-              position: currentPos,
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueBlue,
-              ),
-            ),
-          );
-        });
-
-        if (_controller != null) {
-          await _controller!.animateCamera(
-            CameraUpdate.newLatLng(LatLng(lat, lng)),
-          );
-        }
-
-        if ((lat - end.latitude).abs() < 0.0001 &&
-            (lng - end.longitude).abs() < 0.0001) {
-          currentIndex++;
-        }
-      } else {
-        _endTrip();
-      }
-    });
-
-    SocketService().emit("trip:start", data: {"trip_id": widget.trip!.id});
-  }
-
-  void _endTrip() {
-    _timer?.cancel();
-    SocketService().emit("trip:end", data: {"trip_id": widget.trip!.id});
-    setState(() {
-      tripStarted = false;
-      tripCompleted = true;
-    });
-
-    Get.to(
-      () => ConfirmationScreen(
-        isParcel: widget.isParcel,
-        parcel: widget.isParcel ? widget.parcel : null,
-        parcelUserModel: widget.isParcel ? widget.parcelUserModel : null,
-        trip: widget.isParcel ? null : widget.trip,
-        tripUserModel: widget.isParcel ? null : widget.tripUserModel,
+    _polylines.add(
+      Polyline(
+        polylineId: const PolylineId('pickup_to_destination'),
+        points: route.points,
+        color: Colors.red,
+        width: 5,
       ),
     );
+
+    setState(() {});
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
+  /// ================= UI =================
   @override
   Widget build(BuildContext context) {
-    LatLng initialCamera = LatLng(
-      widget.isParcel ? widget.parcel!.pickupLat : widget.trip!.pickupLat,
-      widget.isParcel ? widget.parcel!.pickupLng : widget.trip!.pickupLng,
-    );
-
     return Scaffold(
       body: Stack(
         children: [
           GoogleMap(
+            onMapCreated: (GoogleMapController controller) {
+              _mapController.complete(controller);
+            },
             initialCameraPosition: CameraPosition(
-              target: initialCamera,
+              target: _currentPosition == null
+                  ? LatLng(widget.trip!.pickupLat, widget.trip!.pickupLng)
+                  : LatLng(
+                      _currentPosition!.latitude,
+                      _currentPosition!.longitude,
+                    ),
               zoom: 14,
             ),
-            markers: markers,
-            polylines: polylines,
-            onMapCreated: (controller) => _controller = controller,
+            markers: _markers,
+            polylines: _polylines,
+            myLocationEnabled: false,
           ),
-
           Positioned(
             top: 40,
             left: 10,
             child: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 3,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () => Get.back(),
-                ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: Get.back,
               ),
             ),
           ),
-
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.2,
-            left: MediaQuery.of(context).size.width * 0.05,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.isParcel
-                        ? widget.parcel!.pickupAddress
-                        : widget.trip!.pickupAddress,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.motorcycle,
-                        size: 18,
-                        color: Colors.grey.shade700,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        etaMin == 0 ? "-- min away" : "$etaMin min away",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    distance == 0
-                        ? "-- km away"
-                        : "${distance.toStringAsFixed(2)} km away",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          if (!tripStarted && !tripCompleted)
-            Positioned(
-              bottom: 20,
-              left: MediaQuery.of(context).size.width / 2 - 100,
-              child: GestureDetector(
-                onTap: () {
-                  if (widget.isParcel) {
-                    _startParcel();
-                  } else {
-                    _startTrip();
-                  }
-                },
-                child: Container(
-                  width: 200,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.isParcel ? "Start Parcel" : "Start Trip",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-          if (tripStarted && !tripCompleted)
-            Positioned(
-              bottom: 20,
-              left: MediaQuery.of(context).size.width / 2 - 100,
-              child: GestureDetector(
-                onTap: () {
-                  if (widget.isParcel) {
-                    Get.to(
-                      () => ConfirmationScreen(
-                        isParcel: widget.isParcel,
-                        parcel: widget.isParcel ? widget.parcel : null,
-                        parcelUserModel: widget.isParcel
-                            ? widget.parcelUserModel
-                            : null,
-                        trip: widget.isParcel ? null : widget.trip,
-                        tripUserModel: widget.isParcel
-                            ? null
-                            : widget.tripUserModel,
-                      ),
-                    );
-                  } else {
-                    _endTrip();
-                  }
-                },
-                child: Container(
-                  width: 200,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.isParcel ? "Deliver Parcel" : "End Trip",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
   }
+}
+
+/// ================= DATA MODEL =================
+class RouteData {
+  final List<LatLng> points;
+  final String duration;
+  final String distance;
+
+  RouteData({
+    required this.points,
+    required this.duration,
+    required this.distance,
+  });
 }

@@ -7,19 +7,13 @@ import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 
 class EarnScreen extends StatefulWidget {
-  final bool isParcel;
-  final ParcelRequestModel? parcel;
-  final TripRequestModel? trip;
-  final ParcelUserModel? parcelUserModel;
-  final TripUserModel? tripUserModel;
+  final double amount;
+  final double vat; 
 
   const EarnScreen({
     super.key,
-    required this.isParcel,
-    this.parcel,
-    this.trip,
-    this.parcelUserModel,
-    this.tripUserModel,
+    required this.amount,
+    required this.vat,  
   });
 
   @override
@@ -73,7 +67,7 @@ class _EarnScreenState extends State<EarnScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          "${widget.isParcel ? widget.parcel!.amount : widget.trip!.totalCost} (XAF)",
+                          "${widget.amount} (XAF)",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF012F64),
@@ -99,17 +93,7 @@ class _EarnScreenState extends State<EarnScreen> {
                       SizedBox(width: 6),
                       SvgPicture.asset("assets/icons/percentige.svg"),
                       SizedBox(width: 4),
-                      widget.isParcel
-                          ? Text(
-                              widget.parcel!.amount.toString(),
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFFFFFFFF),
-                              ),
-                            )
-                          : SizedBox(),
-                      SizedBox(width: 6),
+                     
                       Text(
                         "(XAF)",
                         style: TextStyle(
