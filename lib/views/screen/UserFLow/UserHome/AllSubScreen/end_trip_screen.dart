@@ -17,7 +17,7 @@ import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/user_rating_s
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class EndTripScreen extends StatefulWidget {
-  final DriverModel driver;
+  final Driver driver;
   final TripModel trip;
   const EndTripScreen({super.key, required this.driver, required this.trip});
 
@@ -44,8 +44,8 @@ class _EndTripScreenState extends State<EndTripScreen> {
   @override
   void initState() {
     _userProfileController.fetchUserInfo();
-    driverLat = widget.driver.locationLat;
-    driverLng = widget.driver.locationLng;
+    driverLat = widget.driver.locationLat!;
+    driverLng = widget.driver.locationLng!;
     _calculateEta();
     _listenDriverLocation();
     super.initState();
@@ -84,8 +84,8 @@ class _EndTripScreenState extends State<EndTripScreen> {
     final d = LocationUtils.distanceKm(
       lat1: driverLat,
       lng1: driverLng,
-      lat2: userLat,
-      lng2: userLng,
+      lat2: userLat!,
+      lng2: userLng!,
     );
 
     final eta = LocationUtils.etaMinutes(distanceKm: d);
@@ -107,7 +107,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    codeController.text = widget.trip.slug;
+    codeController.text = widget.trip.slug!;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -197,7 +197,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                           SizedBox(height: 12),
                           Center(
                             child: Text(
-                              widget.driver.name,
+                              widget.driver.name??"",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -295,7 +295,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.trip.pickupAddress,
+                                        widget.trip.pickupAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -315,7 +315,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.trip.dropoffAddress,
+                                        widget.trip.dropoffAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -392,7 +392,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                         fillColor: Color(0xFFE6EAF0),
                         filled: true,
                         hint: Text(
-                          widget.trip.slug,
+                          widget.trip.slug??"",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -472,7 +472,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
 
   void _payTrip() {
     _tripSocketController.payForTrip(
-      tripId: widget.trip.id,
+      tripId: widget.trip.id??"",
       callback: (response) {
         if (response['success']) {
           final balance =
@@ -480,10 +480,10 @@ class _EndTripScreenState extends State<EndTripScreen> {
               0; // Extract the balance from the response
           _showSuccessPopup(
             balance,
-            widget.driver.avatar,
-            widget.driver.name,
-            widget.driver.tripGivenCount,
-            widget.driver.ratingCount.toDouble(),
+            widget.driver.avatar??"",
+            widget.driver.name??"",
+            widget.driver.tripGivenCount!,
+            widget.driver.ratingCount!.toDouble(),
             widget.driver,
             widget.trip,
           );
@@ -501,7 +501,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
     String name,
     int trip,
     double rating,
-    final DriverModel driver,
+    final Driver driver,
     final TripModel tripModel,
   ) {
     Get.dialog(
@@ -514,11 +514,10 @@ class _EndTripScreenState extends State<EndTripScreen> {
               Get.back();
               Get.to(
                 () => UserRatingScreen(
-                  drivierImage: driver.avatar,
-                  driverName: driver.name,
-                  trip: driver.tripGivenCount,
-                  rating: driver.ratingCount.toDouble(),
-                  driver: driver,
+                  drivierImage: driver.avatar!,
+                  driverName: driver.name??"",
+                  trip: driver.tripGivenCount!,
+                  rating: driver.ratingCount!.toDouble(),
                   tripModel: tripModel,
                 ),
               );

@@ -5,12 +5,10 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
-
-import 'package:radeef/models/User/driver_model.dart';
+import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/end_trip_screen.dart';
 
 class TrackDriverScreen extends StatefulWidget {
   final double pickLat;
@@ -18,7 +16,7 @@ class TrackDriverScreen extends StatefulWidget {
   final double dropLat;
   final double dropLan;
   final String dropAddress;
-  final DriverModel driver;
+  final Driver driver;
   final TripModel trip;
 
   const TrackDriverScreen({
@@ -49,14 +47,15 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
   @override
   void initState() {
     _driverLatLng = LatLng(
-      widget.driver.locationLat,
-      widget.driver.locationLng,
+      widget.driver.locationLat!,
+      widget.driver.locationLng!,
     );
+
     _setupMarkers();
     _drawPickupToDestination();
     _listenDriverLocation();
-    print("====== isTripStarted ${_tripSocketController.isTripStarted.value}");
-    if (!_tripSocketController.isTripStarted.value) _drawDriverToPickup();
+    print("====== isTripStarted ${widget.trip.status}");
+    if (widget.trip.status != TripStatus.STARTED) _drawDriverToPickup();
     listenStartedTrip();
     super.initState();
   }
@@ -109,7 +108,7 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
             ),
           );
         });
-        // pickup শুরু না হলে route draw করো
+
         if (!_tripSocketController.isTripStarted.value) {
           await _drawDriverToPickup();
         }
@@ -245,7 +244,7 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
 
   @override
   void dispose() {
-    SocketService().off('driver:location:update');
+    SocketService().off('trip:refresh_location');
     super.dispose();
   }
 

@@ -2,20 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_chat_controller.dart';
-import 'package:radeef/controllers/DriverController/driver_parcel_controller.dart';
-import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_model.dart';
-import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/models/User/trip_model.dart';
 
 import 'package:radeef/service/api_constant.dart';
-import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
-import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/rate_pessengers_screen.dart';
 
 class ConfirmationScreen extends StatefulWidget {
-  final TripDriverModel tripData;
+  final TripModel tripData;
   const ConfirmationScreen({super.key, required this.tripData});
 
   @override
@@ -23,7 +18,7 @@ class ConfirmationScreen extends StatefulWidget {
 }
 
 class _ConfirmationScreenState extends State<ConfirmationScreen> {
-  final _driverParcelController = Get.put(DriverParcelController());
+
 
   final _driverChatController = Get.put(DriverChatController());
 
@@ -58,13 +53,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   //   });
   // }
 
-  void _showPaymentError() {
-    Get.snackbar(
-      'Payment Error',
-      'Payment failed. Please try again.',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
+ 
+  
 
   @override
   Widget build(BuildContext context) {

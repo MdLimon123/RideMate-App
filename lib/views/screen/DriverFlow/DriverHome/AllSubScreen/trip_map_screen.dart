@@ -279,14 +279,16 @@ import 'package:http/http.dart' as http;
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
+import 'package:radeef/views/base/custom_button.dart';
 
 class TrackDriverMapScreen extends StatefulWidget {
   final bool isParcel;
   final ParcelRequestModel? parcel;
-  final TripRequestModel? trip;
+  final TripModel? trip;
   final ParcelUserModel? parcelUserModel;
-  final TripUserModel? tripUserModel;
+
 
   const TrackDriverMapScreen({
     super.key,
@@ -294,7 +296,6 @@ class TrackDriverMapScreen extends StatefulWidget {
     this.parcel,
     this.parcelUserModel,
     this.trip,
-    this.tripUserModel,
   });
 
   @override
@@ -435,7 +436,7 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
       Marker(
         markerId: const MarkerId('driver'),
         position: _currentPosition == null
-            ? LatLng(widget.trip!.pickupLat, widget.trip!.pickupLng)
+            ? LatLng(widget.trip!.pickupLat!, widget.trip!.pickupLng!)
             : LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
@@ -444,7 +445,7 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
     _markers.add(
       Marker(
         markerId: const MarkerId('pickup'),
-        position: LatLng(widget.trip!.pickupLat, widget.trip!.pickupLng),
+        position: LatLng(widget.trip!.pickupLat!, widget.trip!.pickupLng!),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ),
     );
@@ -452,7 +453,7 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
     _markers.add(
       Marker(
         markerId: const MarkerId('destination'),
-        position: LatLng(widget.trip!.dropoffLat, widget.trip!.dropoffLng),
+        position: LatLng(widget.trip!.dropoffLat!, widget.trip!.dropoffLng!),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
     );
@@ -492,10 +493,10 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
   /// ================= POLYLINES =================
   Future<void> _drawPickupToDestination() async {
     final route = await _fetchRoute(
-      widget.trip!.pickupLat,
-      widget.trip!.pickupLng,
-      widget.trip!.dropoffLat,
-      widget.trip!.dropoffLng,
+      widget.trip!.pickupLat!,
+      widget.trip!.pickupLng!,
+      widget.trip!.dropoffLat!,
+      widget.trip!.dropoffLng!,
     );
 
     if (route == null) return;
@@ -524,7 +525,7 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
             },
             initialCameraPosition: CameraPosition(
               target: _currentPosition == null
-                  ? LatLng(widget.trip!.pickupLat, widget.trip!.pickupLng)
+                  ? LatLng(widget.trip!.pickupLat!, widget.trip!.pickupLng!)
                   : LatLng(
                       _currentPosition!.latitude,
                       _currentPosition!.longitude,
@@ -544,6 +545,12 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
                 onPressed: Get.back,
               ),
             ),
+          ),
+
+          Positioned(
+            bottom: 30, left: 20, right: 20,
+            child: CustomButton(onTap: (){}
+            , text: "Trip End"),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
@@ -11,31 +12,28 @@ import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_sc
 
 class NewRequestScreen extends StatefulWidget {
   final bool isParcel;
+  final TripModel? trip;
   final ParcelRequestModel? parcel;
-  final TripRequestModel? trip;
+  // final TripRequestModel? trip;
   final ParcelUserModel? parcelUserModel;
-  final TripUserModel? tripUserModel;
+  // final TripUserModel? tripUserModel;
 
   const NewRequestScreen({
     super.key,
     required this.isParcel,
-    this.parcel,
     this.trip,
+    this.parcel,
     this.parcelUserModel,
-    this.tripUserModel,
+    // this.tripUserModel,
   });
   @override
   State<NewRequestScreen> createState() => _NewRequestScreenState();
 }
 
 class _NewRequestScreenState extends State<NewRequestScreen> {
-
-
   final TripSocketController _tripSocketController = Get.put(
     TripSocketController(),
-  );  
-
-
+  );
 
   @override
   void initState() {
@@ -148,7 +146,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                       child: Text(
                                         widget.isParcel
                                             ? widget.parcel!.pickupAddress
-                                            : widget.trip!.pickupAddress,
+                                            : widget.trip!.pickupAddress ?? "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -171,7 +169,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                       child: Text(
                                         widget.isParcel
                                             ? widget.parcel!.dropoffAddress
-                                            : widget.trip!.dropoffAddress,
+                                            : widget.trip!.dropoffAddress ?? "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -269,14 +267,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                           Get.back();
                         } else {
                           //  Trip accept
-                          SocketService().emit(
-                            'trip:cancel',
-                            data: {"trip_id": widget.trip!.id},
-                          );
-
-                          debugPrint("Trip cancel: ${widget.trip!.id}");
-
-                          Get.back();
+                          _tripSocketController
+                              .driverRejectTripRequest(widget.trip!.id);
                         }
                       },
                       child: Container(
@@ -323,8 +315,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         } else {
                           _tripSocketController.acceptTripRequest(
                             widget.trip!.id,
-                            widget.trip,
-                            widget.tripUserModel,
                           );
                         }
                       },

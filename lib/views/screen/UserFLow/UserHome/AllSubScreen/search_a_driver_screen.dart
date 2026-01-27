@@ -3,16 +3,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
-import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/parcel_response_model.dart';
-import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/find_driver_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/find_parcel_driver_screen.dart';
+import 'package:radeef/views/screen/UserFLow/UserHome/user_home_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class SearchADriverScreen extends StatefulWidget {
@@ -47,8 +45,9 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
   final dropLocationController = TextEditingController();
 
   final _userProfileController = Get.put(UserProfileController());
-  final TripSocketController _tripSocketController =
-      Get.put(TripSocketController());
+  final TripSocketController _tripSocketController = Get.put(
+    TripSocketController(),
+  );
 
   @override
   void initState() {
@@ -97,8 +96,7 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
     }
 
     // Handling 'trip:accepted' event
-  _tripSocketController.listenOnAcceptedTrip();
-
+    _tripSocketController.listenOnAcceptedTrip();
 
     // Handling 'parcel:accepted' event
     SocketService().on('parcel:accepted', (data) {
@@ -372,28 +370,46 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
 
                     CustomButton(
                       onTap: () {
-                        if (widget.parcelId != null) {
-                          SocketService().emit(
-                            'parcel:cancel',
-                            data: {"parcel_id": widget.parcelId!},
-                          );
-                          debugPrint("Parcel declined: ${widget.parcelId}");
-                        } else if (widget.tripId != null) {
-                          SocketService().emit(
-                            'trip:cancel',
-                            data: {"trip_id": widget.tripId!},
-                          );
-                          debugPrint("Trip canceled: ${widget.tripId}");
-                        } else {
-                          debugPrint("Nothing to cancel");
-                          return;
-                        }
-
-                        Get.back();
+                        _tripSocketController.userCancelTrip(widget.tripId!);
+                        // if (widget.parcelId != null) {
+                        //   SocketService().emit(
+                        //     'parcel:cancel',
+                        //     data: {"parcel_id": widget.parcelId!},
+                        //   );
+                        //   debugPrint("Parcel declined: ${widget.parcelId}");
+                        // } else if (widget.tripId != null) {
+                        //   _tripSocketController.userCancelTrip(widget.tripId!);
+                        //   debugPrint("Trip canceled: ${widget.tripId}");
+                        // } else {
+                        //   debugPrint("Nothing to cancel");
+                        //   return;
+                        // }
                       },
                       text: "cancel".tr,
                     ),
 
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     print("palash");
+                    //   },
+                    //   child: Text("Cancel 2"),
+                    // ),
+
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     debugPrint("TAP WORKING");
+                    //     Get.to(() => UserHomeScreen());
+                    //   },
+                    //   child: Container(
+                    //     height: 50,
+                    //     alignment: Alignment.center,
+                    //     color: Colors.red,
+                    //     child: Text(
+                    //       "CANCEL TEST",
+                    //       style: TextStyle(color: Colors.white),
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(height: 90),
                     Container(
                       width: double.infinity,

@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/chat_controller.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
-import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
@@ -17,7 +16,7 @@ import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/track_driver_
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class FindDriverScreen extends StatefulWidget {
-  final DriverModel driver;
+  final Driver driver;
   final TripModel trip;
   const FindDriverScreen({super.key, required this.driver, required this.trip});
 
@@ -42,8 +41,8 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
   @override
   void initState() {
     _userProfileController.fetchUserInfo();
-    driverLat = widget.driver.locationLat;
-    driverLng = widget.driver.locationLng;
+    driverLat = widget.driver.locationLat!;
+    driverLng = widget.driver.locationLng!;
 
     _calculateEta();
     _listenDriverLocation();
@@ -84,8 +83,8 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
     final d = LocationUtils.distanceKm(
       lat1: driverLat,
       lng1: driverLng,
-      lat2: userLat,
-      lng2: userLng,
+      lat2: userLat!,
+      lng2: userLng!,
     );
 
     final eta = LocationUtils.etaMinutes(distanceKm: d);
@@ -107,7 +106,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    codeController.text = widget.trip.slug;
+    codeController.text = widget.trip.slug!;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -197,7 +196,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                           SizedBox(height: 12),
                           Center(
                             child: Text(
-                              widget.driver.name,
+                              widget.driver.name?? "",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -295,7 +294,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.trip.pickupAddress,
+                                        widget.trip.pickupAddress??"",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -315,7 +314,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.trip.dropoffAddress,
+                                        widget.trip.dropoffAddress??"",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -392,7 +391,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                         fillColor: Color(0xFFE6EAF0),
                         filled: true,
                         hint: Text(
-                          widget.trip.slug,
+                          widget.trip.slug??"",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -438,11 +437,11 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                           onTap: () {
                             Get.to(
                               () => TrackDriverScreen(
-                                pickLat: widget.trip.pickupLat,
-                                pickLan: widget.trip.pickupLng,
-                                dropLat: widget.trip.dropoffLat,
-                                dropLan: widget.trip.dropoffLng,
-                                dropAddress: widget.trip.dropoffAddress,
+                                pickLat: widget.trip.pickupLat!,
+                                pickLan: widget.trip.pickupLng!,
+                                dropLat: widget.trip.dropoffLat!,
+                                dropLan: widget.trip.dropoffLng!,
+                                dropAddress: widget.trip.dropoffAddress??"",
                                 driver: widget.driver,
                                 trip: widget.trip,
                               ),

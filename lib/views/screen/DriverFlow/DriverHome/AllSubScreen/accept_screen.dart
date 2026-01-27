@@ -3,8 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_chat_controller.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
+import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
 import 'package:radeef/models/Driver/trip_request_model.dart';
+import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
@@ -12,9 +14,8 @@ import 'trip_map_screen.dart';
 
 class AcceptScreen extends StatefulWidget {
   final ParcelRequestModel? parcel;
-  final TripRequestModel? trip;
+  final TripModel? trip;
   final ParcelUserModel? parcelUserModel;
-  final TripUserModel? tripUserModel;
   final bool isParcel;
 
   const AcceptScreen({
@@ -23,7 +24,6 @@ class AcceptScreen extends StatefulWidget {
     this.parcel,
     this.trip,
     this.parcelUserModel,
-    this.tripUserModel,
   });
 
   @override
@@ -36,10 +36,9 @@ class _AcceptScreenState extends State<AcceptScreen> {
     TripSocketController(),
   );
 
-  bool tripStarted = true;
-
   @override
   Widget build(BuildContext context) {
+    _tripSocketController.isTripStarted.value = widget.trip!.status == TripStatus.STARTED;
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -77,7 +76,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                           Center(
                             child: CustomNetworkImage(
                               imageUrl:
-                                  "${ApiConstant.imageBaseUrl}${widget.isParcel ? widget.parcelUserModel!.avatar : widget.tripUserModel!.avatar}",
+                                  "${ApiConstant.imageBaseUrl}${widget.isParcel ? widget.parcelUserModel!.avatar : widget.trip!.user!.avatar}",
                               boxShape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                               height: 48,
@@ -89,7 +88,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                             child: Text(
                               widget.isParcel
                                   ? widget.parcelUserModel!.name
-                                  : widget.tripUserModel!.name,
+                                  : widget.trip!.user!.name ?? "",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -121,7 +120,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    "${widget.isParcel ? widget.parcelUserModel!.tripReceivedCount : widget.tripUserModel!.tripReceivedCount}",
+                                    "${widget.isParcel ? widget.parcelUserModel!.tripReceivedCount : widget.trip!.user!.tripReceivedCount}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -135,7 +134,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    "${widget.isParcel ? widget.parcelUserModel!.ratingCount : widget.tripUserModel!.ratingCount}",
+                                    "${widget.isParcel ? widget.parcelUserModel!.ratingCount : widget.trip!.user!.ratingCount}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -168,7 +167,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                       child: Text(
                                         widget.isParcel
                                             ? widget.parcel!.pickupAddress
-                                            : widget.trip!.pickupAddress,
+                                            : widget.trip!.pickupAddress ?? "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -191,7 +190,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                       child: Text(
                                         widget.isParcel
                                             ? widget.parcel!.dropoffAddress
-                                            : widget.trip!.dropoffAddress,
+                                            : widget.trip!.dropoffAddress ?? "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -289,7 +288,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                       await _driverChatController.createChatRoom(
                         userId: widget.isParcel
                             ? widget.parcel!.userId
-                            : widget.trip!.userId,
+                            : widget.trip!.userId ?? "",
                       );
                     },
                     child: Container(
@@ -314,11 +313,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                           parcelUserModel: widget.isParcel
                               ? widget.parcelUserModel
                               : null,
-
                           trip: widget.isParcel ? null : widget.trip,
-                          tripUserModel: widget.isParcel
-                              ? null
-                              : widget.tripUserModel,
                         ),
                       );
                     },
@@ -362,9 +357,6 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                     : null,
 
                                 trip: widget.isParcel ? null : widget.trip,
-                                tripUserModel: widget.isParcel
-                                    ? null
-                                    : widget.tripUserModel,
                               ),
                             );
                           },

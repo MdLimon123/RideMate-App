@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
+import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/data_controller.dart';
 import 'package:radeef/helpers/route.dart';
 import 'package:radeef/service/prefs_helper.dart';
@@ -39,30 +41,48 @@ class _SplashScreenState extends State<SplashScreen> {
     print("role ======> $role");
     print("active ====> $isActive");
 
-
-    if (token == null || token.isEmpty) {
+    if (token.isEmpty) {
       Get.offAllNamed(AppRoutes.selectRole);
       return;
-    }
-
-
-    if (!isActive) {
-      if (role == 'USER') {
-        Get.offAll(() => UserLoginScreen());
-      } else if (role == 'DRIVER') {
-        Get.offAll(() => DriverLoginScreen());
-      } else {
-        Get.offAllNamed(AppRoutes.selectRole);
-      }
-      return;
-    }
-    if (role == 'USER') {
-      Get.offAll(() => UserHomeScreen());
-    } else if (role == 'DRIVER') {
-      Get.offAll(() => DriverHomeScreen());
     } else {
-      Get.offAllNamed(AppRoutes.selectRole);
+      await _bootstrap(role);
     }
+
+    // if (!isActive) {
+    //   if (role == 'USER') {
+    //     Get.offAll(() => UserLoginScreen());
+    //   } else if (role == 'DRIVER') {
+    //     Get.offAll(() => DriverLoginScreen());
+    //   } else {
+    //     Get.offAllNamed(AppRoutes.selectRole);
+    //   }
+    //   return;
+    // }
+    // if (role == 'USER') {
+    //   Get.offAll(() => UserHomeScreen());
+    // } else if (role == 'DRIVER') {
+    //   Get.offAll(() => DriverHomeScreen());
+    // } else {
+    //   Get.offAllNamed(AppRoutes.selectRole);
+    // }
+  }
+
+  Future<void> _bootstrap(String role) async {
+    final isDriver = role == 'DRIVER';
+
+    // Set user/driver role
+    TripStateController.to.setRole(driver: isDriver);
+    var tripSocketController = Get.put(TripSocketController(), permanent: true);
+
+    // Init socket listener after login check
+    if (isDriver) {
+      tripSocketController.allDriverListeners();
+    } else {
+      tripSocketController.allUserListeners();
+    }
+    await tripSocketController.recoverTripData();
+
+    
   }
 
   @override

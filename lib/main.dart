@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/localization_controller.dart';
 import 'package:radeef/controllers/theme_controller.dart';
 import 'package:radeef/helpers/di.dart' as GetStorage;
@@ -25,6 +26,8 @@ void main() async {
   if (token != null && token.isNotEmpty) {
     SocketService().connect(token);
   }
+    Get.put(TripStateController(), permanent: true);
+
   Map<String, Map<String, String>> _languages = await di.init();
   runApp(MyApp(languages: _languages));
 }

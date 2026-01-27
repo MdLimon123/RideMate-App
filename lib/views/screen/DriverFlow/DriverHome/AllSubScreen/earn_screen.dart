@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:radeef/models/Driver/parcel_request_model.dart';
-import 'package:radeef/models/Driver/trip_request_model.dart';
+
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 

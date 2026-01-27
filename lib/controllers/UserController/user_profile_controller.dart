@@ -11,6 +11,7 @@ import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UserProfileController extends GetxController {
+  
   var userProfileModel = UserProfileModel().obs;
 
   var aboutUsModel = AboutUsModel().obs;

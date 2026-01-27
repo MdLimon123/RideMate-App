@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
+import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/data_controller.dart';
 import 'package:radeef/models/User/user_info_model.dart';
 import 'package:radeef/service/api_client.dart';
@@ -64,16 +66,19 @@ class DriverAuthController extends GetxController {
     if (response.statusCode == 200 || response.statusCode == 201) {
       final userInfo = UserInfoModel.fromJson(response.body);
 
-          final token = response.body['access_token'];
+      final token = response.body['access_token'];
 
-      await PrefsHelper.setString(
-        AppConstants.bearerToken,
-        token,
-      );
+      await PrefsHelper.setString(AppConstants.bearerToken, token);
       await PrefsHelper.setUserInfo(response.body);
 
       /// Socket connection
-       SocketService().connect(token);
+      SocketService().connect(token);
+      TripStateController.to.setRole(driver: true);
+
+      // Init socket (if not already)
+      var tripSocketController = Get.put(TripSocketController());
+
+      tripSocketController.allUserListeners();
 
       _dataController.setProfileData(
         isActiveD: response.body['user']['is_active'],
@@ -97,9 +102,6 @@ class DriverAuthController extends GetxController {
     }
     isLoading(false);
   }
-
-
-
 
   Future<void> forgetPassword({required String email}) async {
     isForgetLoading(true);

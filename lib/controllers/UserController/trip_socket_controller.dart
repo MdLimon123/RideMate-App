@@ -1,34 +1,52 @@
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:radeef/models/Driver/trip_model.dart';
-import 'package:radeef/models/Driver/trip_request_model.dart';
-import 'package:radeef/models/User/driver_model.dart';
+import 'package:radeef/controllers/UserController/tripstate_controller.dart';
+import 'package:radeef/models/Driver/driver_profile_model.dart';
+
 import 'package:radeef/models/User/trip_model.dart';
+import 'package:radeef/models/User/user_profile_model.dart';
+import 'package:radeef/service/api_client.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/new_request_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/rate_pessengers_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/end_trip_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/find_driver_screen.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
+
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/search_a_driver_screen.dart';
 
 class TripSocketController extends GetxController {
   var isTripStarted = false.obs;
-  var isTripEnded = false.obs;
   var isPaymentSuccessful = false.obs;
+
+  var currentDriver = Rxn<DriverProfileModel>();
+  var currentUser = Rxn<UserProfileModel>();
 
   void allDriverListeners() {
     listenOnRequestForTrip();
     listenOnTripPaid();
+    listenOnDriverCancelTrip();
   }
-  
+
   void allUserListeners() {
     listenOnAcceptedTrip();
     listenOnTripEnded();
-    listenOnDriverCancelTrip();
-    listenStartedTrip(onTripStarted: () {});
+    listenStartedTrip(
+      onTripStarted: () {
+        print("====== TRIP STARTED CALLBACK CALLED ======");
+        TripStateController.to.updateTripStatus(TripStatus.STARTED);
+      },
+    );
+  }
+
+  /// ======> recover trip data <====== ///
+
+  Future<void> recoverTripData() async {
+    final response = await ApiClient.getData('/trips/recover-trip');
+    if (response.statusCode == 200) {
+      TripStateController.to.setTrip(TripModel.fromJson(response.body));
+    } else {
+      TripStateController.to.updateTripStatus(TripStatus.idle);
+    }
   }
 
   /// ======> user request for trip <====== ///
@@ -58,30 +76,22 @@ class TripSocketController extends GetxController {
   /// ======> driver listen on request for trip <====== ///
   void listenOnRequestForTrip() {
     SocketService().on('trip:request', (data) {
-      final socketModel = TripRequestSocketModel.fromJson(data);
-      Get.to(
-        () => NewRequestScreen(
-          isParcel: false,
-          trip: socketModel.trip,
-          tripUserModel: socketModel.user,
-        ),
-      );
+      final trip = TripModel.fromJson(data['trip']);
+      TripStateController.to.setTrip(trip);
     });
   }
 
   /// ======> driver accept request for trip <====== ///
-  void acceptTripRequest(var tripId, trip, tripUserModel) {
+  void acceptTripRequest(var tripId) {
     SocketService().emit(
       'trip:accept',
       data: {"trip_id": tripId},
       ack: (a) {
-        Get.to(
-          () => AcceptScreen(
-            isParcel: false,
-            trip: trip,
-            tripUserModel: tripUserModel,
-          ),
-        );
+        print("Trip accepted ack: $a");
+
+        final trip = TripModel.fromJson(a['data']);
+
+        Get.offAll(() => AcceptScreen(isParcel: false, trip: trip));
       },
     );
   }
@@ -89,10 +99,13 @@ class TripSocketController extends GetxController {
   /// =====> user listen on accepted trip <====== ///
   void listenOnAcceptedTrip() {
     SocketService().on('trip:accepted', (data) {
-      final driver = DriverModel.fromJson(data['driver']);
+      // final driver = DriverModel.fromJson(data['driver']);
+      // final trip = TripModel.fromJson(data['trip']);
+      // // Navigate to FindDriverScreen
+      // Get.off(() => FindDriverScreen(driver: driver, trip: trip));
+
       final trip = TripModel.fromJson(data['trip']);
-      // Navigate to FindDriverScreen
-      Get.off(() => FindDriverScreen(driver: driver, trip: trip));
+      TripStateController.to.setTrip(trip);
     });
   }
 
@@ -138,7 +151,6 @@ class TripSocketController extends GetxController {
   }
 
   /// ========> user listen on driver trip started ==========///
-  /// Listen for trip started event
   void listenStartedTrip({required void Function() onTripStarted}) {
     SocketService().on('trip:started', (data) {
       print("====== TRIP STARTED LISTENER CALLED ======");
@@ -156,11 +168,10 @@ class TripSocketController extends GetxController {
       ack: (response) {
         if (response['success']) {
           isTripStarted.value = false;
-          isTripEnded.value = true;
 
-          Get.to(
+          Get.offAll(
             () => ConfirmationScreen(
-              tripData: TripDriverModel.fromJson(response['data']),
+              tripData: TripModel.fromJson(response['data']),
             ),
           );
         } else {
@@ -176,11 +187,8 @@ class TripSocketController extends GetxController {
 
   void listenOnTripEnded() {
     SocketService().on('trip:ended', (data) {
-      final driver = DriverModel.fromJson(data['driver']);
       final trip = TripModel.fromJson(data['trip']);
-      isTripStarted.value = false;
-      isTripEnded.value = true;
-      Get.to(() => EndTripScreen(driver: driver, trip: trip));
+      TripStateController.to.setTrip(trip);
     });
   }
 
@@ -195,6 +203,7 @@ class TripSocketController extends GetxController {
       ack: (response) {
         isPaymentSuccessful.value = true;
         print("trip:pay response : $response");
+
         callback(response);
       },
     );
@@ -202,50 +211,61 @@ class TripSocketController extends GetxController {
 
   void listenOnTripPaid() {
     SocketService().on('trip:paid', (data) {
-      print("trip:paid data : $data");
       isPaymentSuccessful.value = true;
-      Get.to(
-        () => RatePessengersScreen(
-          userId: data['trip']["user"]["id"] ?? "",
-          userName: data['trip']["user"]["name"] ?? "",
-          userImage: data['trip']["user"]["avatar"] ?? "",
-          tripId: data['trip']['id'] ?? "",
-          rating: data['trip']["user"]["rating"] ?? 0.0,
-          totalTrips: data['trip']["user"]["rating_count"] ?? 0,
-        ),
-      );
+      final trip = TripModel.fromJson(data['trip']);
+      TripStateController.to.setTrip(trip);
     });
   }
 
   /// =====> user cancel request for trip <====== ///
 
   void userCancelTrip(var tripId) {
+    print("===== Emitting trip:cancel for tripId: $tripId =====");
     SocketService().emit(
       'trip:cancel',
       data: {"trip_id": tripId},
       ack: (response) {
-        Get.back();
+        TripStateController.to.clearTrip();
       },
     );
   }
-
   /// =====> driver listen on user cancel request for trip <====== ///
 
   void listenOnDriverCancelTrip() {
     SocketService().on("trip:canceled", (data) {
-      print("trip:canceled : $data");
-      Get.back();
+      print("===== Driver received trip:canceled =====${data}");
+      TripStateController.to.clearTrip();
     });
   }
-
+  
   /// ======> driver cancel request for trip <====== ///
   void driverRejectTripRequest(var tripId) {
     SocketService().emit(
       'trip:driver_cancel',
       data: {"trip_id": tripId},
       ack: (response) {
+        print("Driver canceled trip ack: $response");
         Get.back();
       },
     );
+  }
+
+  /// ===== USER TRIP RECOVER Listen ======= ///
+  //
+
+  @override
+  void onClose() {
+    print("🔴 TripSocketController DISPOSE");
+
+    // USER listeners
+    SocketService().off('trip:accepted');
+    SocketService().off('trip:started');
+    SocketService().off('trip:ended');
+    SocketService().off('trip:canceled');
+    SocketService().off('trip:refresh_location');
+    // DRIVER listeners
+    SocketService().off('trip:request');
+    SocketService().off('trip:paid');
+    super.onClose();
   }
 }

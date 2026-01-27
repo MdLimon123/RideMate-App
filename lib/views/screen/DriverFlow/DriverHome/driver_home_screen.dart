@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_home_controller.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
-import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
@@ -82,24 +81,24 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       CurvedAnimation(parent: _rotationController, curve: Curves.linear),
     );
 
-    SocketService().on('parcel:request', (data) {
-      final socketModel = ParcelRequestSocketModel.fromJson(data);
+    // SocketService().on('parcel:request', (data) {
+    //   final socketModel = ParcelRequestSocketModel.fromJson(data);
 
-      if (_activeRequestExists) return;
+    //   if (_activeRequestExists) return;
 
-      if (socketModel.parcel != null) {
-        _activeRequestExists = true;
-        Get.to(
-          () => NewRequestScreen(
-            isParcel: true,
-            parcel: socketModel.parcel,
-            parcelUserModel: socketModel.user,
-          ),
-        )?.then((value) {
-          _activeRequestExists = false;
-        });
-      }
-    });
+    //   if (socketModel.parcel != null) {
+    //     _activeRequestExists = true;
+    //     Get.to(
+    //       () => NewRequestScreen(
+    //         isParcel: true,
+    //         parcel: socketModel.parcel,
+    //         parcelUserModel: socketModel.user,
+    //       ),
+    //     )?.then((value) {
+    //       _activeRequestExists = false;
+    //     });
+    //   }
+    // });
 
     _tripSocketController.listenOnRequestForTrip();
 

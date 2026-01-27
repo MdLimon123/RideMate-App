@@ -3,12 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:radeef/models/Driver/parcel_request_model.dart';
-import 'package:radeef/models/Driver/trip_request_model.dart';
+
 import 'package:radeef/service/api_client.dart';
 import 'package:radeef/utils/image_utils.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/earn_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 
 class DriverParcelController extends GetxController {

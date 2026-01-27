@@ -16,7 +16,7 @@ class TripUserModel {
   final String name;
   final int tripReceivedCount;
   final String? avatar;
-  final double rating; // ✅ double
+  final double rating; 
   final int ratingCount;
 
   TripUserModel({

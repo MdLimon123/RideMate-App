@@ -5,7 +5,6 @@ import 'package:get/get_instance/get_instance.dart';
 import 'package:get/route_manager.dart';
 import 'package:get/state_manager.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
-import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
@@ -18,7 +17,7 @@ class UserRatingScreen extends StatefulWidget {
   final String driverName;
   final int trip;
   final double rating;
-  final DriverModel driver;
+
   final TripModel tripModel;
 
   const UserRatingScreen({
@@ -27,7 +26,7 @@ class UserRatingScreen extends StatefulWidget {
     required this.driverName,
     required this.trip,
     required this.rating,
-    required this.driver,
+ 
     required this.tripModel,
   });
 

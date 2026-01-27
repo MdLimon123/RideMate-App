@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
+import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/data_controller.dart';
 import 'package:radeef/models/User/user_info_model.dart';
 import 'package:radeef/service/api_client.dart';
@@ -73,6 +75,14 @@ class UserAuthController extends GetxController {
 
       /// Socket connection
       SocketService().connect(token);
+       TripStateController.to.setRole(driver: false);
+
+  // Init socket (if not already)
+      var tripSocketController = Get.put(TripSocketController());
+
+      tripSocketController.allUserListeners();
+
+  
 
       _dataController.setProfileData(
         isActiveD: response.body['user']['is_active'],
