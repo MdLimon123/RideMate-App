@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_button.dart';
@@ -11,25 +11,19 @@ import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
-class SearchADriverScreen extends StatefulWidget {
-  final String pickLocation;
-  final String dropLocation;
-  final String? parcelId;
-  final String? tripId;
+class SearchParcelDriverScreen extends StatefulWidget {
 
-  const SearchADriverScreen({
+
+  const SearchParcelDriverScreen({
     super.key,
-    required this.pickLocation,
-    required this.dropLocation,
-    this.parcelId,
-    this.tripId,
+   
   });
 
   @override
-  State<SearchADriverScreen> createState() => _SearchADriverScreenState();
+  State<SearchParcelDriverScreen> createState() => _SearchParcelDriverScreenState();
 }
 
-class _SearchADriverScreenState extends State<SearchADriverScreen>
+class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
     with TickerProviderStateMixin {
   late AnimationController _xController;
   late AnimationController _yController;
@@ -43,11 +37,8 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
   final dropLocationController = TextEditingController();
 
   final _userProfileController = Get.put(UserProfileController());
-  final TripSocketController _tripSocketController = Get.put(
-    TripSocketController(),
-  );
-
   final _parcelController = Get.put(ParcelController());
+  final _parcelStateController = Get.put(ParcelStateController());
 
   @override
   void initState() {
@@ -94,21 +85,9 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
     } else {
       debugPrint('🟢 Socket already connected');
     }
-
-    // Handling 'trip:accepted' event
-    _tripSocketController.listenOnAcceptedTrip();
-
     _parcelController.listenOnAcceptedParcel();
 
-    // Handling 'parcel:accepted' event
-    // SocketService().on('parcel:accepted', (data) {
-    //   if (!mounted) return;
-    //   final parcelDriverModel = ParcelDriverModel.fromJson(data['driver']);
-    //   final parcel = ParcelModel.fromJson(data['parcel']);
-    //   Get.off(
-    //     () => FindParcelDriverScreen(driver: parcelDriverModel, parcel: parcel),
-    //   );
-    // });
+  
 
     super.initState();
   }
@@ -125,17 +104,13 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
     _yController.dispose();
     _rotationController.dispose();
 
-    // 🔴 Remove socket listener
-    // SocketService().off('trip:accepted');
-    // SocketService().off('parcel:accepted');
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    pickLocationController.text = widget.pickLocation;
-    dropLocationController.text = widget.dropLocation;
+   
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -372,46 +347,13 @@ class _SearchADriverScreenState extends State<SearchADriverScreen>
 
                     CustomButton(
                       onTap: () {
-                        _tripSocketController.userCancelTrip(widget.tripId!);
-                        // if (widget.parcelId != null) {
-                        //   SocketService().emit(
-                        //     'parcel:cancel',
-                        //     data: {"parcel_id": widget.parcelId!},
-                        //   );
-                        //   debugPrint("Parcel declined: ${widget.parcelId}");
-                        // } else if (widget.tripId != null) {
-                        //   _tripSocketController.userCancelTrip(widget.tripId!);
-                        //   debugPrint("Trip canceled: ${widget.tripId}");
-                        // } else {
-                        //   debugPrint("Nothing to cancel");
-                        //   return;
-                        // }
+                        _parcelController.userCancelParcelRequest(_parcelStateController.parcel.value!.id!);
+                      
                       },
                       text: "cancel".tr,
                     ),
 
-                    // ElevatedButton(
-                    //   onPressed: () {
-                    //     print("palash");
-                    //   },
-                    //   child: Text("Cancel 2"),
-                    // ),
-
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     debugPrint("TAP WORKING");
-                    //     Get.to(() => UserHomeScreen());
-                    //   },
-                    //   child: Container(
-                    //     height: 50,
-                    //     alignment: Alignment.center,
-                    //     color: Colors.red,
-                    //     child: Text(
-                    //       "CANCEL TEST",
-                    //       style: TextStyle(color: Colors.white),
-                    //     ),
-                    //   ),
-                    // ),
+               
                     SizedBox(height: 90),
                     Container(
                       width: double.infinity,

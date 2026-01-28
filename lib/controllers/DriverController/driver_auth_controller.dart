@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/data_controller.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
 import 'package:radeef/models/User/user_info_model.dart';
 import 'package:radeef/service/api_client.dart';
 import 'package:radeef/service/prefs_helper.dart';
@@ -77,8 +78,10 @@ class DriverAuthController extends GetxController {
 
       // Init socket (if not already)
       var tripSocketController = Get.put(TripSocketController());
+      var _parcelController = Get.put(ParcelController());
 
       tripSocketController.allUserListeners();
+      _parcelController.allParcelUserListeners();
 
       _dataController.setProfileData(
         isActiveD: response.body['user']['is_active'],

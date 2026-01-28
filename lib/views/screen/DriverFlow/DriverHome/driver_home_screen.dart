@@ -6,14 +6,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_home_controller.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
-import 'package:radeef/models/Driver/parcel_request_model.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
 import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/bottom_menu.dart';
 import 'package:radeef/views/base/custom_switch.dart';
 import 'package:radeef/views/base/home_state_shimmer.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/new_request_screen.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
 
 class DriverHomeScreen extends StatefulWidget {
@@ -30,8 +29,9 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     TripSocketController(),
   );
 
+  final _parcelController = Get.put(ParcelController());
+
   bool isSwitch = true;
-  bool _activeRequestExists = false;
 
   late AnimationController _xController;
   late AnimationController _yController;
@@ -48,6 +48,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
   @override
   void initState() {
     _tripSocketController.allDriverListeners();
+    _parcelController.allDriverParcelListeners();
     _driverHomeController.fetchHomeData();
     isSwitch = true;
     toggleOnlineStatus(isSwitch);
@@ -81,24 +82,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
       CurvedAnimation(parent: _rotationController, curve: Curves.linear),
     );
 
-    // SocketService().on('parcel:request', (data) {
-    //   final socketModel = ParcelRequestSocketModel.fromJson(data);
-
-    //   if (_activeRequestExists) return;
-
-    //   if (socketModel.parcel != null) {
-    //     _activeRequestExists = true;
-    //     Get.to(
-    //       () => NewRequestScreen(
-    //         isParcel: true,
-    //         parcel: socketModel.parcel,
-    //         parcelUserModel: socketModel.user,
-    //       ),
-    //     )?.then((value) {
-    //       _activeRequestExists = false;
-    //     });
-    //   }
-    // });
+    _parcelController.listenOnRequestForParcel();
 
     _tripSocketController.listenOnRequestForTrip();
 
@@ -132,7 +116,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
   StreamSubscription<Position>? _positionStream;
 
   void startLocationUpdates() {
-    if (_positionStream != null) return; // prevent duplicate stream
+    if (_positionStream != null) return;
 
     LocationSettings locationSettings = const LocationSettings(
       accuracy: LocationAccuracy.high,

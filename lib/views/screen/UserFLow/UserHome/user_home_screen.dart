@@ -4,12 +4,13 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/home_controller.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/book_a_ride_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/parcel_details_screen.dart';
+import 'package:radeef/views/screen/UserFLow/ParcelScreen/parcel_details_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class UserHomeScreen extends StatefulWidget {
@@ -28,9 +29,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     TripSocketController(),
   );
 
+  final _parcelController = Get.put(ParcelController());
+
   @override
   void initState() {
     _tripSocketController.allUserListeners();
+    _parcelController.allParcelUserListeners();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _homeController.subscribleId();
       OneSignalHelper.optIn();

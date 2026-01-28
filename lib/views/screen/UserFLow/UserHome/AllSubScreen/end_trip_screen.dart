@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/chat_controller.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
-import 'package:radeef/models/User/driver_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
@@ -541,4 +540,6 @@ class _EndTripScreenState extends State<EndTripScreen> {
       ),
     );
   }
+
+
 }

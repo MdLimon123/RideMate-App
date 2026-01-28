@@ -1,64 +1,47 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
-import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
-import 'package:radeef/controllers/UserController/tripstate_controller.dart';
-import 'package:radeef/models/User/trip_model.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/trip_map_screen.dart';
+import 'package:http/http.dart' as http;
 
-class TrackDriverScreen extends StatefulWidget {
-  final double pickLat;
-  final double pickLan;
-  final double dropLat;
-  final double dropLan;
-  final String dropAddress;
-  final Driver driver;
-  final TripModel trip;
-
-  const TrackDriverScreen({
-    super.key,
-    required this.pickLat,
-    required this.pickLan,
-    required this.dropLat,
-    required this.dropLan,
-    required this.dropAddress,
-    required this.driver,
-    required this.trip,
-  });
+class TrackParcelDriverScreen extends StatefulWidget {
+  const TrackParcelDriverScreen({super.key});
 
   @override
-  State<TrackDriverScreen> createState() => _TrackDriverScreenState();
+  State<TrackParcelDriverScreen> createState() =>
+      _TrackParcelDriverScreenState();
 }
 
-class _TrackDriverScreenState extends State<TrackDriverScreen> {
-
-
+class _TrackParcelDriverScreenState extends State<TrackParcelDriverScreen> {
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
 
-  final TripSocketController _tripSocketController = Get.put(
-    TripSocketController(),
-  );
+  final _parcelController = Get.put(ParcelController());
+  final _parcelStateController = Get.put(ParcelStateController());
 
   LatLng? _driverLatLng;
 
   @override
   void initState() {
     _driverLatLng = LatLng(
-      widget.driver.locationLat!,
-      widget.driver.locationLng!,
+      _parcelStateController.parcel.value!.driver!.locationLat!,
+      _parcelStateController.parcel.value!.driver!.locationLng!,
     );
 
     _setupMarkers();
     _drawPickupToDestination();
-    _listenDriverLocation();
-    print("====== isTripStarted ${widget.trip.status}");
-    if (widget.trip.status != TripStatus.STARTED) _drawDriverToPickup();
-    listenStartedTrip();
+    _listenParcelDriverLocation();
+
+    if (_parcelStateController.parcel.value!.status != ParcelState.STARTED)
+      _drawDriverToPickup();
+    ;
     super.initState();
   }
 
@@ -77,7 +60,10 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
     _markers.add(
       Marker(
         markerId: const MarkerId('pickup'),
-        position: LatLng(widget.pickLat, widget.pickLan),
+        position: LatLng(
+          _parcelStateController.parcel.value!.pickupLat!,
+          _parcelStateController.parcel.value!.pickupLng!,
+        ),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ),
     );
@@ -85,15 +71,18 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
     _markers.add(
       Marker(
         markerId: const MarkerId('destination'),
-        position: LatLng(widget.dropLat, widget.dropLan),
+        position: LatLng(
+          _parcelStateController.parcel.value!.dropoffLat!,
+          _parcelStateController.parcel.value!.dropoffLng!,
+        ),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
     );
   }
 
   /// ================= SOCKET =================
-  void _listenDriverLocation() async {
-    _tripSocketController.listenDriverLocation(
+  void _listenParcelDriverLocation() async {
+    _parcelController.listenDriverParcelLocation(
       onLocationUpdate: (newLatLng) async {
         setState(() {
           _driverLatLng = newLatLng;
@@ -111,45 +100,20 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
           );
         });
 
-        if (!_tripSocketController.isTripStarted.value) {
+        if (!_parcelController.isParcelStarted.value) {
           await _drawDriverToPickup();
         }
       },
     );
-
-    // SocketService().on('trip:refresh_location', (data) async {
-    //   final newLatLng = LatLng(data['location_lat'], data['location_lng']);
-
-    //   setState(() {
-    //     _driverLatLng = newLatLng;
-
-    //     // 🔴 ONLY update driver marker
-    //     _markers.removeWhere((m) => m.markerId.value == 'driver');
-
-    //     _markers.add(
-    //       Marker(
-    //         markerId: const MarkerId('driver'),
-    //         position: _driverLatLng!,
-    //         icon: BitmapDescriptor.defaultMarkerWithHue(
-    //           BitmapDescriptor.hueBlue,
-    //         ),
-    //       ),
-    //     );
-    //   });
-    //   // pickup শুরু না হলে route draw করো
-    //   if (!_isPickupStarted) {
-    //     await _drawDriverToPickup();
-    //   }
-    // });
   }
 
-  void listenStartedTrip() {
-    _tripSocketController.listenStartedTrip(
-      onTripStarted: () {
+  void listenStartedParcel() {
+    _parcelController.listenStartedParcel(
+      onParcelStarted: () {
         setState(() {
-          _tripSocketController.isTripStarted.value = true;
+          _parcelController.isParcelStarted.value = true;
           print(
-            "====== TRIP STARTED ${_tripSocketController.isTripStarted.value}",
+            "====== TRIP STARTED ${_parcelController.isParcelStarted.value}",
           );
 
           // 🔴 FORCE REMOVE
@@ -194,7 +158,7 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
 
   /// ================= POLYLINES =================
   Future<void> _drawDriverToPickup() async {
-    if (_tripSocketController.isTripStarted.value) return;
+    if (_parcelController.isParcelStarted.value) return;
 
     // 🔴 REMOVE FIRST
     _polylines.removeWhere((p) => p.polylineId.value == 'driver_to_pickup');
@@ -202,12 +166,12 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
     final route = await _fetchRoute(
       _driverLatLng!.latitude,
       _driverLatLng!.longitude,
-      widget.pickLat,
-      widget.pickLan,
+      _parcelStateController.parcel.value!.pickupLat!,
+      _parcelStateController.parcel.value!.pickupLng!,
     );
 
     // 🔴 CHECK AGAIN AFTER AWAIT
-    if (route == null || _tripSocketController.isTripStarted.value) return;
+    if (route == null || _parcelController.isParcelStarted.value) return;
 
     _polylines.add(
       Polyline(
@@ -224,10 +188,10 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
   /// ================= POLYLINES =================
   Future<void> _drawPickupToDestination() async {
     final route = await _fetchRoute(
-      widget.pickLat,
-      widget.pickLan,
-      widget.dropLat,
-      widget.dropLan,
+      _parcelStateController.parcel.value!.pickupLat!,
+      _parcelStateController.parcel.value!.pickupLng!,
+      _parcelStateController.parcel.value!.dropoffLat!,
+      _parcelStateController.parcel.value!.dropoffLng!,
     );
 
     if (route == null) return;
@@ -246,13 +210,10 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
 
   @override
   void dispose() {
-    SocketService().off('trip:refresh_location');
+    SocketService().off('parcel:refresh_location');
     super.dispose();
   }
 
-
-
-  /// ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -279,51 +240,8 @@ class _TrackDriverScreenState extends State<TrackDriverScreen> {
               ),
             ),
           ),
-
-          // Positioned(
-          //   bottom: 30,
-          //   left: 30,
-          //   right: 30,
-          //   child: InkWell(
-          //     onTap: () {
-          //       Get.to(
-          //         () => EndTripScreen(driver: widget.driver, trip: widget.trip),
-          //       );
-          //     },
-          //     child: Container(
-          //       padding: const EdgeInsets.all(14),
-          //       decoration: BoxDecoration(
-          //         color: Colors.red,
-          //         borderRadius: BorderRadius.circular(10),
-          //       ),
-          //       child: const Center(
-          //         child: Text(
-          //           "End Trip",
-          //           style: TextStyle(
-          //             color: Colors.white,
-          //             fontSize: 18,
-          //             fontWeight: FontWeight.bold,
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
   }
-}
-
-/// ================= DATA MODEL =================
-class RouteData {
-  final List<LatLng> points;
-  final String duration;
-  final String distance;
-
-  RouteData({
-    required this.points,
-    required this.duration,
-    required this.distance,
-  });
 }

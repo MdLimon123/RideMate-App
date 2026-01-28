@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:radeef/controllers/UserController/tripstate_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/models/Driver/driver_profile_model.dart';
 
 import 'package:radeef/models/User/trip_model.dart';
@@ -10,9 +11,10 @@ import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/search_a_driver_screen.dart';
+
+import '../../models/parcel_model.dart';
 
 class TripSocketController extends GetxController {
   var isTripStarted = false.obs;
@@ -40,10 +42,32 @@ class TripSocketController extends GetxController {
 
   /// ======> recover trip data <====== ///
 
+  // Future<void> recoverTripData() async {
+  //   final response = await ApiClient.getData('/trips/recover-trip');
+  //   if (response.statusCode == 200) {
+  //     if (response.body['data'] != null) {
+  //       TripStateController.to.setTrip(TripModel.fromJson(response.body));
+  //     } else {
+  //       TripStateController.to.setTrip(TripModel.fromJson(response.body));
+  //     }
+  //   } else {
+  //     TripStateController.to.updateTripStatus(TripStatus.idle);
+  //   }
+  // }
+
   Future<void> recoverTripData() async {
     final response = await ApiClient.getData('/trips/recover-trip');
+
     if (response.statusCode == 200) {
-      TripStateController.to.setTrip(TripModel.fromJson(response.body));
+      final body = response.body;
+
+      if (body['data'] != null) {
+        final tripJson = body['data'];
+
+        TripStateController.to.setTrip(TripModel.fromJson(tripJson));
+      } else {
+        TripStateController.to.updateTripStatus(TripStatus.idle);
+      }
     } else {
       TripStateController.to.updateTripStatus(TripStatus.idle);
     }
@@ -229,6 +253,7 @@ class TripSocketController extends GetxController {
       },
     );
   }
+
   /// =====> driver listen on user cancel request for trip <====== ///
 
   void listenOnDriverCancelTrip() {
@@ -237,7 +262,7 @@ class TripSocketController extends GetxController {
       TripStateController.to.clearTrip();
     });
   }
-  
+
   /// ======> driver cancel request for trip <====== ///
   void driverRejectTripRequest(var tripId) {
     SocketService().emit(

@@ -4,38 +4,33 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/chat_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
-import 'package:radeef/models/User/parcel_response_model.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/utils/location_utils.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/track_parcel_driver_screen.dart';
+import 'package:radeef/views/screen/UserFLow/ParcelScreen/user_rating_for_parcel_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
-class FindParcelDriverScreen extends StatefulWidget {
-  final ParcelDriverModel driver;
-  final ParcelModel parcel;
-
-
-  const FindParcelDriverScreen({
-    super.key,
-    required this.driver,
-    required this.parcel,
-
-  });
+class EndParcelScreen extends StatefulWidget {
+  const EndParcelScreen({super.key});
 
   @override
-  State<FindParcelDriverScreen> createState() => _FindParcelDriverScreenState();
+  State<EndParcelScreen> createState() => _EndParcelScreenState();
 }
 
-class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
+class _EndParcelScreenState extends State<EndParcelScreen> {
   final codeController = TextEditingController(text: "");
+
+  final _chatController = Get.put(ChatController());
 
   final _userProfileController = Get.put(UserProfileController());
 
-  final _chatController = Get.put(ChatController());
+  final _parcelController = Get.put(ParcelController());
+  final _parcelStateController = Get.put(ParcelStateController());
 
   double driverLat = 0;
   double driverLng = 0;
@@ -46,8 +41,8 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
   @override
   void initState() {
     _userProfileController.fetchUserInfo();
-    driverLat = widget.driver.locationLat!;
-    driverLng = widget.driver.locationLng!;
+    driverLat = _parcelStateController.parcel.value!.driver!.locationLat!;
+    driverLng = _parcelStateController.parcel.value!.driver!.locationLng!;
     _calculateEta();
     _listenDriverLocation();
     super.initState();
@@ -72,8 +67,8 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
   }
 
   void _calculateEta() {
-    final userLat = widget.parcel.pickupLat;
-    final userLng = widget.parcel.pickupLng;
+    final userLat = _parcelStateController.parcel.value!.pickupLat;
+    final userLng = _parcelStateController.parcel.value!.pickupLng;
 
     if (driverLat == 0 || driverLng == 0 || userLat == 0 || userLng == 0) {
       setState(() {
@@ -109,7 +104,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    codeController.text = widget.parcel.slug ?? "";
+    codeController.text = _parcelStateController.parcel.value!.slug!;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -189,7 +184,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                           Center(
                             child: CustomNetworkImage(
                               imageUrl:
-                                  "${ApiConstant.imageBaseUrl}${widget.driver.avatar}",
+                                  "${ApiConstant.imageBaseUrl}${_parcelStateController.parcel.value!.driver!.avatar}",
                               boxShape: BoxShape.circle,
                               border: Border.all(color: Color(0xFFFFFFFF)),
                               height: 48,
@@ -199,7 +194,12 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                           SizedBox(height: 12),
                           Center(
                             child: Text(
-                              widget.driver.name!,
+                              _parcelStateController
+                                      .parcel
+                                      .value!
+                                      .driver!
+                                      .name ??
+                                  "",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -213,7 +213,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "${widget.driver.vehicleBrand} ${widget.driver.vehicleModel}",
+                                "${_parcelStateController.parcel.value!.driver!.vehicleModel} ${_parcelStateController.parcel.value!.driver!.vehicleBrand}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -223,7 +223,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                               SizedBox(width: 8),
                               Text(
                                 etaMin == 0
-                                    ? "-- min away"
+                                    ? "-- min away "
                                     : "$etaMin min away",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -256,7 +256,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                   ),
                                   SizedBox(width: 4),
                                   Text(
-                                    "${widget.driver.tripGivenCount}",
+                                    "${_parcelStateController.parcel.value!.driver!.tripGivenCount!}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -267,7 +267,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                   Icon(Icons.star, color: Color(0xFF012F64)),
                                   SizedBox(width: 4),
                                   Text(
-                                    "${widget.driver.ratingCount}",
+                                    "${_parcelStateController.parcel.value!.driver!.rating!}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -297,7 +297,10 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.parcel.pickupAddress!,
+                                        _parcelStateController
+                                            .parcel
+                                            .value!
+                                            .pickupAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -317,7 +320,10 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.parcel.dropoffAddress!,
+                                        _parcelStateController
+                                            .parcel
+                                            .value!
+                                            .dropoffAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -334,7 +340,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                     SvgPicture.asset('assets/icons/dollar.svg'),
                                     SizedBox(width: 12),
                                     Text(
-                                      "${widget.parcel.totalCost}",
+                                      "${_parcelStateController.parcel.value!.totalCost!} XAF",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w400,
@@ -394,7 +400,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                         fillColor: Color(0xFFE6EAF0),
                         filled: true,
                         hint: Text(
-                          widget.parcel.slug!,
+                          _parcelStateController.parcel.value!.slug!,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -420,8 +426,12 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                         SizedBox(width: 16),
                         InkWell(
                           onTap: () async {
-                            _chatController.createChatRoom(
-                              userId: widget.driver.id!,
+                            await _chatController.createChatRoom(
+                              userId: _parcelStateController
+                                  .parcel
+                                  .value!
+                                  .driver!
+                                  .id!,
                             );
                           },
                           child: Container(
@@ -436,22 +446,11 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                           ),
                         ),
                         SizedBox(width: 22),
+
                         InkWell(
                           onTap: () {
-                            Get.to(
-                              () => TrackParcelDriverScreen(
-                                pickLat: widget.parcel.pickupLat!,
-                                pickLan: widget.parcel.pickupLng!,
-                                dropLat: widget.parcel.dropoffLat!,
-                                dropLan: widget.parcel.dropoffLng!,
-                                dropAddress: widget.parcel.dropoffAddress!,
-                                driver: widget.driver,
-                                parcel: widget.parcel,
-                               
-                              ),
-                            );
+                            _payTrip();
                           },
-
                           child: Container(
                             height: 46,
                             padding: EdgeInsets.symmetric(horizontal: 10),
@@ -461,7 +460,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                             ),
                             child: Center(
                               child: Text(
-                                "Track Driver",
+                                "Pay Now ",
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
@@ -471,39 +470,6 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                             ),
                           ),
                         ),
-
-                        // InkWell(
-                        //   onTap: () {
-                        //     Get.to(
-                        //       () => ParcelUserRatingScreen(
-                        //         drivierImage: widget.driver.avatar!,
-                        //         driverName: widget.driver.name!,
-                        //         trip: widget.driver.tripGivenCount!,
-                        //         rating: widget.driver.ratingCount!.toDouble(),
-                        //         driver: widget.driver,
-                        //         parcelModel: widget.parcel,
-                        //       ),
-                        //     );
-                        //   },
-                        //   child: Container(
-                        //     height: 46,
-                        //     padding: EdgeInsets.symmetric(horizontal: 10),
-                        //     decoration: BoxDecoration(
-                        //       borderRadius: BorderRadius.circular(24),
-                        //       color: Color(0xFFE6EAF0),
-                        //     ),
-                        //     child: Center(
-                        //       child: Text(
-                        //         "Pay Now",
-                        //         style: TextStyle(
-                        //           fontSize: 12,
-                        //           fontWeight: FontWeight.w500,
-                        //           color: AppColors.textColor,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ],
@@ -512,6 +478,54 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _payTrip() {
+    _parcelController.payForParcel(
+      parcelId: _parcelStateController.parcel.value!.id ?? "",
+      callback: (response) {
+        if (response['success']) {
+          final balance =
+              response['data']['balance'] ??
+              0; // Extract the balance from the response
+          _showSuccessPopup(balance);
+        } else {
+          final message = "Payment failed";
+          _showErrorPopup(message);
+        }
+      },
+    );
+  }
+
+  void _showSuccessPopup(int balance) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Payment Successful"),
+        content: Text("Current Balance: \$$balance"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+              Get.to(() => UserRatingForParcelScreen());
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  void _showErrorPopup(String message) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Payment Failed"),
+        content: Text(message),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text("OK")),
+        ],
       ),
     );
   }

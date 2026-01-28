@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_chat_controller.dart';
-import 'package:radeef/models/User/trip_model.dart';
-
+import 'package:radeef/controllers/DriverController/driver_parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
+import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
+import 'package:radeef/views/screen/DriverFlow/parcel/final_parcel_earn.dart';
 
-class ConfirmationScreen extends StatefulWidget {
-  final TripModel tripData;
-  const ConfirmationScreen({super.key, required this.tripData});
+class DriverParcelConfirmationScreen extends StatefulWidget {
+  const DriverParcelConfirmationScreen({super.key});
 
   @override
-  State<ConfirmationScreen> createState() => _ConfirmationScreenState();
+  State<DriverParcelConfirmationScreen> createState() =>
+      _DriverParcelConfirmationScreenState();
 }
 
-class _ConfirmationScreenState extends State<ConfirmationScreen> {
+class _DriverParcelConfirmationScreenState
+    extends State<DriverParcelConfirmationScreen> {
+  final _parcelStateController = Get.put(ParcelStateController());
 
-
-  final _driverChatController = Get.put(DriverChatController());
+  final _driverParcelController = Get.put(DriverParcelController());
 
   @override
   void initState() {
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 Center(
                   child: CustomNetworkImage(
                     imageUrl:
-                        "${ApiConstant.imageBaseUrl}${widget.tripData.user?.avatar ?? ''}",
+                        "${ApiConstant.imageBaseUrl}${_parcelStateController.parcel.value?.user?.avatar ?? ''}",
                     boxShape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                     height: 48,
@@ -63,7 +65,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 const SizedBox(height: 12),
                 Center(
                   child: Text(
-                    widget.tripData.user?.name ?? 'N/A',
+                    _parcelStateController.parcel.value?.user?.name ?? '',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -95,7 +97,13 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          widget.tripData.user?.ratingCount.toString() ?? '0',
+                          _parcelStateController
+                                  .parcel
+                                  .value
+                                  ?.user
+                                  ?.tripReceivedCount!
+                                  .toString() ??
+                              '0',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -106,7 +114,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         const Icon(Icons.star, color: Color(0xFF012F64)),
                         const SizedBox(width: 4),
                         Text(
-                          widget.tripData.user?.rating!.toStringAsFixed(1) ??
+                          _parcelStateController.parcel.value?.user?.rating!
+                                  .toStringAsFixed(1) ??
                               '0',
                           style: TextStyle(
                             fontSize: 16,
@@ -120,66 +129,56 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 ),
                 SizedBox(height: 34),
 
-                // widget.isParcel
-                //     ? Container(
-                //         width: double.infinity,
-                //         padding: EdgeInsets.symmetric(
-                //           horizontal: 10,
-                //           vertical: 10,
-                //         ),
-                //         decoration: BoxDecoration(
-                //           color: Color(0xFFFFFFFF),
-                //           borderRadius: BorderRadius.circular(16),
-                //         ),
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //           children: [
-                //             Text(
-                //               "Take a picture for end trip",
-                //               style: TextStyle(
-                //                 fontSize: 14,
-                //                 fontWeight: FontWeight.w400,
-                //                 color: AppColors.textColor,
-                //               ),
-                //             ),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFFFFF),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Take a picture for end trip",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textColor,
+                        ),
+                      ),
 
-                //             Obx(() {
-                //               final image =
-                //                   _driverParcelController.parcelImage.value;
-                //               return InkWell(
-                //                 onTap: () {
-                //                   _driverParcelController.pickParcelImage(
-                //                     fromCamera: true,
-                //                   );
-                //                 },
-                //                 child: Container(
-                //                   height: 28,
-                //                   width: 28,
-                //                   decoration: BoxDecoration(
-                //                     borderRadius: BorderRadius.circular(4),
-                //                     border: Border.all(
-                //                       color: Color(0xFF11DF7F),
-                //                       width: 0.5,
-                //                     ),
-                //                   ),
-                //                   child: image != null
-                //                       ? ClipRRect(
-                //                           borderRadius: BorderRadius.circular(
-                //                             4,
-                //                           ),
-                //                           child: Image.file(
-                //                             image,
-                //                             fit: BoxFit.cover,
-                //                           ),
-                //                         )
-                //                       : null,
-                //                 ),
-                //               );
-                //             }),
-                //           ],
-                //         ),
-                //       )
-                //     : SizedBox(),
+                      Obx(() {
+                        final image = _driverParcelController.parcelImage.value;
+                        return InkWell(
+                          onTap: () {
+                            _driverParcelController.pickParcelImage(
+                              fromCamera: true,
+                            );
+                          },
+                          child: Container(
+                            height: 28,
+                            width: 28,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Color(0xFF11DF7F),
+                                width: 0.5,
+                              ),
+                            ),
+                            child: image != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Image.file(image, fit: BoxFit.cover),
+                                  )
+                                : null,
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
@@ -199,7 +198,11 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              widget.tripData.pickupAddress ?? "",
+                              _parcelStateController
+                                      .parcel
+                                      .value
+                                      ?.pickupAddress ??
+                                  "",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
@@ -220,7 +223,11 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              widget.tripData.dropoffAddress ?? "",
+                              _parcelStateController
+                                      .parcel
+                                      .value
+                                      ?.dropoffAddress ??
+                                  "",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
@@ -241,7 +248,40 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            widget.tripData.totalCost?.toString() ?? "0",
+                            _parcelStateController.parcel.value?.totalCost
+                                    .toString() ??
+                                "0",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF012F64),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "(XAF)",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w200,
+                              color: AppColors.textColor,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/dollar_fill.svg',
+                            color: AppColors.textColor,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            _parcelStateController.parcel.value?.amount
+                                    .toString() ??
+                                "0",
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
@@ -266,80 +306,57 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             ),
           ),
           SizedBox(height: 50),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  height: 40,
-                  width: 40,
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFE6EAF0),
-                  ),
-                  child: SvgPicture.asset('assets/icons/phone.svg'),
-                ),
-                const SizedBox(width: 16),
-                InkWell(
-                  onTap: () async {
-                    await _driverChatController.createChatRoom(
-                      userId: widget.tripData.userId.toString(),
-                    );
-                  },
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFFE6EAF0),
-                    ),
-                    child: SvgPicture.asset('assets/icons/message.svg'),
-                  ),
-                ),
-                const SizedBox(width: 22),
-
-                // Start Trip button
-                // InkWell(
-                //   onTap: () {
-                //     //  _handleTripPaymentConfirmation();
-
-                //     Get.to(
-                //       () => RatePessengersScreen(
-                //         userId: widget.tripData.userId.toString(),
-                //         userName: widget.tripData.user!.name ?? "",
-                //         userImage: widget.tripData.user!.avatar ?? "",
-                //         tripId: widget.tripData.id ?? "",
-                //         rating: widget.tripData.user!.rating ?? 0.0,
-                //         totalTrips: widget.tripData.user!.ratingCount ?? 0,
-                //       ),
-                //     );
-                //     debugPrint("payent ===========>");
-                //   },
-                //   child: Container(
-                //     height: 40,
-                //     padding: const EdgeInsets.symmetric(horizontal: 10),
-                //     decoration: BoxDecoration(
-                //       borderRadius: BorderRadius.circular(24),
-                //       color: Color(0xFF345983),
-                //     ),
-                //     child: Center(
-                //       child: Text(
-                //         "Confirm",
-                //         style: const TextStyle(
-                //           fontSize: 14,
-                //           fontWeight: FontWeight.w500,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
-              ],
-            ),
+          CustomButton(
+            onTap: () {
+              _driverParcelController
+                  .uplaodParcelImage(
+                    imagePath: _driverParcelController.parcelImage.value!.path,
+                  )
+                  .then((value) {
+                    Get.offAll(FinalParcelEarn());
+                  });
+            },
+            text: "Confirm",
           ),
+
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Container(
+          //         height: 40,
+          //         width: 40,
+          //         padding: const EdgeInsets.all(8),
+          //         decoration: BoxDecoration(
+          //           shape: BoxShape.circle,
+          //           color: const Color(0xFFE6EAF0),
+          //         ),
+          //         child: SvgPicture.asset('assets/icons/phone.svg'),
+          //       ),
+          //       const SizedBox(width: 16),
+          //       InkWell(
+          //         onTap: () async {
+          //           await _driverChatController.createChatRoom(
+          //             userId: _parcelStateController.parcel.value?.userId.toString() ?? "",
+          //           );
+          //         },
+          //         child: Container(
+          //           height: 40,
+          //           width: 40,
+          //           padding: const EdgeInsets.all(8),
+          //           decoration: BoxDecoration(
+          //             shape: BoxShape.circle,
+          //             color: const Color(0xFFE6EAF0),
+          //           ),
+          //           child: SvgPicture.asset('assets/icons/message.svg'),
+          //         ),
+          //       ),
+          //       const SizedBox(width: 22),
+
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

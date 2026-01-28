@@ -1,65 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
-import 'package:radeef/models/Driver/parcel_request_model.dart';
-import 'package:radeef/models/User/trip_model.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
 
-class NewRequestScreen extends StatefulWidget {
-  final bool isParcel;
-  final TripModel? trip;
-  final ParcelRequestModel? parcel;
-  // final TripRequestModel? trip;
-  final ParcelUserModel? parcelUserModel;
-  // final TripUserModel? tripUserModel;
-
-  const NewRequestScreen({
-    super.key,
-    required this.isParcel,
-    this.trip,
-    this.parcel,
-    this.parcelUserModel,
-    // this.tripUserModel,
-  });
+class DriverParcelRequest extends StatefulWidget {
+  const DriverParcelRequest({super.key});
   @override
-  State<NewRequestScreen> createState() => _NewRequestScreenState();
+  State<DriverParcelRequest> createState() => _DriverParcelRequestState();
 }
 
-class _NewRequestScreenState extends State<NewRequestScreen> {
-  final TripSocketController _tripSocketController = Get.put(
-    TripSocketController(),
-  );
+class _DriverParcelRequestState extends State<DriverParcelRequest> {
+  final _parcelStateController = Get.put(ParcelStateController());
+  final _parcelController = Get.put(ParcelController());
 
   @override
   void initState() {
-    cancelTrip();
+    cancelParcel();
     super.initState();
   }
 
-  void cancelTrip() {
-    // if (widget.isParcel) {
-    //   SocketService().emit(
-    //     "parcel:cancel",
-    //     data: {"parcel_id": widget.parcel!.id},
-    //   );
-    // } else {
-    //   SocketService().emit("trip:cancel", data: {"trip_id": widget.trip!.id});
-    // }
-
-    if (widget.isParcel) {
-      SocketService().on("parcel:canceled", (data) {
-        Get.back();
-      });
-    } else {
-      SocketService().on("trip:canceled", (data) {
-        print("trip:canceled : $data");
-        Get.back();
-      });
-    }
+  void cancelParcel() {
+    SocketService().on("parcel:canceled", (data) {
+      Get.back();
+    });
   }
 
   @override
@@ -101,9 +68,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         children: [
                           Center(
                             child: Text(
-                              widget.isParcel
-                                  ? "New Parcel Request"
-                                  : "newRideRequest".tr,
+                              "New Parcel Request",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -143,9 +108,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.isParcel
-                                            ? widget.parcel!.pickupAddress
-                                            : widget.trip!.pickupAddress ?? "",
+                                        _parcelStateController
+                                            .parcel
+                                            .value!
+                                            .pickupAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -166,9 +132,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.isParcel
-                                            ? widget.parcel!.dropoffAddress
-                                            : widget.trip!.dropoffAddress ?? "",
+                                        _parcelStateController
+                                            .parcel
+                                            .value!
+                                            .dropoffAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -181,33 +148,29 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                 ),
                                 SizedBox(height: 12),
 
-                                widget.isParcel
-                                    ? Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                            "assets/icons/box.svg",
-                                          ),
-                                          SizedBox(width: 12),
-                                          Text(
-                                            "${widget.parcel!.amount}",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xFF012F64),
-                                            ),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            "(XAF)",
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w200,
-                                              color: AppColors.textColor,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
+                                Row(
+                                  children: [
+                                    SvgPicture.asset("assets/icons/box.svg"),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      "${_parcelStateController.parcel.value!.amount!}",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF012F64),
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      "(XAF)",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w200,
+                                        color: AppColors.textColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
 
                                 SizedBox(height: 12),
                                 Row(
@@ -218,7 +181,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                     ),
                                     SizedBox(width: 12),
                                     Text(
-                                      "${widget.isParcel ? widget.parcel!.totalCost : widget.trip!.totalCost}",
+                                      "${_parcelStateController.parcel.value!.totalCost!}",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
@@ -254,21 +217,16 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        if (widget.isParcel) {
-                          //  Parcel accept
-                          SocketService().emit(
-                            'parcel:driver_cancel',
-                            data: {"parcel_id": widget.parcel!.id},
-                          );
+                        //  Parcel accept
+                        SocketService().emit(
+                          'parcel:driver_cancel',
+                          data: {
+                            "parcel_id":
+                                _parcelStateController.parcel.value!.id,
+                          },
+                        );
 
-                          debugPrint("Parcel decline: ${widget.parcel!.id}");
-
-                          Get.back();
-                        } else {
-                          //  Trip accept
-                          _tripSocketController
-                              .driverRejectTripRequest(widget.trip!.id);
-                        }
+                        Get.back();
                       },
                       child: Container(
                         width: double.infinity,
@@ -294,28 +252,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   Expanded(
                     child: CustomButton(
                       onTap: () {
-                        if (widget.isParcel) {
-                          //  Parcel accept
-                          SocketService().emit(
-                            'parcel:accept',
-                            data: {"parcel_id": widget.parcel!.id},
-                          );
-
-                          debugPrint("Parcel accepted: ${widget.parcel!.id}");
-
-                          //  Parcel model pass
-                          Get.to(
-                            () => AcceptScreen(
-                              isParcel: true,
-                              parcel: widget.parcel,
-                              parcelUserModel: widget.parcelUserModel,
-                            ),
-                          );
-                        } else {
-                          _tripSocketController.acceptTripRequest(
-                            widget.trip!.id,
-                          );
-                        }
+                        _parcelController.acceptParcelRequest(
+                          _parcelStateController.parcel.value!.id,
+                        );
                       },
                       text: "accept".tr,
                     ),

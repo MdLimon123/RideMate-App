@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:radeef/models/User/recover_trip_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';

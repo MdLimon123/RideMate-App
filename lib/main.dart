@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/localization_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/controllers/theme_controller.dart';
 import 'package:radeef/helpers/di.dart' as GetStorage;
 import 'package:radeef/service/notification_service.dart';
@@ -26,7 +27,8 @@ void main() async {
   if (token != null && token.isNotEmpty) {
     SocketService().connect(token);
   }
-    Get.put(TripStateController(), permanent: true);
+  Get.put(TripStateController(), permanent: true);
+  Get.put(ParcelStateController(), permanent: true);
 
   Map<String, Map<String, String>> _languages = await di.init();
   runApp(MyApp(languages: _languages));
@@ -56,7 +58,7 @@ class MyApp extends StatelessWidget {
                   defaultTransition: Transition.rightToLeft,
                   locale: localizeController.locale,
                   translations: Messages(languages: languages),
-                  
+
                   fallbackLocale: Locale(
                     AppConstants.languages[0].languageCode,
                     AppConstants.languages[0].countryCode,
@@ -64,6 +66,7 @@ class MyApp extends StatelessWidget {
                   transitionDuration: const Duration(milliseconds: 500),
                   getPages: AppRoutes.page,
                   initialRoute: AppRoutes.splashScreen,
+             
                 );
               },
             );

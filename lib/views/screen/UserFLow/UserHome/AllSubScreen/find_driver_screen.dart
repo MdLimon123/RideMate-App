@@ -32,6 +32,8 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
   final _userProfileController = Get.put(UserProfileController());
   final _tripSocketController = Get.put(TripSocketController());
 
+
+
   double driverLat = 0;
   double driverLng = 0;
 

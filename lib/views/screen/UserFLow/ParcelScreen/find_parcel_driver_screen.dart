@@ -1,41 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/chat_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
-import 'package:radeef/models/User/parcel_response_model.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/utils/location_utils.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/parcel_user_rating_screen.dart';
+import 'package:radeef/views/screen/UserFLow/ParcelScreen/track_parcel_driver_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
-class EndParcelScreen extends StatefulWidget {
-  final ParcelDriverModel driver;
-  final ParcelModel parcel;
-
-  const EndParcelScreen({
+class FindParcelDriverScreen extends StatefulWidget {
+  const FindParcelDriverScreen({
     super.key,
-    required this.driver,
-    required this.parcel,
- 
   });
 
   @override
-  State<EndParcelScreen> createState() => _EndParcelScreenState();
+  State<FindParcelDriverScreen> createState() => _FindParcelDriverScreenState();
 }
 
-class _EndParcelScreenState extends State<EndParcelScreen> {
+class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
   final codeController = TextEditingController(text: "");
 
-  final _chatController = Get.put(ChatController());
+    final _parcelStateController = Get.put(ParcelStateController());
+    final _parcelController = Get.put(ParcelController());
 
   final _userProfileController = Get.put(UserProfileController());
+
+  final _chatController = Get.put(ChatController());
 
   double driverLat = 0;
   double driverLng = 0;
@@ -46,10 +43,12 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
   @override
   void initState() {
     _userProfileController.fetchUserInfo();
-    driverLat = widget.driver.locationLat!;
-    driverLng = widget.driver.locationLng!;
+    driverLat = _parcelStateController.parcel.value!.locationLat!;
+    driverLng = _parcelStateController.parcel.value!.locationLng!;
+
     _calculateEta();
     _listenDriverLocation();
+    _parcelController.listernOnParcelEnded();
     super.initState();
   }
 
@@ -72,8 +71,8 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
   }
 
   void _calculateEta() {
-    final userLat = widget.parcel.pickupLat;
-    final userLng = widget.parcel.pickupLng;
+    final userLat = _parcelStateController.parcel.value!.pickupLat;
+    final userLng = _parcelStateController.parcel.value!.pickupLng;
 
     if (driverLat == 0 || driverLng == 0 || userLat == 0 || userLng == 0) {
       setState(() {
@@ -109,7 +108,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    codeController.text = widget.parcel.slug!;
+    codeController.text = _parcelStateController.parcel.value!.slug ?? "";
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -189,7 +188,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                           Center(
                             child: CustomNetworkImage(
                               imageUrl:
-                                  "${ApiConstant.imageBaseUrl}${widget.driver.avatar}",
+                                  "${ApiConstant.imageBaseUrl}${_parcelStateController.parcel.value!.driver!.avatar}",
                               boxShape: BoxShape.circle,
                               border: Border.all(color: Color(0xFFFFFFFF)),
                               height: 48,
@@ -199,7 +198,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                           SizedBox(height: 12),
                           Center(
                             child: Text(
-                              widget.driver.name!,
+                              _parcelStateController.parcel.value!.driver!.name!,
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -213,7 +212,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "${widget.driver.vehicleBrand} ${widget.driver.vehicleModel}",
+                                "${_parcelStateController.parcel.value!.driver!.vehicleBrand} ${_parcelStateController.parcel.value!.driver!.vehicleModel}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -223,7 +222,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                               SizedBox(width: 8),
                               Text(
                                 etaMin == 0
-                                    ? "-- min away "
+                                    ? "-- min away"
                                     : "$etaMin min away",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -256,7 +255,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                   ),
                                   SizedBox(width: 4),
                                   Text(
-                                    "${widget.driver.tripGivenCount}",
+                                    "${_parcelStateController.parcel.value!.driver!.tripGivenCount}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -267,7 +266,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                   Icon(Icons.star, color: Color(0xFF012F64)),
                                   SizedBox(width: 4),
                                   Text(
-                                    "${widget.driver.ratingCount}",
+                                    "${_parcelStateController.parcel.value!.driver!.ratingCount}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -297,7 +296,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.parcel.pickupAddress!,
+                                        _parcelStateController.parcel.value!.pickupAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -317,7 +316,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.parcel.dropoffAddress!,
+                                        _parcelStateController.parcel.value!.dropoffAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -334,7 +333,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                     SvgPicture.asset('assets/icons/dollar.svg'),
                                     SizedBox(width: 12),
                                     Text(
-                                      "${widget.parcel.totalCost}",
+                                      "${_parcelStateController.parcel.value!.totalCost}",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w400,
@@ -394,7 +393,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                         fillColor: Color(0xFFE6EAF0),
                         filled: true,
                         hint: Text(
-                          widget.parcel.slug!,
+                          _parcelStateController.parcel.value!.slug!,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -420,8 +419,8 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                         SizedBox(width: 16),
                         InkWell(
                           onTap: () async {
-                            await _chatController.createChatRoom(
-                              userId: widget.driver.id.toString(),
+                            _chatController.createChatRoom(
+                              userId: _parcelStateController.parcel.value!.driver!.id!,
                             );
                           },
                           child: Container(
@@ -436,26 +435,17 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                           ),
                         ),
                         SizedBox(width: 22),
-
                         InkWell(
                           onTap: () {
-                            SocketService().emit(
-                              "parcel:pay",
-                              data: {"parcel_id": widget.parcel.id!},
-                            );
                             Get.to(
-                              () => ParcelUserRatingScreen(
-                                drivierImage: widget.driver.avatar!,
-                                driverName: widget.driver.name!,
-                                trip: widget.driver.tripGivenCount!,
-                                rating: widget.driver.ratingCount!.toDouble(),
-                                driver: widget.driver,
-                                parcelModel: widget.parcel,
+                              () => TrackParcelDriverScreen(
+                             
                           
-                            
+                               
                               ),
                             );
                           },
+
                           child: Container(
                             height: 46,
                             padding: EdgeInsets.symmetric(horizontal: 10),
@@ -465,7 +455,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                             ),
                             child: Center(
                               child: Text(
-                                "Pay Now ",
+                                "Track Driver",
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
@@ -475,6 +465,39 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                             ),
                           ),
                         ),
+
+                        // InkWell(
+                        //   onTap: () {
+                        //     Get.to(
+                        //       () => ParcelUserRatingScreen(
+                        //         drivierImage: widget.driver.avatar!,
+                        //         driverName: widget.driver.name!,
+                        //         trip: widget.driver.tripGivenCount!,
+                        //         rating: widget.driver.ratingCount!.toDouble(),
+                        //         driver: widget.driver,
+                        //         parcelModel: widget.parcel,
+                        //       ),
+                        //     );
+                        //   },
+                        //   child: Container(
+                        //     height: 46,
+                        //     padding: EdgeInsets.symmetric(horizontal: 10),
+                        //     decoration: BoxDecoration(
+                        //       borderRadius: BorderRadius.circular(24),
+                        //       color: Color(0xFFE6EAF0),
+                        //     ),
+                        //     child: Center(
+                        //       child: Text(
+                        //         "Pay Now",
+                        //         style: TextStyle(
+                        //           fontSize: 12,
+                        //           fontWeight: FontWeight.w500,
+                        //           color: AppColors.textColor,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ],

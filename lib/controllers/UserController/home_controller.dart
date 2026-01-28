@@ -9,6 +9,7 @@ import 'package:radeef/service/api_client.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/notification_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
+import 'package:radeef/views/screen/UserFLow/ParcelScreen/showParcelAmount.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/show_amount_screen.dart';
 
 enum LocationField { pick, drop, none }
@@ -169,7 +170,7 @@ class HomeController extends GetxController {
     if (response.statusCode == 200 || response.statusCode == 201) {
       showCustomSnackBar(response.statusText, isError: false);
       Get.to(
-        () => ShowAmountScreen(
+        () => ShowParcelAmountScreen(
           showAmount: response.body['estimated_fare'],
           weight: response.body['query']['weight'],
           amount: response.body['query']['amount'],

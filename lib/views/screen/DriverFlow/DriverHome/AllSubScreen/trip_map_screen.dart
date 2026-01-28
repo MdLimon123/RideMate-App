@@ -278,7 +278,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/models/Driver/parcel_request_model.dart';
-import 'package:radeef/models/Driver/trip_request_model.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/views/base/custom_button.dart';

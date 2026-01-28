@@ -95,4 +95,29 @@ class DriverParcelController extends GetxController {
     }
     isLoading(false);
   }
+
+
+    Future<void> submitParcelRating({required String userId, String? parcleId}) async {
+    isLoading(true);
+    final Map<String, dynamic> body = {
+      "user_id": userId,
+      "rating": rating.value.toInt(),
+      "comment": "Good",
+      "ref_parcel_id": parcleId,
+    };
+
+    final response = await ApiClient.postData("/reviews/give-review", body);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      showCustomSnackBar("Review Submitted", isError: false);
+      // Get.to(
+      //   () => EarnScreen(amount: 2.5, vat: 0.0),
+      // );
+      Get.offAll(() => DriverHomeScreen());
+    } else {
+      debugPrint(response.body);
+      showCustomSnackBar(response.statusText, isError: true);
+    }
+    isLoading(false);
+  }
 }

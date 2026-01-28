@@ -2,42 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_chat_controller.dart';
-import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
-import 'package:radeef/controllers/UserController/tripstate_controller.dart';
-import 'package:radeef/models/Driver/parcel_request_model.dart';
-import 'package:radeef/models/User/trip_model.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
+
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
-import 'trip_map_screen.dart';
+import 'package:radeef/views/screen/UserFLow/ParcelScreen/track_parcel_driver_screen.dart';
 
-class AcceptScreen extends StatefulWidget {
-  final ParcelRequestModel? parcel;
-  final TripModel? trip;
-  final ParcelUserModel? parcelUserModel;
-  final bool isParcel;
-
-  const AcceptScreen({
-    super.key,
-    required this.isParcel,
-    this.parcel,
-    this.trip,
-    this.parcelUserModel,
-  });
+class DriverParcelAccepted extends StatefulWidget {
+  const DriverParcelAccepted({super.key});
 
   @override
-  State<AcceptScreen> createState() => _AcceptScreenState();
+  State<DriverParcelAccepted> createState() => _DriverParcelScreenState();
 }
 
-class _AcceptScreenState extends State<AcceptScreen> {
+class _DriverParcelScreenState extends State<DriverParcelAccepted> {
   final _driverChatController = Get.put(DriverChatController());
-  final TripSocketController _tripSocketController = Get.put(
-    TripSocketController(),
-  );
+  final _parcelController = Get.put(ParcelController());
+  final _parcelStateController = Get.put(ParcelStateController());
 
   @override
   Widget build(BuildContext context) {
-    _tripSocketController.isTripStarted.value = widget.trip!.status == TripStatus.STARTED;
+    _parcelController.isParcelStarted.value =
+        _parcelStateController.parcel.value!.status == ParcelState.STARTED;
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -75,7 +63,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                           Center(
                             child: CustomNetworkImage(
                               imageUrl:
-                                  "${ApiConstant.imageBaseUrl}${widget.isParcel ? widget.parcelUserModel!.avatar : widget.trip!.user!.avatar}",
+                                  "${ApiConstant.imageBaseUrl}${_parcelStateController.parcel.value!.user!.avatar}",
                               boxShape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                               height: 48,
@@ -85,9 +73,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                           const SizedBox(height: 12),
                           Center(
                             child: Text(
-                              widget.isParcel
-                                  ? widget.parcelUserModel!.name
-                                  : widget.trip!.user!.name ?? "",
+                              _parcelStateController.parcel.value!.user!.name!,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -119,7 +105,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    "${widget.isParcel ? widget.parcelUserModel!.tripReceivedCount : widget.trip!.user!.tripReceivedCount}",
+                                    "${_parcelStateController.parcel.value!.user!.tripReceivedCount!}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -133,7 +119,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    "${widget.isParcel ? widget.parcelUserModel!.ratingCount : widget.trip!.user!.ratingCount}",
+                                    "${_parcelStateController.parcel.value!.user!.rating!}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -164,9 +150,11 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.isParcel
-                                            ? widget.parcel!.pickupAddress
-                                            : widget.trip!.pickupAddress ?? "",
+                                        _parcelStateController
+                                                .parcel
+                                                .value!
+                                                .pickupAddress ??
+                                            "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -187,9 +175,11 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.isParcel
-                                            ? widget.parcel!.dropoffAddress
-                                            : widget.trip!.dropoffAddress ?? "",
+                                        _parcelStateController
+                                                .parcel
+                                                .value!
+                                                .dropoffAddress ??
+                                            "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -201,33 +191,31 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                   ],
                                 ),
                                 SizedBox(height: 12),
-                                widget.isParcel
-                                    ? Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                            "assets/icons/box.svg",
-                                          ),
-                                          SizedBox(width: 12),
-                                          Text(
-                                            "${widget.isParcel ? widget.parcel!.totalCost : widget.trip!.totalCost}",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xFF012F64),
-                                            ),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            "(XAF)",
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w200,
-                                              color: AppColors.textColor,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
+
+                                Row(
+                                  children: [
+                                    SvgPicture.asset("assets/icons/box.svg"),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      "${_parcelStateController.parcel.value!.totalCost}",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF012F64),
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      "(XAF)",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w200,
+                                        color: AppColors.textColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
@@ -237,7 +225,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
-                                      "${widget.isParcel ? widget.parcel!.amount : widget.trip!.totalCost}",
+                                      "${_parcelStateController.parcel.value!.amount}",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
@@ -285,9 +273,8 @@ class _AcceptScreenState extends State<AcceptScreen> {
                   InkWell(
                     onTap: () async {
                       await _driverChatController.createChatRoom(
-                        userId: widget.isParcel
-                            ? widget.parcel!.userId
-                            : widget.trip!.userId ?? "",
+                        userId:
+                            _parcelStateController.parcel.value!.user!.id ?? "",
                       );
                     },
                     child: Container(
@@ -304,17 +291,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
 
                   InkWell(
                     onTap: () {
-                      Get.to(
-                        () => TrackDriverMapScreen(
-                          isParcel: widget.isParcel,
-
-                          parcel: widget.isParcel ? widget.parcel : null,
-                          parcelUserModel: widget.isParcel
-                              ? widget.parcelUserModel
-                              : null,
-                          trip: widget.isParcel ? null : widget.trip,
-                        ),
-                      );
+                      Get.to(() => TrackParcelDriverScreen());
                     },
                     child: Container(
                       height: 46,
@@ -339,25 +316,17 @@ class _AcceptScreenState extends State<AcceptScreen> {
                   Obx(
                     () => InkWell(
                       onTap: () {
-                        if (_tripSocketController.isTripStarted.value) {
-                          _tripSocketController.tripEnded(widget.trip!.id);
+                        if (_parcelController.isParcelStarted.value) {
+                          print("Parcel ended =========>");
+                          _parcelController.parcelEnded(
+                            parcelId: _parcelStateController.parcel.value!.id,
+                          );
                           return;
                         }
-                        _tripSocketController.tripStarted(
-                          tripId: widget.trip!.id,
-                          onTripStarted: () {
-                            Get.to(
-                              () => TrackDriverMapScreen(
-                                isParcel: widget.isParcel,
-
-                                parcel: widget.isParcel ? widget.parcel : null,
-                                parcelUserModel: widget.isParcel
-                                    ? widget.parcelUserModel
-                                    : null,
-
-                                trip: widget.isParcel ? null : widget.trip,
-                              ),
-                            );
+                        _parcelController.parcelStarted(
+                          parcelId: _parcelStateController.parcel.value!.id,
+                          onParcelStarted: () {
+                            Get.to(() => TrackParcelDriverScreen());
                           },
                         );
                       },
@@ -370,11 +339,11 @@ class _AcceptScreenState extends State<AcceptScreen> {
                         ),
                         child: Center(
                           child: Text(
-                            _tripSocketController.isTripStarted.value
-                                ? "End Trip"
-                                : "Start Trip",
+                            _parcelController.isParcelStarted.value
+                                ? "Deliver Parcel"
+                                : "Parcel Started",
                             style: TextStyle(
-                              fontSize: widget.isParcel ? 12 : 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
                             ),

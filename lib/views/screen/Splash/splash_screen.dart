@@ -3,12 +3,10 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/data_controller.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/helpers/route.dart';
 import 'package:radeef/service/prefs_helper.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverAuth/driver_login_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserAuth/user_login_screen.dart';
-import 'package:radeef/views/screen/UserFLow/UserHome/user_home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -72,17 +70,20 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Set user/driver role
     TripStateController.to.setRole(driver: isDriver);
+    ParcelStateController.to.setRole(driver: isDriver);
     var tripSocketController = Get.put(TripSocketController(), permanent: true);
+    var _parcelController = Get.put(ParcelController(), permanent: true);
 
     // Init socket listener after login check
     if (isDriver) {
       tripSocketController.allDriverListeners();
+      _parcelController.allDriverParcelListeners();
     } else {
       tripSocketController.allUserListeners();
+      _parcelController.allParcelUserListeners();
     }
     await tripSocketController.recoverTripData();
-
-    
+    await _parcelController.recoverParcelData();
   }
 
   @override
