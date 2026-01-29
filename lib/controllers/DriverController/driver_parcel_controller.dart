@@ -29,47 +29,39 @@ class DriverParcelController extends GetxController {
     }
   }
 
-  Future<List<String>?> uplaodParcelImage({required String imagePath}) async {
-    isLodading(true);
+  Future<List<String>?> uplaodParcelImage({
+    required String imagePath,
+    required String parcelId,
+  }) async {
+    try {
+      isLoading(true);
 
-    final List<MultipartBody> multipartBody = [];
-    if (imagePath.isNotEmpty) {
-      multipartBody.add(MultipartBody('files', File(imagePath)));
-    }
+      final multipartBody = [MultipartBody('files', File(imagePath))];
 
-    final response = await ApiClient.postMultipartData(
-      "/upload-media",
-      {},
-      multipartBody: multipartBody,
-    );
+      final response = await ApiClient.postMultipartData(
+        "/parcels/deliver-parcel",
+        {"parcel_id": parcelId},
+        multipartBody: multipartBody,
+      );
 
-    isLodading(false);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        showCustomSnackBar(response.statusText, isError: false);
+        final body = response.body is String
+            ? jsonDecode(response.body)
+            : response.body;
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      showCustomSnackBar(response.statusText, isError: false);
-
-      //  JSON decode if String
-      final body = response.body is String
-          ? jsonDecode(response.body)
-          : response.body;
-
-      if (body is List) {
-        // response already List<String>
-        return body.map((e) => e.toString()).toList();
-      } else if (body is Map && body['files'] != null) {
-        final filesData = body['files'];
-        if (filesData is List) {
-          return filesData.map((e) => e.toString()).toList();
-        } else if (filesData is String) {
-          return [filesData];
+        if (body is Map && body['files'] is List) {
+          return List<String>.from(body['files']);
         }
+      } else {
+        showCustomSnackBar(response.statusText, isError: true);
       }
-
-      return null;
-    } else {
-      showCustomSnackBar(response.statusText, isError: true);
-      return null;
+    } catch (e) {
+      showCustomSnackBar(e.toString(), isError: true);
+    } finally {
+      isLoading(false);
     }
+    return null;
   }
 
   Future<void> submitRating({required String userId, String? tripId}) async {
@@ -96,8 +88,10 @@ class DriverParcelController extends GetxController {
     isLoading(false);
   }
 
-
-    Future<void> submitParcelRating({required String userId, String? parcleId}) async {
+  Future<void> submitParcelRating({
+    required String userId,
+    String? parcleId,
+  }) async {
     isLoading(true);
     final Map<String, dynamic> body = {
       "user_id": userId,

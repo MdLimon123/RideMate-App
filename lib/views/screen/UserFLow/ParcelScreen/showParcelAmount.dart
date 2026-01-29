@@ -19,7 +19,7 @@ class ShowParcelAmountScreen extends StatefulWidget {
   final double dropLat;
   final double dropLan;
   final int? weight;
-  final int? amount;
+  final double? amount;
 
   final String pickLocation;
   final String dropLocation;
@@ -203,7 +203,7 @@ class _ShowParcelAmountScreenState extends State<ShowParcelAmountScreen> {
                         child: Text(
                           "${widget.showAmount} XAF",
                           style: TextStyle(
-                            fontSize: 50,
+                            fontSize: 40,
                             fontWeight: FontWeight.w500,
                             color: Colors.white,
                           ),
@@ -277,8 +277,6 @@ class _ShowParcelAmountScreenState extends State<ShowParcelAmountScreen> {
                                   "dropoff_lng": widget.dropLan,
                                   "dropoff_address": widget.dropLocation,
                                 });
-
-                               
                               }
                             },
                             text: "confirm".tr,

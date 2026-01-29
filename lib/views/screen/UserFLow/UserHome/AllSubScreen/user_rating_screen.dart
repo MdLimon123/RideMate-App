@@ -26,7 +26,7 @@ class UserRatingScreen extends StatefulWidget {
     required this.driverName,
     required this.trip,
     required this.rating,
- 
+
     required this.tripModel,
   });
 
@@ -150,7 +150,7 @@ class _RatePessengersScreenState extends State<UserRatingScreen> {
                         itemCount: 5,
                         itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                         itemBuilder: (context, _) =>
-                            Icon(Icons.star, color: Color(0xFFFFFFFF)),
+                            Icon(Icons.star, color: Color(0xFF012F64)),
                         onRatingUpdate: (rating) {
                           _userProfileController.updateRating(rating);
                         },

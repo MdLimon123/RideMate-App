@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:radeef/controllers/DriverController/driver_chat_controller.dart';
 import 'package:radeef/controllers/DriverController/driver_parcel_controller.dart';
+import 'package:radeef/controllers/parcel_controller.dart';
 import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
+import 'package:radeef/views/screen/DriverFlow/parcel/driver_payment_wating_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/final_parcel_earn.dart';
 
 class DriverParcelConfirmationScreen extends StatefulWidget {
@@ -21,6 +22,8 @@ class DriverParcelConfirmationScreen extends StatefulWidget {
 class _DriverParcelConfirmationScreenState
     extends State<DriverParcelConfirmationScreen> {
   final _parcelStateController = Get.put(ParcelStateController());
+
+  final _parcelController = Get.put(ParcelController());
 
   final _driverParcelController = Get.put(DriverParcelController());
 
@@ -306,17 +309,71 @@ class _DriverParcelConfirmationScreenState
             ),
           ),
           SizedBox(height: 50),
-          CustomButton(
-            onTap: () {
-              _driverParcelController
-                  .uplaodParcelImage(
-                    imagePath: _driverParcelController.parcelImage.value!.path,
-                  )
-                  .then((value) {
-                    Get.offAll(FinalParcelEarn());
-                  });
-            },
-            text: "Confirm",
+
+          //     CustomButton(
+          //       onTap: () async {
+          //         // _driverParcelController
+          //         //     .uplaodParcelImage(
+          //         //       imagePath: _driverParcelController.parcelImage.value!.path,
+          //         //     )
+          //         //     .then((value) {
+          //         //       _parcelController.parcelEnded(
+          //         //         parcelId: _parcelStateController.parcel.value!.id,
+          //         //         imageFile: _driverParcelController.parcelImage.value,
+          //         //       );
+          //         //     });
+
+          //         try {
+
+          //           await _driverParcelController.uplaodParcelImage(
+          //             imagePath: _driverParcelController.parcelImage.value!.path,
+          //           ).then((_) {
+
+          //             _parcelController.parcelEnded(
+          //             parcelId: _parcelStateController.parcel.value!.id,
+          //             imageFile: _driverParcelController.parcelImage.value,
+          //              onCompleted: (success) {
+          // if (success) {
+          //   Get.snackbar("Success", "Parcel confirmed successfully");
+          // } else {
+          //   Get.snackbar("Error", "Parcel confirmation failed");
+          // }
+          //           );
+
+          //           });
+
+          //           Get.snackbar("Success", "Parcel confirmed successfully");
+          //         } catch (e) {
+
+          //           Get.snackbar("Error", "Failed to confirm parcel: $e");
+          //         }
+          //       },
+          //       text: "Confirm",
+          //     ),
+          Obx(
+            () => CustomButton(
+              loading: _driverParcelController.isLoading.value,
+              onTap: () {
+                final parcelImage = _driverParcelController.parcelImage.value;
+
+                if (parcelImage == null) {
+                  Get.snackbar("Error", "Please select a parcel image first");
+                  return;
+                }
+
+                _driverParcelController
+                    .uplaodParcelImage(
+                      imagePath: parcelImage.path,
+                      parcelId: _parcelStateController.parcel.value!.id
+                          .toString(),
+                    )
+                    .then((_) {
+                      // Get.offAll(FinalParcelEarn());
+                      DriverPaymentWatingScreen();
+                    });
+              },
+              text: "Confirm",
+            ),
           ),
 
           // Padding(

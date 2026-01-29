@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/new_request_screen.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/payment_wating_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/rate_pessengers_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/end_trip_screen.dart';
@@ -131,7 +131,8 @@ class TripStateController extends GetxController {
         break;
 
       case TripStatus.ARRIVED:
-        Get.offAll(ConfirmationScreen(tripData: trip.value!));
+       // Get.offAll(ConfirmationScreen(tripData: trip.value!));
+        Get.offAll(() => PaymentWatingScreen());
         break;
       case TripStatus.COMPLETED:
         Get.offAll(

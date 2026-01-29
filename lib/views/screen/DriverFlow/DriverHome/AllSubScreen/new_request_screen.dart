@@ -36,6 +36,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   @override
   void initState() {
+    
     cancelTrip();
     super.initState();
   }

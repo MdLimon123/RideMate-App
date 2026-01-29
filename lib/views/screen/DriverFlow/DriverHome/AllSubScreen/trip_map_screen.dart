@@ -288,7 +288,6 @@ class TrackDriverMapScreen extends StatefulWidget {
   final TripModel? trip;
   final ParcelUserModel? parcelUserModel;
 
-
   const TrackDriverMapScreen({
     super.key,
     required this.isParcel,
@@ -546,11 +545,11 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
             ),
           ),
 
-          Positioned(
-            bottom: 30, left: 20, right: 20,
-            child: CustomButton(onTap: (){}
-            , text: "Trip End"),
-          ),
+          // Positioned(
+          //   bottom: 30, left: 20, right: 20,
+          //   child: CustomButton(onTap: (){}
+          //   , text: "Trip End"),
+          // ),
         ],
       ),
     );

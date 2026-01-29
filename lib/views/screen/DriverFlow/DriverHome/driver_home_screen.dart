@@ -12,6 +12,7 @@ import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/bottom_menu.dart';
 import 'package:radeef/views/base/custom_switch.dart';
+import 'package:radeef/views/base/format_time_min_hour.dart';
 import 'package:radeef/views/base/home_state_shimmer.dart';
 import 'package:radeef/views/screen/Notification/notification_screen.dart';
 
@@ -319,6 +320,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                   ),
                                 ),
                           const SizedBox(height: 20),
+
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(
@@ -331,76 +333,89 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                             ),
                             child: Column(
                               children: [
+                                // 🔹 Header Row
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: const [
-                                    Text(
-                                      "Tips",
-                                      style: TextStyle(
-                                        color: Color(0xFF333333),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
+                                    Expanded(
+                                      child: Text(
+                                        "Tips",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Color(0xFF333333),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      "Online",
-                                      style: TextStyle(
-                                        color: Color(0xFF333333),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
+                                    Expanded(
+                                      child: Text(
+                                        "Online",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Color(0xFF333333),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      "Earnings",
-                                      style: TextStyle(
-                                        color: Color(0xFF333333),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
+                                    Expanded(
+                                      child: Text(
+                                        "Earnings",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Color(0xFF333333),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 6),
+
+                                const SizedBox(height: 8),
+
+                                // 🔹 Values Row
                                 Obx(() {
                                   if (_driverHomeController.isLoading.value) {
                                     return const HomeStatsShimmer();
                                   }
 
+                                  final home =
+                                      _driverHomeController.homeModel.value;
+
                                   return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        _driverHomeController
-                                            .homeModel
-                                            .value
-                                            .totalCount
-                                            .toString(),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF333333),
+                                      Expanded(
+                                        child: Text(
+                                          home.totalCount.toString(),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF333333),
+                                          ),
                                         ),
                                       ),
-                                      Text(
-                                        _driverHomeController
-                                            .homeModel
-                                            .value
-                                            .totalTime
-                                            .toString(),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF333333),
+                                      Expanded(
+                                        child: Text(
+                                          formatMinutesToHour(home.totalTime),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF333333),
+                                          ),
                                         ),
                                       ),
-                                      Text(
-                                        "${_driverHomeController.homeModel.value.totalEarnings} XAF",
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF333333),
+                                      Expanded(
+                                        child: Text(
+                                          "${home.totalEarnings} XAF",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF333333),
+                                          ),
                                         ),
                                       ),
                                     ],

@@ -93,39 +93,43 @@ class _ParcelDetailsScreenState extends State<ParcelDetailsScreen> {
               ),
               SizedBox(height: 32),
 
-              // CustomTextField(
-              //   hintText: "Parcels Type",
-              //   controller: _homeController.parcelTypeController,
-              // ),
-              Obx(
-                () => CustomDropdown(
-                  title: "Parcel Type",
-                  options: _homeController.parcelType.toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      _homeController.selectedParcelType.value = value;
-                    }
-                  },
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Obx(
+                        () => CustomDropdown(
+                          title: "Parcel Type",
+                          options: _homeController.parcelType.toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              _homeController.selectedParcelType.value = value;
+                            }
+                          },
+                        ),
+                      ),
+
+                      SizedBox(height: 12),
+                      CustomTextField(
+                        hintText: "Parcels Weight",
+                        controller: _homeController.parcelWeightController,
+                      ),
+                      SizedBox(height: 12),
+                      CustomTextField(
+                        hintText: "Parcels Amount",
+                        controller: _homeController.parcelAmount,
+                      ),
+
+                      SizedBox(height: 160),
+                      CustomButton(
+                        onTap: () {
+                          Get.to(() => BookARideScreen());
+                        },
+                        text: "confirm".tr,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-              SizedBox(height: 12),
-              CustomTextField(
-                hintText: "Parcels Weight",
-                controller: _homeController.parcelWeightController,
-              ),
-              SizedBox(height: 12),
-              CustomTextField(
-                hintText: "Parcels Amount",
-                controller: _homeController.parcelAmount,
-              ),
-
-              SizedBox(height: 160),
-              CustomButton(
-                onTap: () {
-                  Get.to(() => BookARideScreen());
-                },
-                text: "confirm".tr,
               ),
             ],
           ),

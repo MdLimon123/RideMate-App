@@ -1,11 +1,8 @@
 import 'dart:io';
-
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/models/parcel_model.dart';
-import 'package:radeef/service/api_client.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 
@@ -31,49 +28,17 @@ class ParcelController extends GetxController {
     );
   }
 
-  // Future<void> recoverParcelData() async {
-  //   loading(true);
-  //   final response = await ApiClient.getData('/trips/recover-trip');
-  //   if (response.statusCode == 200) {
-  //     if (response.body['data'] != null) {
-  //       ParcelStateController.to.setParcel(ParcelModel.fromJson(response.body));
-  //     } else {
-  //       ParcelStateController.to.setParcel(ParcelModel.fromJson(response.body));
-  //     }
-  //   } else {
-  //     debugPrint("No active parcel found");
-  //   }
-  //   loading(false);
-  // }
-
-  Future<void> recoverParcelData() async {
-    loading(true);
-
-    final response = await ApiClient.getData('/trips/recover-trip');
-
-    if (response.statusCode == 200) {
-      final body = response.body;
-
-      if (body['isParcel'] == true && body['data'] != null) {
-        final parcelJson = body['data'];
-
-        ParcelStateController.to.setParcel(ParcelModel.fromJson(parcelJson));
-      } else {
-        debugPrint("Recovered data is not parcel");
-      }
-    } else {
-      debugPrint("No active parcel found");
-    }
-
-    loading(false);
-  }
-
   /// ======> user request for parcel <====== ///
   void requestForParcel(var data) {
     SocketService().emit(
       'parcel:new_request',
       data: data,
       ack: (res) {
+        if (res['success']) {
+          final parcel = ParcelModel.fromJson(res['data']);
+          ParcelStateController.to.setParcel(parcel);
+        }
+
         /// navigate to search a driver screen
       },
     );
@@ -93,7 +58,10 @@ class ParcelController extends GetxController {
       'parcel:accept',
       data: {"parcel_id": parcelId},
       ack: (res) {
-        /// navigate to confirmation screen
+        if (res['success']) {
+          final parcel = ParcelModel.fromJson(res['data']);
+          ParcelStateController.to.setParcel(parcel);
+        }
       },
     );
   }
@@ -156,15 +124,39 @@ class ParcelController extends GetxController {
   }
 
   //// ======> Driver Parcel Ended <======= ///
-  void parcelEnded({var parcelId, File? imageFile}) {
+  // void parcelEnded({var parcelId, File? imageFile, required Function() onCompleted}) {
+  //   SocketService().emit(
+  //     'parcel:deliver',
+  //     data: {"parcel_id": parcelId, "files": imageFile},
+  //     ack: (res) {
+  //       if (res['success']) {
+  //         isParcelStarted.value = false;
+  //         onCompleted();
+  //       } else {
+  //         showCustomSnackBar("Failed to end parcel");
+  //       }
+  //     },
+
+  //   );
+  // }
+
+  void parcelEnded({
+    var parcelId,
+    File? imageFile,
+    void Function(bool success)? onCompleted,
+  }) {
     SocketService().emit(
       'parcel:deliver',
       data: {"parcel_id": parcelId, "files": imageFile},
       ack: (res) {
         if (res['success']) {
           isParcelStarted.value = false;
+
+          if (onCompleted != null) onCompleted(true);
         } else {
           showCustomSnackBar("Failed to end parcel");
+
+          if (onCompleted != null) onCompleted(false);
         }
       },
     );
@@ -174,7 +166,8 @@ class ParcelController extends GetxController {
 
   void listernOnParcelEnded() {
     SocketService().on('parcel:delivered', (data) {
-      final parcel = ParcelModel.fromJson(data['parcel']);
+      print(" ======> parcel:delivered <====== $data");
+      final parcel = ParcelModel.fromJson(data);
       ParcelStateController.to.setParcel(parcel);
     });
   }
@@ -188,6 +181,7 @@ class ParcelController extends GetxController {
       "parcel:pay",
       data: {"parcel_id": parcelId},
       ack: (response) {
+        print("parcel:pay response======>  : $response");
         callback(response);
       },
     );
@@ -197,6 +191,7 @@ class ParcelController extends GetxController {
 
   void listenOnParcelPaid() {
     SocketService().on('parcel:paid', (data) {
+      print(" ======> parcel:paid <======");
       final parcel = ParcelModel.fromJson(data['parcel']);
       ParcelStateController.to.setParcel(parcel);
     });
@@ -206,9 +201,10 @@ class ParcelController extends GetxController {
 
   void userCancelParcelRequest(var parcelId) {
     SocketService().emit(
-      "parcel:driver_cancel",
+      "parcel:cancel",
       data: {"parcel_id": parcelId},
       ack: (response) {
+        print("Parcel canceled ack: $response");
         ParcelStateController.to.clearParcel();
       },
     );

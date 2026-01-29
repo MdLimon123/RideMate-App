@@ -8,10 +8,10 @@ import 'package:radeef/models/about_us_model.dart';
 import 'package:radeef/service/api_client.dart';
 import 'package:radeef/utils/image_utils.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
+import 'package:radeef/views/screen/UserFLow/UserHome/user_home_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UserProfileController extends GetxController {
-  
   var userProfileModel = UserProfileModel().obs;
 
   var aboutUsModel = AboutUsModel().obs;
@@ -201,7 +201,8 @@ class UserProfileController extends GetxController {
     final response = await ApiClient.postData("/reviews/give-review", body);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-        showCustomSnackBar("Review Submitted", isError: false);
+      showCustomSnackBar("Review Submitted", isError: false);
+      Get.offAll(UserHomeScreen());
     } else {
       debugPrint(response.body);
       showCustomSnackBar(response.statusText, isError: true);
@@ -227,6 +228,7 @@ class UserProfileController extends GetxController {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       showCustomSnackBar("Review Submitted", isError: false);
+      Get.offAll(UserHomeScreen());
     } else {
       debugPrint(response.body);
       showCustomSnackBar(response.statusText, isError: true);

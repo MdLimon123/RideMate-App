@@ -413,16 +413,6 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          height: 40,
-                          width: 40,
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFE6EAF0),
-                          ),
-                          child: SvgPicture.asset('assets/icons/phone.svg'),
-                        ),
                         SizedBox(width: 16),
                         InkWell(
                           onTap: () async {
@@ -489,7 +479,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
         if (response['success']) {
           final balance =
               response['data']['balance'] ??
-              0; // Extract the balance from the response
+              0; 
           _showSuccessPopup(balance);
         } else {
           final message = "Payment failed";

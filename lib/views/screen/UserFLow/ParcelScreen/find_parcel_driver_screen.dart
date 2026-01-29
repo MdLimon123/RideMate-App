@@ -16,9 +16,7 @@ import 'package:radeef/views/screen/UserFLow/ParcelScreen/track_parcel_driver_sc
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class FindParcelDriverScreen extends StatefulWidget {
-  const FindParcelDriverScreen({
-    super.key,
-  });
+  const FindParcelDriverScreen({super.key});
 
   @override
   State<FindParcelDriverScreen> createState() => _FindParcelDriverScreenState();
@@ -27,8 +25,8 @@ class FindParcelDriverScreen extends StatefulWidget {
 class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
   final codeController = TextEditingController(text: "");
 
-    final _parcelStateController = Get.put(ParcelStateController());
-    final _parcelController = Get.put(ParcelController());
+  final _parcelStateController = Get.put(ParcelStateController());
+  final _parcelController = Get.put(ParcelController());
 
   final _userProfileController = Get.put(UserProfileController());
 
@@ -43,8 +41,8 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
   @override
   void initState() {
     _userProfileController.fetchUserInfo();
-    driverLat = _parcelStateController.parcel.value!.locationLat!;
-    driverLng = _parcelStateController.parcel.value!.locationLng!;
+    driverLat = _parcelStateController.parcel.value!.locationLat ?? 0.0;
+    driverLng = _parcelStateController.parcel.value!.locationLng ?? 0.0;
 
     _calculateEta();
     _listenDriverLocation();
@@ -188,7 +186,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                           Center(
                             child: CustomNetworkImage(
                               imageUrl:
-                                  "${ApiConstant.imageBaseUrl}${_parcelStateController.parcel.value!.driver!.avatar}",
+                                  "${ApiConstant.imageBaseUrl}${_parcelStateController.parcel.value!.driver?.avatar ?? ""}",
                               boxShape: BoxShape.circle,
                               border: Border.all(color: Color(0xFFFFFFFF)),
                               height: 48,
@@ -198,7 +196,12 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                           SizedBox(height: 12),
                           Center(
                             child: Text(
-                              _parcelStateController.parcel.value!.driver!.name!,
+                              _parcelStateController
+                                      .parcel
+                                      .value
+                                      ?.driver
+                                      ?.name ??
+                                  "Unknown Driver",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -212,7 +215,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "${_parcelStateController.parcel.value!.driver!.vehicleBrand} ${_parcelStateController.parcel.value!.driver!.vehicleModel}",
+                                "${_parcelStateController.parcel.value!.driver?.vehicleBrand ?? ""} ${_parcelStateController.parcel.value!.driver?.vehicleModel ?? ""}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -255,7 +258,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                   ),
                                   SizedBox(width: 4),
                                   Text(
-                                    "${_parcelStateController.parcel.value!.driver!.tripGivenCount}",
+                                    "${_parcelStateController.parcel.value!.driver?.tripGivenCount ?? ""}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -266,7 +269,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                   Icon(Icons.star, color: Color(0xFF012F64)),
                                   SizedBox(width: 4),
                                   Text(
-                                    "${_parcelStateController.parcel.value!.driver!.ratingCount}",
+                                    "${_parcelStateController.parcel.value!.driver?.ratingCount ?? ""}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -296,7 +299,10 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        _parcelStateController.parcel.value!.pickupAddress!,
+                                        _parcelStateController
+                                            .parcel
+                                            .value!
+                                            .pickupAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -316,7 +322,10 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        _parcelStateController.parcel.value!.dropoffAddress!,
+                                        _parcelStateController
+                                            .parcel
+                                            .value!
+                                            .dropoffAddress!,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -420,7 +429,11 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                         InkWell(
                           onTap: () async {
                             _chatController.createChatRoom(
-                              userId: _parcelStateController.parcel.value!.driver!.id!,
+                              userId: _parcelStateController
+                                  .parcel
+                                  .value!
+                                  .driver!
+                                  .id!,
                             );
                           },
                           child: Container(
@@ -437,13 +450,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                         SizedBox(width: 22),
                         InkWell(
                           onTap: () {
-                            Get.to(
-                              () => TrackParcelDriverScreen(
-                             
-                          
-                               
-                              ),
-                            );
+                            Get.to(() => TrackParcelDriverScreen());
                           },
 
                           child: Container(

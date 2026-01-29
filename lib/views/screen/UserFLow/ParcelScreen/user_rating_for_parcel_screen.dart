@@ -137,7 +137,7 @@ class _UserRAtingForParcelState extends State<UserRatingForParcelScreen> {
                         itemCount: 5,
                         itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                         itemBuilder: (context, _) =>
-                            Icon(Icons.star, color: Color(0xFFFFFFFF)),
+                            Icon(Icons.star, color: Color(0xFF012F64)),
                         onRatingUpdate: (rating) {
                           _userProfileController.updateRating(rating);
                         },

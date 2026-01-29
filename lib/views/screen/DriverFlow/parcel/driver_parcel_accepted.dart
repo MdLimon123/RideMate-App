@@ -8,6 +8,7 @@ import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
+import 'package:radeef/views/screen/DriverFlow/parcel/driver_parcel_confirm.dart';
 import 'package:radeef/views/screen/UserFLow/ParcelScreen/track_parcel_driver_screen.dart';
 
 class DriverParcelAccepted extends StatefulWidget {
@@ -317,11 +318,10 @@ class _DriverParcelScreenState extends State<DriverParcelAccepted> {
                     () => InkWell(
                       onTap: () {
                         if (_parcelController.isParcelStarted.value) {
-                          print("Parcel ended =========>");
-                          _parcelController.parcelEnded(
-                            parcelId: _parcelStateController.parcel.value!.id,
-                          );
-                          return;
+                          // print("Parcel ended =========>");
+                        
+                       
+                          Get.to(() => DriverParcelConfirmationScreen());
                         }
                         _parcelController.parcelStarted(
                           parcelId: _parcelStateController.parcel.value!.id,

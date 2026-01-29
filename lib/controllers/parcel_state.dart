@@ -6,6 +6,7 @@ import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dar
 import 'package:radeef/views/screen/DriverFlow/parcel/driver_parcel_accepted.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/driver_parcel_confirm.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/driver_parcel_request.dart';
+import 'package:radeef/views/screen/DriverFlow/parcel/final_parcel_earn.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/parcel_rate_for_user.dart';
 import 'package:radeef/views/screen/UserFLow/ParcelScreen/end_parcel_screen.dart';
 import 'package:radeef/views/screen/UserFLow/ParcelScreen/find_parcel_driver_screen.dart';
@@ -19,7 +20,7 @@ enum ParcelState {
   REQUESTED,
   ACCEPTED,
   STARTED,
-  ARRIVED,
+  DELIVERED,
   COMPLETED,
   CANCELLED,
 }
@@ -38,8 +39,8 @@ class ParcelStateController extends GetxController {
   }
 
   // ================= SET FULL TRIP =================
-  void setParcel(ParcelModel tripData) {
-    parcel.value = tripData;
+  void setParcel(ParcelModel parcelData) {
+    parcel.value = parcelData;
     updateParcelStatus(parcel.value!.status!);
   }
 
@@ -82,8 +83,7 @@ class ParcelStateController extends GetxController {
       case ParcelState.STARTED:
         Get.offAll(FindParcelDriverScreen());
         break;
-
-      case ParcelState.ARRIVED:
+      case ParcelState.DELIVERED:
         Get.offAll(EndParcelScreen());
       case ParcelState.COMPLETED:
         Get.offAll(UserRatingForParcelScreen());
@@ -113,7 +113,7 @@ class ParcelStateController extends GetxController {
         Get.offAll(DriverParcelAccepted());
         break;
 
-      case ParcelState.ARRIVED:
+      case ParcelState.DELIVERED:
         Get.offAll(DriverParcelConfirmationScreen());
         break;
       case ParcelState.COMPLETED:

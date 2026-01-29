@@ -49,7 +49,7 @@ class ParcelModel {
   final dynamic processingDriverId;
   final dynamic processingAt;
   final bool? isProcessing;
-  final List<dynamic>? deliveryProofFiles;
+  final List<String>? deliveryProofFiles;
   final dynamic deliveryLat;
   final dynamic deliveryLng;
   final User? user;
@@ -138,7 +138,8 @@ class ParcelModel {
     isProcessing: json["is_processing"],
     deliveryProofFiles: json["delivery_proof_files"] == null
         ? []
-        : List<dynamic>.from(json["delivery_proof_files"]!.map((x) => x)),
+        : List<String>.from(json["delivery_proof_files"]),
+
     deliveryLat: json["delivery_lat"],
     deliveryLng: json["delivery_lng"],
     user: json["user"] == null ? null : User.fromJson(json["user"]),
@@ -307,7 +308,7 @@ class User {
   final String? gender;
   final int? tripReceivedCount;
   final bool? isStripeConnected;
-  final int? rating;
+  final double? rating;
   final int? ratingCount;
   final dynamic locationLat;
   final dynamic locationLng;
@@ -336,7 +337,7 @@ class User {
     gender: json["gender"],
     tripReceivedCount: json["trip_received_count"],
     isStripeConnected: json["is_stripe_connected"],
-    rating: json["rating"],
+    rating: json["rating"].toDouble(),
     ratingCount: json["rating_count"],
     locationLat: json["location_lat"],
     locationLng: json["location_lng"],

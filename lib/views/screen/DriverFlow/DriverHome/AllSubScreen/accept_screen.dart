@@ -37,7 +37,8 @@ class _AcceptScreenState extends State<AcceptScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _tripSocketController.isTripStarted.value = widget.trip!.status == TripStatus.STARTED;
+    _tripSocketController.isTripStarted.value =
+        widget.trip!.status == TripStatus.STARTED;
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -271,17 +272,16 @@ class _AcceptScreenState extends State<AcceptScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFFE6EAF0),
-                    ),
-                    child: SvgPicture.asset('assets/icons/phone.svg'),
-                  ),
-
+                  // Container(
+                  //   height: 40,
+                  //   width: 40,
+                  //   padding: const EdgeInsets.all(8),
+                  //   decoration: BoxDecoration(
+                  //     shape: BoxShape.circle,
+                  //     color: const Color(0xFFE6EAF0),
+                  //   ),
+                  //   child: SvgPicture.asset('assets/icons/phone.svg'),
+                  // ),
                   InkWell(
                     onTap: () async {
                       await _driverChatController.createChatRoom(

@@ -171,9 +171,11 @@ class HomeController extends GetxController {
       showCustomSnackBar(response.statusText, isError: false);
       Get.to(
         () => ShowParcelAmountScreen(
-          showAmount: response.body['estimated_fare'],
+          showAmount: response.body['estimated_fare'].toDouble(),
           weight: response.body['query']['weight'],
-          amount: response.body['query']['amount'],
+          amount: response.body['query']['amount'].runtimeType == int
+              ? response.body['query']['amount'].toDouble()
+              : response.body['query']['amount'],
           pickLat: pickCoordinates[0],
           pickLng: pickCoordinates[1],
           dropLat: dropCoordinates[0],

@@ -32,8 +32,6 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
   final _userProfileController = Get.put(UserProfileController());
   final _tripSocketController = Get.put(TripSocketController());
 
-
-
   double driverLat = 0;
   double driverLng = 0;
 
@@ -198,7 +196,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                           SizedBox(height: 12),
                           Center(
                             child: Text(
-                              widget.driver.name?? "",
+                              widget.driver.name ?? "",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -296,7 +294,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.trip.pickupAddress??"",
+                                        widget.trip.pickupAddress ?? "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -316,7 +314,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        widget.trip.dropoffAddress??"",
+                                        widget.trip.dropoffAddress ?? "",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -393,7 +391,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                         fillColor: Color(0xFFE6EAF0),
                         filled: true,
                         hint: Text(
-                          widget.trip.slug??"",
+                          widget.trip.slug ?? "",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -406,16 +404,16 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          height: 40,
-                          width: 40,
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFE6EAF0),
-                          ),
-                          child: SvgPicture.asset('assets/icons/phone.svg'),
-                        ),
+                        // Container(
+                        //   height: 40,
+                        //   width: 40,
+                        //   padding: EdgeInsets.all(8),
+                        //   decoration: BoxDecoration(
+                        //     shape: BoxShape.circle,
+                        //     color: Color(0xFFE6EAF0),
+                        //   ),
+                        //   child: SvgPicture.asset('assets/icons/phone.svg'),
+                        // ),
                         SizedBox(width: 16),
                         InkWell(
                           onTap: () async {
@@ -443,7 +441,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                                 pickLan: widget.trip.pickupLng!,
                                 dropLat: widget.trip.dropoffLat!,
                                 dropLan: widget.trip.dropoffLng!,
-                                dropAddress: widget.trip.dropoffAddress??"",
+                                dropAddress: widget.trip.dropoffAddress ?? "",
                                 driver: widget.driver,
                                 trip: widget.trip,
                               ),

@@ -78,10 +78,10 @@ class DriverAuthController extends GetxController {
 
       // Init socket (if not already)
       var tripSocketController = Get.put(TripSocketController());
-      var _parcelController = Get.put(ParcelController());
+      var parcelController = Get.put(ParcelController());
 
       tripSocketController.allUserListeners();
-      _parcelController.allParcelUserListeners();
+      parcelController.allParcelUserListeners();
 
       _dataController.setProfileData(
         isActiveD: response.body['user']['is_active'],

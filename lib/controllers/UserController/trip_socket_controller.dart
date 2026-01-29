@@ -11,6 +11,7 @@ import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/payment_wating_screen.dart';
 
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/search_a_driver_screen.dart';
 
@@ -61,12 +62,10 @@ class TripSocketController extends GetxController {
     if (response.statusCode == 200) {
       final body = response.body;
 
-      if (body['data'] != null) {
-        final tripJson = body['data'];
-
-        TripStateController.to.setTrip(TripModel.fromJson(tripJson));
+      if (body['isParcel']) {
+        ParcelStateController.to.setParcel(ParcelModel.fromJson(body['data']));
       } else {
-        TripStateController.to.updateTripStatus(TripStatus.idle);
+        TripStateController.to.setTrip(TripModel.fromJson(body['data']));
       }
     } else {
       TripStateController.to.updateTripStatus(TripStatus.idle);
@@ -193,11 +192,12 @@ class TripSocketController extends GetxController {
         if (response['success']) {
           isTripStarted.value = false;
 
-          Get.offAll(
-            () => ConfirmationScreen(
-              tripData: TripModel.fromJson(response['data']),
-            ),
-          );
+          Get.offAll(() => PaymentWatingScreen());
+          // Get.offAll(
+          //   () => ConfirmationScreen(
+          //     tripData: TripModel.fromJson(response['data']),
+          //   ),
+          // );
         } else {
           showCustomSnackBar(
             response['error'][0]?.message ?? "Failed to end trip",

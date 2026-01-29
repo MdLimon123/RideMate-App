@@ -72,18 +72,18 @@ class _SplashScreenState extends State<SplashScreen> {
     TripStateController.to.setRole(driver: isDriver);
     ParcelStateController.to.setRole(driver: isDriver);
     var tripSocketController = Get.put(TripSocketController(), permanent: true);
-    var _parcelController = Get.put(ParcelController(), permanent: true);
+    var parcelController = Get.put(ParcelController(), permanent: true);
 
     // Init socket listener after login check
     if (isDriver) {
       tripSocketController.allDriverListeners();
-      _parcelController.allDriverParcelListeners();
+      parcelController.allDriverParcelListeners();
     } else {
       tripSocketController.allUserListeners();
-      _parcelController.allParcelUserListeners();
+      parcelController.allParcelUserListeners();
     }
+
     await tripSocketController.recoverTripData();
-    await _parcelController.recoverParcelData();
   }
 
   @override
