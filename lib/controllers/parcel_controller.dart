@@ -226,6 +226,7 @@ class ParcelController extends GetxController {
       "parcel:driver_cancel",
       data: {"parcel_id": parcelId},
       ack: (response) {
+        print("Driver canceled parcel ack ========> : $response");
         ParcelStateController.to.clearParcel();
       },
     );

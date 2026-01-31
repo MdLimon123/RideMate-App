@@ -3,16 +3,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/models/Driver/driver_profile_model.dart';
-
 import 'package:radeef/models/User/trip_model.dart';
 import 'package:radeef/models/User/user_profile_model.dart';
 import 'package:radeef/service/api_client.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/accept_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/confirmation_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/DriverHome/AllSubScreen/payment_wating_screen.dart';
-
+import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserHome/AllSubScreen/search_a_driver_screen.dart';
 
 import '../../models/parcel_model.dart';
@@ -269,8 +267,9 @@ class TripSocketController extends GetxController {
       'trip:driver_cancel',
       data: {"trip_id": tripId},
       ack: (response) {
-        print("Driver canceled trip ack: $response");
-        Get.back();
+        print("Driver canceled trip ack=========>: $response");
+        print("Driver trip Id=========>: $tripId");
+        Get.offAll(DriverHomeScreen());
       },
     );
   }

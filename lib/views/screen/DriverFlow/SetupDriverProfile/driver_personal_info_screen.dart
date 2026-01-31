@@ -39,8 +39,7 @@ class _DriverPersonalInfoScreenState extends State<DriverPersonalInfoScreen> {
           ],
         ),
       ),
-     
-     
+
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         children: [
@@ -96,10 +95,25 @@ class _DriverPersonalInfoScreenState extends State<DriverPersonalInfoScreen> {
           ),
           SizedBox(height: 12),
           CustomTextField(
-            suffixIcon: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SvgPicture.asset("assets/icons/calender.svg"),
-            ),
+            readOnly: true,
+            onTap: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime(2006, 1, 1),
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+              );
+
+              if (pickedDate != null) {
+                
+                String formattedDate =
+                    "${pickedDate.year.toString().padLeft(4, '0')}-"
+                    "${pickedDate.month.toString().padLeft(2, '0')}-"
+                    "${pickedDate.day.toString().padLeft(2, '0')}";
+
+                dateOfBirthController.text = formattedDate;
+              }
+            },
             hintText: "Date Of birth",
             controller: dateOfBirthController,
           ),
@@ -306,7 +320,7 @@ class _DriverPersonalInfoScreenState extends State<DriverPersonalInfoScreen> {
               ],
             ),
           ),
-         
+
           SizedBox(height: 8),
 
           Container(
@@ -500,8 +514,7 @@ class _DriverPersonalInfoScreenState extends State<DriverPersonalInfoScreen> {
               ],
             ),
           ),
-        
-        
+
           SizedBox(height: 40),
           Obx(
             () => CustomButton(

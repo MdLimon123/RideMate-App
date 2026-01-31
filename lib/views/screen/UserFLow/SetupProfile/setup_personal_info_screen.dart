@@ -101,6 +101,24 @@ class _SetupPersonalInfoScreenState extends State<SetupPersonalInfoScreen> {
             SizedBox(height: 12),
             CustomTextField(
               controller: dateOfBirthTextController,
+              readOnly: true,
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime(2006, 1, 1),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+
+                if (pickedDate != null) {
+                  String formattedDate =
+                      "${pickedDate.year.toString().padLeft(4, '0')}-"
+                      "${pickedDate.month.toString().padLeft(2, '0')}-"
+                      "${pickedDate.day.toString().padLeft(2, '0')}";
+
+                  dateOfBirthTextController.text = formattedDate;
+                }
+              },
               suffixIcon: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SvgPicture.asset("assets/icons/calender.svg"),

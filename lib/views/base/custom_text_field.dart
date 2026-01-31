@@ -18,6 +18,8 @@ class CustomTextField extends StatefulWidget {
   final FormFieldValidator? validator;
   final bool isPassword;
   final bool? isEmail;
+  final Function()? onTap;
+  final bool readOnly;
 
   const CustomTextField({
     super.key,
@@ -35,6 +37,8 @@ class CustomTextField extends StatefulWidget {
     this.filColor,
     this.labelText,
     this.isPassword = false,
+    this.onTap,
+    this.readOnly = false,
   });
 
   @override
@@ -84,6 +88,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
               return null;
             },
         cursorColor: AppColors.primaryColor,
+        onTap: widget.onTap,
+        readOnly: widget.readOnly,
         obscureText: widget.isPassword ? obscureText : false,
         style: TextStyle(
           color: Color(0xFF545454),

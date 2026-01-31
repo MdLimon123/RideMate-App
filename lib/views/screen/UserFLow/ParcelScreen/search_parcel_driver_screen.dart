@@ -12,8 +12,6 @@ import 'package:radeef/views/screen/Notification/notification_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class SearchParcelDriverScreen extends StatefulWidget {
-
-
   const SearchParcelDriverScreen({
     super.key,
    

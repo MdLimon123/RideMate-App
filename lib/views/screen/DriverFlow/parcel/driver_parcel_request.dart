@@ -217,16 +217,9 @@ class _DriverParcelRequestState extends State<DriverParcelRequest> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        //  Parcel accept
-                        SocketService().emit(
-                          'parcel:driver_cancel',
-                          data: {
-                            "parcel_id":
-                                _parcelStateController.parcel.value!.id,
-                          },
+                        _parcelController.driverCancelParcelRequest(
+                          _parcelStateController.parcel.value!.id,
                         );
-
-                        Get.back();
                       },
                       child: Container(
                         width: double.infinity,

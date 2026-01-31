@@ -76,7 +76,7 @@ class DriverAuthController extends GetxController {
       SocketService().connect(token);
       TripStateController.to.setRole(driver: true);
 
-      // Init socket (if not already)
+    
       var tripSocketController = Get.put(TripSocketController());
       var parcelController = Get.put(ParcelController());
 
@@ -105,6 +105,9 @@ class DriverAuthController extends GetxController {
     }
     isLoading(false);
   }
+
+
+
 
   Future<void> forgetPassword({required String email}) async {
     isForgetLoading(true);

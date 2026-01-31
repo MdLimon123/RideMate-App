@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     print("token ======> $token");
     print("role ======> $role");
-    print("active ====> $isActive");
+    print("isverified ====> $isActive");
 
     if (token.isEmpty) {
       Get.offAllNamed(AppRoutes.selectRole);
