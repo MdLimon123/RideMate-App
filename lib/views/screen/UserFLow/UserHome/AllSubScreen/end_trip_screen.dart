@@ -196,7 +196,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                           SizedBox(height: 12),
                           Center(
                             child: Text(
-                              widget.driver.name??"",
+                              widget.driver.name ?? "",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -233,13 +233,15 @@ class _EndTripScreenState extends State<EndTripScreen> {
                           SizedBox(height: 16),
                           Center(
                             child: Container(
-                              width: 158,
+                           
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Color(0xFFFFFFFF),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
+                                 mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset("assets/icons/cycle.svg"),
                                   SizedBox(width: 4),
@@ -391,7 +393,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                         fillColor: Color(0xFFE6EAF0),
                         filled: true,
                         hint: Text(
-                          widget.trip.slug??"",
+                          widget.trip.slug ?? "",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -471,16 +473,18 @@ class _EndTripScreenState extends State<EndTripScreen> {
 
   void _payTrip() {
     _tripSocketController.payForTrip(
-      tripId: widget.trip.id??"",
+      tripId: widget.trip.id ?? "",
       callback: (response) {
         if (response['success']) {
-          final balance =
-              response['data']['balance'] ??
-              0; // Extract the balance from the response
+          final balance = response['data']['current_balance'] ?? 0;
+
+          print("balance ==============> $balance");
+
+          print("response ==============> ${response}");
           _showSuccessPopup(
             balance,
-            widget.driver.avatar??"",
-            widget.driver.name??"",
+            widget.driver.avatar ?? "",
+            widget.driver.name ?? "",
             widget.driver.tripGivenCount!,
             widget.driver.ratingCount!.toDouble(),
             widget.driver,
@@ -514,7 +518,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
               Get.to(
                 () => UserRatingScreen(
                   drivierImage: driver.avatar!,
-                  driverName: driver.name??"",
+                  driverName: driver.name ?? "",
                   trip: driver.tripGivenCount!,
                   rating: driver.ratingCount!.toDouble(),
                   tripModel: tripModel,
@@ -540,6 +544,4 @@ class _EndTripScreenState extends State<EndTripScreen> {
       ),
     );
   }
-
-
 }

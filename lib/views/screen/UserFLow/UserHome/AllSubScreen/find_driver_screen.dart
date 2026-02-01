@@ -233,13 +233,14 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                           SizedBox(height: 16),
                           Center(
                             child: Container(
-                              width: 158,
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Color(0xFFFFFFFF),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset("assets/icons/cycle.svg"),
                                   SizedBox(width: 4),

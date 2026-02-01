@@ -41,19 +41,6 @@ class TripSocketController extends GetxController {
 
   /// ======> recover trip data <====== ///
 
-  // Future<void> recoverTripData() async {
-  //   final response = await ApiClient.getData('/trips/recover-trip');
-  //   if (response.statusCode == 200) {
-  //     if (response.body['data'] != null) {
-  //       TripStateController.to.setTrip(TripModel.fromJson(response.body));
-  //     } else {
-  //       TripStateController.to.setTrip(TripModel.fromJson(response.body));
-  //     }
-  //   } else {
-  //     TripStateController.to.updateTripStatus(TripStatus.idle);
-  //   }
-  // }
-
   Future<void> recoverTripData() async {
     final response = await ApiClient.getData('/trips/recover-trip');
 
@@ -77,6 +64,8 @@ class TripSocketController extends GetxController {
       data: data,
       ack: (res) {
         if (res['success']) {
+    
+          print("Trip requested successfully");
           Get.to(
             () => SearchADriverScreen(
               pickLocation: res['data']["pickup_address"],
@@ -108,10 +97,9 @@ class TripSocketController extends GetxController {
       'trip:accept',
       data: {"trip_id": tripId},
       ack: (a) {
+
         print("Trip accepted ack: $a");
-
         final trip = TripModel.fromJson(a['data']);
-
         Get.offAll(() => AcceptScreen(isParcel: false, trip: trip));
       },
     );
@@ -120,11 +108,7 @@ class TripSocketController extends GetxController {
   /// =====> user listen on accepted trip <====== ///
   void listenOnAcceptedTrip() {
     SocketService().on('trip:accepted', (data) {
-      // final driver = DriverModel.fromJson(data['driver']);
-      // final trip = TripModel.fromJson(data['trip']);
-      // // Navigate to FindDriverScreen
-      // Get.off(() => FindDriverScreen(driver: driver, trip: trip));
-
+      print("====== TRIP ACCEPTED LISTENER CALLED ======${data}");
       final trip = TripModel.fromJson(data['trip']);
       TripStateController.to.setTrip(trip);
     });
@@ -191,11 +175,7 @@ class TripSocketController extends GetxController {
           isTripStarted.value = false;
 
           Get.offAll(() => PaymentWatingScreen());
-          // Get.offAll(
-          //   () => ConfirmationScreen(
-          //     tripData: TripModel.fromJson(response['data']),
-          //   ),
-          // );
+        
         } else {
           showCustomSnackBar(
             response['error'][0]?.message ?? "Failed to end trip",
@@ -209,6 +189,7 @@ class TripSocketController extends GetxController {
 
   void listenOnTripEnded() {
     SocketService().on('trip:ended', (data) {
+      print("====== TRIP ENDED LISTENER CALLED ======${data}");
       final trip = TripModel.fromJson(data['trip']);
       TripStateController.to.setTrip(trip);
     });

@@ -1,18 +1,14 @@
 import 'package:get/get.dart';
-
 import 'package:radeef/models/parcel_model.dart';
-
 import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/driver_parcel_accepted.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/driver_parcel_confirm.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/driver_parcel_request.dart';
-import 'package:radeef/views/screen/DriverFlow/parcel/final_parcel_earn.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/parcel_rate_for_user.dart';
 import 'package:radeef/views/screen/UserFLow/ParcelScreen/end_parcel_screen.dart';
 import 'package:radeef/views/screen/UserFLow/ParcelScreen/find_parcel_driver_screen.dart';
 import 'package:radeef/views/screen/UserFLow/ParcelScreen/search_parcel_driver_screen.dart';
 import 'package:radeef/views/screen/UserFLow/ParcelScreen/user_rating_for_parcel_screen.dart';
-
 import 'package:radeef/views/screen/UserFLow/UserHome/user_home_screen.dart';
 
 enum ParcelState {

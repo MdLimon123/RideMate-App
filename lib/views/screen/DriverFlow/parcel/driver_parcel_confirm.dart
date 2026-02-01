@@ -9,7 +9,6 @@ import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 import 'package:radeef/views/base/custom_network_image.dart';
 import 'package:radeef/views/screen/DriverFlow/parcel/driver_payment_wating_screen.dart';
-import 'package:radeef/views/screen/DriverFlow/parcel/final_parcel_earn.dart';
 
 class DriverParcelConfirmationScreen extends StatefulWidget {
   const DriverParcelConfirmationScreen({super.key});
@@ -80,13 +79,15 @@ class _DriverParcelConfirmationScreenState
                 const SizedBox(height: 8),
                 Center(
                   child: Container(
-                    width: 158,
+                 
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
+                       mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SvgPicture.asset("assets/icons/cycle.svg"),
                         const SizedBox(width: 4),

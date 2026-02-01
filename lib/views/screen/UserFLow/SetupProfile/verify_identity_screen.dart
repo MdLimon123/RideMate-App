@@ -51,15 +51,16 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Obx(() {
-          if (!_setupProfileController.isPermissionGranted.value) {
-            return Center(
-              child: Text(
-                "Camera permission required to continue.",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
+
+          // if (_setupProfileController.isPermissionGranted.value) {
+          //   return Center(
+          //     child: Text(
+          //       "Camera permission required to continue.",
+          //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   );
+          // }
 
           // Camera initializing
           if (_setupProfileController.isCameraInitialized.value) {

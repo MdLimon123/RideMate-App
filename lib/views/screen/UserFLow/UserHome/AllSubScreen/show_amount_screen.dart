@@ -261,7 +261,7 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                                 return;
                               }
                               if (_homeController.selectedIndex.value == 0) {
-                             _tripSocketController.requestForTrip({
+                                _tripSocketController.requestForTrip({
                                   "pickup_lat": widget.pickLat,
                                   "pickup_lng": widget.pickLng,
                                   "pickup_address": widget.pickLocation,

@@ -86,13 +86,14 @@ class _RatePessengersScreenState extends State<UserRatingScreen> {
                   const SizedBox(height: 8),
                   Center(
                     child: Container(
-                      width: 158,
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SvgPicture.asset("assets/icons/cycle.svg"),
                           const SizedBox(width: 4),
@@ -113,7 +114,7 @@ class _RatePessengersScreenState extends State<UserRatingScreen> {
                               color: Color(0xFF333333),
                             ),
                           ),
-                          const SizedBox(width: 20),
+                          const SizedBox(width: 16),
                           const Icon(Icons.star, color: Color(0xFF012F64)),
                           const SizedBox(width: 4),
                           Text(

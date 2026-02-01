@@ -32,7 +32,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
 
   final _parcelController = Get.put(ParcelController());
 
-  bool isSwitch = true;
+  bool isSwitch = false;
 
   late AnimationController _xController;
   late AnimationController _yController;
@@ -51,7 +51,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
     _tripSocketController.allDriverListeners();
     _parcelController.allDriverParcelListeners();
     _driverHomeController.fetchHomeData();
-    isSwitch = true;
+    isSwitch = false;
     toggleOnlineStatus(isSwitch);
     subscribleId();
     _xController = AnimationController(
@@ -202,6 +202,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
+
               child: Row(
                 children: [
                   Text(
@@ -231,6 +232,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                   ),
                 ],
               ),
+           
+           
             ),
             SizedBox(height: 20),
             SizedBox(

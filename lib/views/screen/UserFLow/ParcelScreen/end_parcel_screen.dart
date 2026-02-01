@@ -236,13 +236,15 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                           SizedBox(height: 16),
                           Center(
                             child: Container(
-                              width: 158,
+                      
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Color(0xFFFFFFFF),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
+                                 mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset("assets/icons/cycle.svg"),
                                   SizedBox(width: 4),
@@ -477,9 +479,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
       parcelId: _parcelStateController.parcel.value!.id ?? "",
       callback: (response) {
         if (response['success']) {
-          final balance =
-              response['data']['balance'] ??
-              0; 
+          final balance = response['data']['current_balance'] ?? 0;
           _showSuccessPopup(balance);
         } else {
           final message = "Payment failed";

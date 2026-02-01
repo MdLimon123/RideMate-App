@@ -56,63 +56,96 @@ class UserSetupProfileController extends GetxController {
     }
   }
 
-  ///  Step 1: Request Camera Permission
-  Future<void> requestCameraPermission() async {
+Future<bool> requestCameraPermission() async {
     var status = await Permission.camera.status;
-
-    if (status.isDenied || status.isPermanentlyDenied) {
-      status = await Permission.camera.request();
-    }
-
-    if (status.isGranted) {
-      isPermissionGranted.value = true;
+ 
+    if (Platform.isIOS) {
       await initCamera();
     } else {
-      Get.snackbar(
-        "Permission Denied",
-        "Camera permission is required to verify your identity.",
-      );
+      if (status.isGranted) {
+        isPermissionGranted.value = true;
+        // if (Platform.isIOS) {
+        //   await Future.delayed(const Duration(milliseconds: 200));
+        // }
+        await initCamera();
+        return true;
+      } else if (status.isDenied) {
+        status = await Permission.camera.request();
+        if (status.isGranted) {
+          isPermissionGranted.value = true;
+          if (Platform.isAndroid) {
+            await Future.delayed(const Duration(milliseconds: 200));
+          }
+          await initCamera();
+          return true;
+        } else {
+          Get.snackbar(
+            "Permission Denied",
+            "Camera permission is required to verify your identity.",
+          );
+          return false;
+        }
+      } else if (status.isPermanentlyDenied) {
+        Get.snackbar(
+          "Permission Denied",
+          "Please enable camera permission from iOS settings.",
+        );
+        return false;
+      }
     }
+ 
+    return false;
   }
-
-  ///  Step 2: Initialize front camera safely
+ 
   Future<void> initCamera() async {
     try {
       final cameras = await availableCameras();
-      final frontCamera = cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front,
-      );
-
+      CameraDescription? frontCamera;
+      try {
+        frontCamera = cameras.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.front,
+        );
+      } catch (_) {
+        frontCamera = cameras.isNotEmpty ? cameras.first : null;
+      }
+ 
+      if (frontCamera == null) {
+        Get.snackbar("Camera Error", "No cameras found on device.");
+        return;
+      }
+ 
       final controller = CameraController(frontCamera, ResolutionPreset.medium);
       await controller.initialize();
-
+ 
       cameraController = controller;
       isCameraInitialized.value = true;
     } catch (e) {
       Get.snackbar("Camera Error", e.toString());
     }
   }
-
+ 
+ 
+ 
   ///  Step 3: Capture selfie safely
   Future<void> captureSelfie() async {
     final controller = cameraController;
-
+ 
     if (controller == null || !controller.value.isInitialized) {
       Get.snackbar("Error", "Camera not ready!");
       return;
     }
-
+ 
     try {
       final image = await controller.takePicture();
       capturedImage = image;
-
+ 
       isCameraInitialized.value = false;
-
+ 
       await Future.delayed(const Duration(milliseconds: 300));
-
+ 
       await controller.dispose();
       cameraController = null;
-
+ 
       Get.snackbar("Success", "Selfie captured successfully!");
     } catch (e) {
       Get.snackbar("Capture Failed", e.toString());

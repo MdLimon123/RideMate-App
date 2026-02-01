@@ -24,8 +24,8 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+      body: SingleChildScrollView(
+        padding:  EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +83,7 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
                       ),
                     ),
                   ),
-
+                
                   /// Expanded dropdown content
                   if (_languageController.isExpanded.value) ...[
                     const SizedBox(height: 4),
@@ -91,18 +91,18 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
                       decoration: BoxDecoration(
                         color: Color(0xFFE6EAF0),
                         borderRadius: BorderRadius.circular(8),
-
+                
                       ),
                       child: Column(
                         children: _languageController.languages
                             .map((lang) {
                         
-
+                
                           return GestureDetector(
                             onTap: () {
                               _languageController.selectLanguage(
                                   lang.tr);
-
+                
                               final selectedLangModel =
                               AppConstants.languages.firstWhere(
                                     (language) =>
@@ -110,14 +110,14 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
                                 orElse: () =>
                                 AppConstants.languages[0],
                               );
-
+                
                               _localizationController.setLanguage(
                                 Locale(
                                   selectedLangModel.languageCode,
                                   selectedLangModel.countryCode,
                                 ),
                               );
-
+                
                               _languageController.isExpanded.value =
                               false;
                             },
@@ -128,7 +128,7 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
                                     color:
                                     const Color(0xFF4B5563)),
                               ),
-
+                
                             ),
                           );
                         }).toList(),
@@ -143,7 +143,7 @@ class _DriverSelectUserLanguageScreenState extends State<DriverSelectUserLanguag
               Get.offAllNamed(AppRoutes.driverLoginScreen);
             }, text: "next".tr)
           ],
-
+                
         ),
       )
 

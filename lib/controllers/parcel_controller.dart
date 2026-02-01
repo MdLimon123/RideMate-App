@@ -5,6 +5,7 @@ import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/models/parcel_model.dart';
 import 'package:radeef/service/socket_service.dart';
 import 'package:radeef/views/base/custom_snackbar.dart';
+import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dart';
 
 class ParcelController extends GetxController {
   final RxBool loading = false.obs;
@@ -214,8 +215,10 @@ class ParcelController extends GetxController {
 
   void listenOnDriverCancelParcel() {
     SocketService().on('parcel:cancelled', (data) {
-      final parcel = ParcelModel.fromJson(data['parcel']);
-      ParcelStateController.to.setParcel(parcel);
+      // final parcel = ParcelModel.fromJson(data['parcel']);
+      // ParcelStateController.to.setParcel(parcel);
+      Get.offAll(() => DriverHomeScreen());
+      
     });
   }
 

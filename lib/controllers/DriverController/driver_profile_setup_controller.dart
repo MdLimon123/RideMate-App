@@ -246,30 +246,63 @@ class DriverProfileSetupController extends GetxController {
     isLoading(false);
   }
 
-  Future<void> requestCameraPermission() async {
+  Future<bool> requestCameraPermission() async {
     var status = await Permission.camera.status;
 
-    if (status.isDenied || status.isPermanentlyDenied) {
-      status = await Permission.camera.request();
-    }
-
-    if (status.isGranted) {
-      isPermissionGranted.value = true;
+    if (Platform.isIOS) {
       await initCamera();
     } else {
-      Get.snackbar(
-        "Permission Denied",
-        "Camera permission is required to verify your identity.",
-      );
+      if (status.isGranted) {
+        isPermissionGranted.value = true;
+        // if (Platform.isIOS) {
+        //   await Future.delayed(const Duration(milliseconds: 200));
+        // }
+        await initCamera();
+        return true;
+      } else if (status.isDenied) {
+        status = await Permission.camera.request();
+        if (status.isGranted) {
+          isPermissionGranted.value = true;
+          if (Platform.isAndroid) {
+            await Future.delayed(const Duration(milliseconds: 200));
+          }
+          await initCamera();
+          return true;
+        } else {
+          Get.snackbar(
+            "Permission Denied",
+            "Camera permission is required to verify your identity.",
+          );
+          return false;
+        }
+      } else if (status.isPermanentlyDenied) {
+        Get.snackbar(
+          "Permission Denied",
+          "Please enable camera permission from iOS settings.",
+        );
+        return false;
+      }
     }
+
+    return false;
   }
 
   Future<void> initCamera() async {
     try {
       final cameras = await availableCameras();
-      final frontCamera = cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front,
-      );
+      CameraDescription? frontCamera;
+      try {
+        frontCamera = cameras.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.front,
+        );
+      } catch (_) {
+        frontCamera = cameras.isNotEmpty ? cameras.first : null;
+      }
+
+      if (frontCamera == null) {
+        Get.snackbar("Camera Error", "No cameras found on device.");
+        return;
+      }
 
       final controller = CameraController(frontCamera, ResolutionPreset.medium);
       await controller.initialize();

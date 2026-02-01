@@ -17,11 +17,10 @@ class _LocationEnableScreenState extends State<LocationEnableScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
           children: [
-            SizedBox(height: 164),
             Center(child: SvgPicture.asset('assets/icons/location_enable.svg')),
             SizedBox(height: 44),
             Center(
@@ -47,7 +46,8 @@ class _LocationEnableScreenState extends State<LocationEnableScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(height: 280),
+
+            Spacer(),
 
             CustomButton(
               onTap: () {

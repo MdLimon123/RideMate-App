@@ -356,7 +356,7 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
   }
 
   void startLocationUpdates() async {
-    if (_positionStream != null) return; // prevent duplicate stream
+    if (_positionStream != null) return;
 
     // 1️⃣ Immediate first update
     Position position = await Geolocator.getCurrentPosition(
@@ -365,7 +365,7 @@ class _TrackDriverMapScreenState extends State<TrackDriverMapScreen> {
     _currentPosition = position;
     _updateDriverMarkerAndServer(position);
 
-    // 2️⃣ Continuous updates every 10 meters
+    
     LocationSettings locationSettings = const LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 10, // update only if moved 10m

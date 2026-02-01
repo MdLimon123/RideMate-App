@@ -73,13 +73,15 @@ class _UserRAtingForParcelState extends State<UserRatingForParcelScreen> {
                   const SizedBox(height: 8),
                   Center(
                     child: Container(
-                      width: 158,
+                
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
+                         mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SvgPicture.asset("assets/icons/cycle.svg"),
                           const SizedBox(width: 4),

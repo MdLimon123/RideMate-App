@@ -80,13 +80,13 @@ class UserAuthController extends GetxController {
 
       // Init socket (if not already)
       var tripSocketController = Get.put(TripSocketController());
-      var _parcelController = Get.put(ParcelController());
+      var parcelController = Get.put(ParcelController());
 
       tripSocketController.allUserListeners();
-      _parcelController.allParcelUserListeners();
+      parcelController.allParcelUserListeners();
 
       _dataController.setProfileData(
-        isActiveD: response.body['user']['is_verified'],
+        isActiveD: response.body['user']['is_active'],
         idD: response.body['user']['id'],
         nameD: response.body['user']['name'],
         roleD: response.body['user']['role'],

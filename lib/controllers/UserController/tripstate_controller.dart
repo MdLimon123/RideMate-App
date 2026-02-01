@@ -131,7 +131,7 @@ class TripStateController extends GetxController {
         break;
 
       case TripStatus.ARRIVED:
-       // Get.offAll(ConfirmationScreen(tripData: trip.value!));
+     
         Get.offAll(() => PaymentWatingScreen());
         break;
       case TripStatus.COMPLETED:

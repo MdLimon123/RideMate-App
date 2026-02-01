@@ -53,15 +53,15 @@ class _DriverVerifyIdentityScreenState
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Obx(() {
-          if (!_driverSetupController.isPermissionGranted.value) {
-            return Center(
-              child: Text(
-                "Camera permission required to continue.",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
+          // if (_driverSetupController.isPermissionGranted.value) {
+          //   return Center(
+          //     child: Text(
+          //       "Camera permission required to continue.",
+          //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   );
+          // }
 
           // Camera initializing
           if (_driverSetupController.isCameraInitialized.value) {
