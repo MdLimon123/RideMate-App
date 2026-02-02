@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
 import 'package:radeef/utils/app_colors.dart';
@@ -33,13 +34,15 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             : ListView(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
                 children: [
-                  Text(
-                    "${_userProfileController.aboutUsModel.value.content}",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF5A5A5A),
-                    ),
+                  Html(
+                    data: _userProfileController.aboutUsModel.value.content!,
+                    style: {
+                      "p": Style(
+                        fontSize: FontSize(14),
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF5A5A5A),
+                      ),
+                    },
                   ),
                 ],
               ),

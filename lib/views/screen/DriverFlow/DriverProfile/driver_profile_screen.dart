@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_profile_controller.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/service/prefs_helper.dart';
+import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/utils/app_constants.dart';
 import 'package:radeef/views/base/bottom_menu.dart';
 import 'package:radeef/views/base/custom_button.dart';
@@ -39,7 +40,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     return Scaffold(
       body: Obx(
         () => _driverProfileController.isLoading.value
-            ? Center(child: CustomLoading())
+            ? Center(child: CustomLoading(color: AppColors.primaryColor))
             : SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
@@ -99,15 +100,14 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                       SizedBox(height: 8),
                       Center(
                         child: Container(
-                      
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Color(0xFFE6EAF0),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
-                             mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SvgPicture.asset("assets/icons/cycle.svg"),
                               SizedBox(width: 4),

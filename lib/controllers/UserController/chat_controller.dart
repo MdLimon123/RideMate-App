@@ -16,10 +16,21 @@ class ChatController extends GetxController {
 
   final _dataController = Get.put(DataController());
 
-    @override
+  @override
   void onInit() {
     super.onInit();
     listenForMessages();
+  }
+
+  Future<void> createAdminChatRoom() async {
+    final response = await ApiClient.postData("/inbox/new-chat-to-admin", {});
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      chatId.value = response.body['id'];
+      debugPrint("Chat ID=========>: ${chatId.value}");
+      Get.to(() => NeedHelpScreen(chatId: chatId.value));
+    } else {
+      debugPrint("Something went wrong");
+    }
   }
 
   Future<void> createChatRoom({required String userId}) async {
@@ -85,15 +96,14 @@ class ChatController extends GetxController {
     );
   }
 
-void listenForMessages() {
-  _socketService.on("message:new", (data) {
-    final message = Message.fromJson(data);
+  void listenForMessages() {
+    _socketService.on("message:new", (data) {
+      final message = Message.fromJson(data);
 
-    final exists = messages.any((m) => m.id == message.id);
-    if (!exists) {
-      messages.add(message);
-    }
-  });
-}
-
+      final exists = messages.any((m) => m.id == message.id);
+      if (!exists) {
+        messages.add(message);
+      }
+    });
+  }
 }

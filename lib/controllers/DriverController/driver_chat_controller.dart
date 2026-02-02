@@ -23,6 +23,17 @@ class DriverChatController extends GetxController {
     listenForMessages();
   }
 
+  Future<void> createAdminChatRoom() async {
+    final response = await ApiClient.postData("/inbox/new-chat-to-admin", {});
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      chatId.value = response.body['id'];
+      debugPrint("Chat ID=========>: ${chatId.value}");
+      Get.to(() => DriverNeedHelpScreen(chatId: chatId.value));
+    } else {
+      debugPrint("Something went wrong");
+    }
+  }
+
   Future<void> createChatRoom({required String userId}) async {
     final body = {"user_id": userId};
 
@@ -67,7 +78,7 @@ class DriverChatController extends GetxController {
     };
 
     ///  correct event
-    _socketService.emit("message:send",data:  body);
+    _socketService.emit("message:send", data: body);
 
     /// Optimistic UI
     messages.add(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:radeef/controllers/UserController/chat_controller.dart';
 import 'package:radeef/controllers/UserController/home_controller.dart';
 import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/user_profile_controller.dart';
@@ -30,6 +31,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   );
 
   final _parcelController = Get.put(ParcelController());
+
+  final _chatController = Get.put(ChatController());
 
   @override
   void initState() {
@@ -312,44 +315,49 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       ),
 
                       SizedBox(height: 129),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 20,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFE6E6E6),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset('assets/icons/what.svg'),
-                            SizedBox(width: 10),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "needHelp".tr,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF333333),
+                      InkWell(
+                        onTap: () {
+                          _chatController.createAdminChatRoom();
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFE6E6E6),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              SvgPicture.asset('assets/icons/what.svg'),
+                              SizedBox(width: 10),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "needHelp".tr,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF333333),
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  "support".tr,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF333333),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "support".tr,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF333333),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],

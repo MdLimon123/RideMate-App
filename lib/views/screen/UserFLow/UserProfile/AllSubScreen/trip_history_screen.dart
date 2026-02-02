@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:radeef/controllers/DriverController/driver_rider_controller.dart';
+import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_appbar.dart';
 import 'package:radeef/views/base/custom_loading.dart';
 
@@ -84,7 +85,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             SizedBox(height: 20),
             Obx(
               () => _driverRiderController.isLoading.value
-                  ? Center(child: CustomLoading())
+                  ? Center(child: CustomLoading(color: AppColors.primaryColor))
                   : _driverRiderController.riderHistoryList.isEmpty
                   ? Center(
                       child: Text(

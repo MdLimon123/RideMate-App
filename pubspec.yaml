@@ -41,6 +41,7 @@ dependencies:
   init: ^1.0.0
   onesignal_flutter: ^5.3.5
   geocoding: 
+  flutter_html: ^3.0.0
 
 
 dev_dependencies:

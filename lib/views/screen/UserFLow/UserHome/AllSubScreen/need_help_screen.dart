@@ -49,17 +49,17 @@ class _NeedHelpScreenState extends State<NeedHelpScreen> {
                 color: Color(0xFF333333),
               ),
             ),
-            Spacer(),
-            Container(
-              height: 40,
-              width: 40,
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFFE6EAF0),
-              ),
-              child: SvgPicture.asset("assets/icons/phone.svg"),
-            ),
+            // Spacer(),
+            // Container(
+            //   height: 40,
+            //   width: 40,
+            //   padding: EdgeInsets.all(8),
+            //   decoration: BoxDecoration(
+            //     shape: BoxShape.circle,
+            //     color: Color(0xFFE6EAF0),
+            //   ),
+            //   child: SvgPicture.asset("assets/icons/phone.svg"),
+            // ),
           ],
         ),
       ),
