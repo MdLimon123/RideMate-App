@@ -402,8 +402,10 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                       ),
                     ),
                     SizedBox(height: 98),
+
+
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         // Container(
                         //   height: 40,
@@ -415,7 +417,6 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                         //   ),
                         //   child: SvgPicture.asset('assets/icons/phone.svg'),
                         // ),
-                        SizedBox(width: 16),
                         InkWell(
                           onTap: () async {
                             await _chatController.createChatRoom(
@@ -434,35 +435,38 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                           ),
                         ),
                         SizedBox(width: 22),
-                        InkWell(
-                          onTap: () {
-                            Get.to(
-                              () => TrackDriverScreen(
-                                pickLat: widget.trip.pickupLat!,
-                                pickLan: widget.trip.pickupLng!,
-                                dropLat: widget.trip.dropoffLat!,
-                                dropLan: widget.trip.dropoffLng!,
-                                dropAddress: widget.trip.dropoffAddress ?? "",
-                                driver: widget.driver,
-                                trip: widget.trip,
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              Get.to(
+                                () => TrackDriverScreen(
+                                  pickLat: widget.trip.pickupLat!,
+                                  pickLan: widget.trip.pickupLng!,
+                                  dropLat: widget.trip.dropoffLat!,
+                                  dropLan: widget.trip.dropoffLng!,
+                                  dropAddress: widget.trip.dropoffAddress ?? "",
+                                  driver: widget.driver,
+                                  trip: widget.trip,
+                                ),
+                              );
+                            },
+                          
+                            child: Container(
+                              height: 46,
+                                              
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                color: Color(0xFFE6EAF0),
                               ),
-                            );
-                          },
-
-                          child: Container(
-                            height: 46,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24),
-                              color: Color(0xFFE6EAF0),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Track Driver",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textColor,
+                              child: Center(
+                                child: Text(
+                                  "Track Driver",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
                               ),
                             ),
@@ -503,6 +507,8 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                         // ),
                       ],
                     ),
+                 
+                 
                   ],
                 ),
               ),

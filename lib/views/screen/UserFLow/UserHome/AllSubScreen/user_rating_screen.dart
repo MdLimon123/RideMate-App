@@ -149,9 +149,10 @@ class _RatePessengersScreenState extends State<UserRatingScreen> {
                         direction: Axis.horizontal,
                         allowHalfRating: true,
                         itemCount: 5,
+                        itemSize: 30,
                         itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                         itemBuilder: (context, _) =>
-                            Icon(Icons.star, color: Color(0xFF012F64)),
+                            Icon(Icons.star, color: Colors.amber),
                         onRatingUpdate: (rating) {
                           _userProfileController.updateRating(rating);
                         },

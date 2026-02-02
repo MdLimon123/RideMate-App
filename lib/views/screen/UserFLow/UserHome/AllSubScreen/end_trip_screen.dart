@@ -404,18 +404,20 @@ class _EndTripScreenState extends State<EndTripScreen> {
                     ),
                     SizedBox(height: 98),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 40,
-                          width: 40,
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFE6EAF0),
-                          ),
-                          child: SvgPicture.asset('assets/icons/phone.svg'),
-                        ),
+                        // Container(
+                        //   height: 40,
+                        //   width: 40,
+                        //   padding: EdgeInsets.all(8),
+                        //   decoration: BoxDecoration(
+                        //     shape: BoxShape.circle,
+                        //     color: Color(0xFFE6EAF0),
+                        //   ),
+                        //   child: SvgPicture.asset('assets/icons/phone.svg'),
+                        // ),
+
+
                         SizedBox(width: 16),
                         InkWell(
                           onTap: () async {
@@ -436,24 +438,26 @@ class _EndTripScreenState extends State<EndTripScreen> {
                         ),
                         SizedBox(width: 22),
 
-                        InkWell(
-                          onTap: () {
-                            _payTrip();
-                          },
-                          child: Container(
-                            height: 46,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24),
-                              color: Color(0xFFE6EAF0),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Pay Now ",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textColor,
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              _payTrip();
+                            },
+                            child: Container(
+                              height: 46,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                color: Color(0xFFE6EAF0),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Pay Now ",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
                               ),
                             ),

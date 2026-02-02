@@ -73,15 +73,14 @@ class _UserRAtingForParcelState extends State<UserRatingForParcelScreen> {
                   const SizedBox(height: 8),
                   Center(
                     child: Container(
-                
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
-                         mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SvgPicture.asset("assets/icons/cycle.svg"),
                           const SizedBox(width: 4),
@@ -137,9 +136,10 @@ class _UserRAtingForParcelState extends State<UserRatingForParcelScreen> {
                         direction: Axis.horizontal,
                         allowHalfRating: true,
                         itemCount: 5,
+                        itemSize: 30,
                         itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                         itemBuilder: (context, _) =>
-                            Icon(Icons.star, color: Color(0xFF012F64)),
+                            Icon(Icons.star, color: Colors.amber),
                         onRatingUpdate: (rating) {
                           _userProfileController.updateRating(rating);
                         },
@@ -184,7 +184,8 @@ class _UserRAtingForParcelState extends State<UserRatingForParcelScreen> {
                       loading: _userProfileController.isLaoding.value,
                       onTap: () {
                         _userProfileController.submitRatingParcel(
-                          userId: _parcelStateController.parcel.value!.driver!.id!,
+                          userId:
+                              _parcelStateController.parcel.value!.driver!.id!,
                           parcelId: _parcelStateController.parcel.value!.id!,
                         );
                       },

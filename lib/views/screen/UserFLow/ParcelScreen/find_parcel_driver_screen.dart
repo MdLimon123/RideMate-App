@@ -238,14 +238,13 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                           SizedBox(height: 16),
                           Center(
                             child: Container(
-                           
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Color(0xFFFFFFFF),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
-                                 mainAxisSize: MainAxisSize.min,
+                                mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset("assets/icons/cycle.svg"),
@@ -415,18 +414,18 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                     ),
                     SizedBox(height: 98),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 40,
-                          width: 40,
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFE6EAF0),
-                          ),
-                          child: SvgPicture.asset('assets/icons/phone.svg'),
-                        ),
+                        // Container(
+                        //   height: 40,
+                        //   width: 40,
+                        //   padding: EdgeInsets.all(8),
+                        //   decoration: BoxDecoration(
+                        //     shape: BoxShape.circle,
+                        //     color: Color(0xFFE6EAF0),
+                        //   ),
+                        //   child: SvgPicture.asset('assets/icons/phone.svg'),
+                        // ),
                         SizedBox(width: 16),
                         InkWell(
                           onTap: () async {
@@ -450,25 +449,28 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                           ),
                         ),
                         SizedBox(width: 22),
-                        InkWell(
-                          onTap: () {
-                            Get.to(() => TrackParcelDriverScreen());
-                          },
-
-                          child: Container(
-                            height: 46,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24),
-                              color: Color(0xFFE6EAF0),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Track Driver",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textColor,
+                        Expanded(
+                          child: InkWell(
+                          
+                            onTap: () {
+                              Get.to(() => TrackParcelDriverScreen());
+                            },
+                          
+                            child: Container(
+                              height: 46,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                color: Color(0xFFE6EAF0),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Track Driver",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
                               ),
                             ),

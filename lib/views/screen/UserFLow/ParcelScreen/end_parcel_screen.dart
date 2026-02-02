@@ -413,7 +413,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                     ),
                     SizedBox(height: 98),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(width: 16),
                         InkWell(
@@ -439,24 +439,26 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                         ),
                         SizedBox(width: 22),
 
-                        InkWell(
-                          onTap: () {
-                            _payTrip();
-                          },
-                          child: Container(
-                            height: 46,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24),
-                              color: Color(0xFFE6EAF0),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Pay Now ",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textColor,
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              _payTrip();
+                            },
+                            child: Container(
+                              height: 46,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                color: Color(0xFFE6EAF0),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Pay Now ",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
                               ),
                             ),
