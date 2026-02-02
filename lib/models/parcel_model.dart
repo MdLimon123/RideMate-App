@@ -213,7 +213,7 @@ class Driver {
   final List<dynamic>? vehiclePhotos;
   final int? tripGivenCount;
   final bool? isStripeConnected;
-  final int? rating;
+  final double? rating;
   final int? ratingCount;
   final double? locationLat;
   final double? locationLng;
@@ -264,7 +264,7 @@ class Driver {
         : List<dynamic>.from(json["vehicle_photos"]!.map((x) => x)),
     tripGivenCount: json["trip_given_count"],
     isStripeConnected: json["is_stripe_connected"],
-    rating: json["rating"],
+    rating: json["rating"].toDouble(),
     ratingCount: json["rating_count"],
     locationLat: json["location_lat"]?.toDouble(),
     locationLng: json["location_lng"]?.toDouble(),

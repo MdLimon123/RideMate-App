@@ -121,10 +121,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     children: [
                       TextFormField(
                         readOnly: true,
-                        onTap: () {},
+                        onTap: () {
+                          _homeController.updateSelectedIndex(0);
+                          Get.to(() => BookARideScreen());
+                        },
                         decoration: InputDecoration(
                           hint: Text(
-                            "Where do you want to got?",
+                            "Where do you want to go?",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
@@ -161,9 +164,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                           Expanded(
                             child: InkWell(
                               onTap: () {
-                                _homeController.updateSelectedIndex(
-                                  0,
-                                ); 
+                                _homeController.updateSelectedIndex(0);
                                 Get.to(() => BookARideScreen());
                               },
                               child: Container(
@@ -259,6 +260,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                           ),
                         ],
                       ),
+                      SizedBox(height: 10),
                       Obx(
                         () => ListView.separated(
                           shrinkWrap: true,

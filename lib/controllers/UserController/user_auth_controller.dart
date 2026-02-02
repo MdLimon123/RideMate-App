@@ -29,7 +29,8 @@ class UserAuthController extends GetxController {
   Future<void> signup({required String email, required String password}) async {
     isLoading(true);
 
-    final body = {"email": email, "password": password, "role": "USER"};
+    final body = {"email": email, 
+    "password": password, "role": "USER"};
     var headers = {'Content-Type': 'application/json'};
 
     final response = await ApiClient.postData(

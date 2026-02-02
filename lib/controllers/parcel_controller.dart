@@ -61,6 +61,7 @@ class ParcelController extends GetxController {
       ack: (res) {
         if (res['success']) {
           final parcel = ParcelModel.fromJson(res['data']);
+          print(res);
           ParcelStateController.to.setParcel(parcel);
         }
       },
@@ -218,7 +219,6 @@ class ParcelController extends GetxController {
       // final parcel = ParcelModel.fromJson(data['parcel']);
       // ParcelStateController.to.setParcel(parcel);
       Get.offAll(() => DriverHomeScreen());
-      
     });
   }
 

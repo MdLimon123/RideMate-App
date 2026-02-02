@@ -114,7 +114,7 @@ class _BookARideScreenState extends State<BookARideScreen> {
                             },
                             decoration: InputDecoration(
                               hint: Text(
-                                "Aqua Tower, Mohakhali",
+                                "Pick-up Location",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -184,7 +184,7 @@ class _BookARideScreenState extends State<BookARideScreen> {
                             },
                             decoration: InputDecoration(
                               hint: Text(
-                                "Aqua Tower, Mohakhali",
+                                "Drop-off Location",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,

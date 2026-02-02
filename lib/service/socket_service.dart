@@ -23,7 +23,7 @@ class SocketService {
     debugPrint('🟡 Trying to connect socket...');
     socket = IO.io(
       'https://api.radeefz.com',
-    IO.OptionBuilder()
+      IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
           .enableReconnection()
@@ -63,12 +63,14 @@ class SocketService {
   }
 
   // Emit event
-   void emit(String event, {dynamic data, Function(dynamic response)? ack}) {
+  void emit(String event, {dynamic data, Function(dynamic response)? ack}) {
     if (socket == null) return;
 
     if (ack != null) {
       socket!.emitWithAck(event, data, ack: ack);
-        debugPrint("============================ Emit Ack : $ack ============================");
+      debugPrint(
+        "============================ Emit event : $event ask : $ack ============================",
+      );
     } else {
       socket!.emit(event, data);
     }
@@ -88,16 +90,3 @@ class SocketService {
     socket?.off(event);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

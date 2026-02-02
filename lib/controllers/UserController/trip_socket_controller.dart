@@ -64,7 +64,6 @@ class TripSocketController extends GetxController {
       data: data,
       ack: (res) {
         if (res['success']) {
-    
           print("Trip requested successfully");
           Get.to(
             () => SearchADriverScreen(
@@ -97,7 +96,6 @@ class TripSocketController extends GetxController {
       'trip:accept',
       data: {"trip_id": tripId},
       ack: (a) {
-
         print("Trip accepted ack: $a");
         final trip = TripModel.fromJson(a['data']);
         Get.offAll(() => AcceptScreen(isParcel: false, trip: trip));
@@ -175,7 +173,6 @@ class TripSocketController extends GetxController {
           isTripStarted.value = false;
 
           Get.offAll(() => PaymentWatingScreen());
-        
         } else {
           showCustomSnackBar(
             response['error'][0]?.message ?? "Failed to end trip",

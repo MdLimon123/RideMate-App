@@ -112,11 +112,13 @@ class _ParcelDetailsScreenState extends State<ParcelDetailsScreen> {
                       SizedBox(height: 12),
                       CustomTextField(
                         hintText: "Parcels Weight",
+                        keyboardType: TextInputType.number,
                         controller: _homeController.parcelWeightController,
                       ),
                       SizedBox(height: 12),
                       CustomTextField(
                         hintText: "Parcels Amount",
+                        keyboardType: TextInputType.number,
                         controller: _homeController.parcelAmount,
                       ),
 

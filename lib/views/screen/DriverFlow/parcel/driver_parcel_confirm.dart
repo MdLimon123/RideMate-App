@@ -21,7 +21,6 @@ class _DriverParcelConfirmationScreenState
     extends State<DriverParcelConfirmationScreen> {
   final _parcelStateController = Get.put(ParcelStateController());
 
-
   final _driverParcelController = Get.put(DriverParcelController());
 
   @override
@@ -77,15 +76,14 @@ class _DriverParcelConfirmationScreenState
                 const SizedBox(height: 8),
                 Center(
                   child: Container(
-                 
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
-                       mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SvgPicture.asset("assets/icons/cycle.svg"),
                         const SizedBox(width: 4),
@@ -131,53 +129,62 @@ class _DriverParcelConfirmationScreenState
                 ),
                 SizedBox(height: 34),
 
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFFFFFF),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Take a picture for end trip",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textColor,
-                        ),
-                      ),
-
-                      Obx(() {
-                        final image = _driverParcelController.parcelImage.value;
-                        return InkWell(
-                          onTap: () {
-                            _driverParcelController.pickParcelImage(
-                              fromCamera: true,
-                            );
-                          },
-                          child: Container(
-                            height: 28,
-                            width: 28,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: Color(0xFF11DF7F),
-                                width: 0.5,
-                              ),
-                            ),
-                            child: image != null
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Image.file(image, fit: BoxFit.cover),
-                                  )
-                                : null,
+                InkWell(
+                  onTap: () {
+                    _driverParcelController.pickParcelImage(fromCamera: true);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFFFFFFF),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Take a picture for end trip",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textColor,
                           ),
-                        );
-                      }),
-                    ],
+                        ),
+
+                        Obx(() {
+                          final image =
+                              _driverParcelController.parcelImage.value;
+                          return InkWell(
+                            onTap: () {
+                              _driverParcelController.pickParcelImage(
+                                fromCamera: true,
+                              );
+                            },
+                            child: Container(
+                              height: 28,
+                              width: 28,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: Color(0xFF11DF7F),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: image != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: Image.file(
+                                        image,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
                   ),
                 ),
 

@@ -12,13 +12,11 @@ import 'package:radeef/views/screen/Notification/notification_screen.dart';
 import 'package:radeef/views/screen/UserFLow/UserProfile/user_profile_screen.dart';
 
 class SearchParcelDriverScreen extends StatefulWidget {
-  const SearchParcelDriverScreen({
-    super.key,
-   
-  });
+  const SearchParcelDriverScreen({super.key});
 
   @override
-  State<SearchParcelDriverScreen> createState() => _SearchParcelDriverScreenState();
+  State<SearchParcelDriverScreen> createState() =>
+      _SearchParcelDriverScreenState();
 }
 
 class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
@@ -85,8 +83,6 @@ class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
     }
     _parcelController.listenOnAcceptedParcel();
 
-  
-
     super.initState();
   }
 
@@ -102,13 +98,11 @@ class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
     _yController.dispose();
     _rotationController.dispose();
 
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-   
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -178,7 +172,7 @@ class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
                       readOnly: true,
                       decoration: InputDecoration(
                         hint: Text(
-                          "Aqua Tower, Mohakhali",
+                          "Pick-up Location",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -215,7 +209,7 @@ class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
                       readOnly: true,
                       decoration: InputDecoration(
                         hint: Text(
-                          "Aqua Tower, Mohakhali",
+                          "Drop-off Location",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -345,13 +339,13 @@ class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
 
                     CustomButton(
                       onTap: () {
-                        _parcelController.userCancelParcelRequest(_parcelStateController.parcel.value!.id!);
-                      
+                        _parcelController.userCancelParcelRequest(
+                          _parcelStateController.parcel.value!.id!,
+                        );
                       },
                       text: "cancel".tr,
                     ),
 
-               
                     SizedBox(height: 90),
                     Container(
                       width: double.infinity,
