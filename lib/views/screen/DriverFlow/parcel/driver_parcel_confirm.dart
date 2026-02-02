@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:radeef/controllers/DriverController/driver_parcel_controller.dart';
-import 'package:radeef/controllers/parcel_controller.dart';
 import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/service/api_constant.dart';
 import 'package:radeef/utils/app_colors.dart';
@@ -22,7 +21,6 @@ class _DriverParcelConfirmationScreenState
     extends State<DriverParcelConfirmationScreen> {
   final _parcelStateController = Get.put(ParcelStateController());
 
-  final _parcelController = Get.put(ParcelController());
 
   final _driverParcelController = Get.put(DriverParcelController());
 

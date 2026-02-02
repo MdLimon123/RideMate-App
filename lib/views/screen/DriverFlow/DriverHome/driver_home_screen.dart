@@ -42,7 +42,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
   late Animation<double> _yScale;
   late Animation<double> _rotation;
 
-  // Location tracking
+
   Timer? _locationTimer;
   Position? _currentPosition;
 

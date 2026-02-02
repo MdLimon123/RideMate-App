@@ -493,7 +493,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
     Get.dialog(
       AlertDialog(
         title: const Text("Payment Successful"),
-        content: Text("Current Balance: \$$balance"),
+        content: Text("Current Balance: \$ $balance"),
         actions: [
           TextButton(
             onPressed: () {

@@ -184,12 +184,7 @@ class _UserRAtingForParcelState extends State<UserRatingForParcelScreen> {
                       loading: _userProfileController.isLaoding.value,
                       onTap: () {
                         _userProfileController.submitRatingParcel(
-                          userId: _userProfileController
-                              .userProfileModel
-                              .value
-                              .id
-                              .toString(),
-
+                          userId: _parcelStateController.parcel.value!.driver!.id!,
                           parcelId: _parcelStateController.parcel.value!.id!,
                         );
                       },

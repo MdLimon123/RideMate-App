@@ -91,7 +91,7 @@ class ParcelStateController extends GetxController {
   }
 
   // ================= DRIVER FLOW =================
-  
+
   void _driverFlow(ParcelState status) {
     switch (status) {
       case ParcelState.idle:

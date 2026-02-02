@@ -4,6 +4,7 @@ import 'package:radeef/controllers/UserController/trip_socket_controller.dart';
 import 'package:radeef/controllers/UserController/tripstate_controller.dart';
 import 'package:radeef/controllers/data_controller.dart';
 import 'package:radeef/controllers/parcel_controller.dart';
+import 'package:radeef/controllers/parcel_state.dart';
 import 'package:radeef/models/User/user_info_model.dart';
 import 'package:radeef/service/api_client.dart';
 import 'package:radeef/service/prefs_helper.dart';
@@ -75,8 +76,8 @@ class DriverAuthController extends GetxController {
       /// Socket connection
       SocketService().connect(token);
       TripStateController.to.setRole(driver: true);
+      ParcelStateController.to.setRole(driver: true);
 
-    
       var tripSocketController = Get.put(TripSocketController());
       var parcelController = Get.put(ParcelController());
 
@@ -105,9 +106,6 @@ class DriverAuthController extends GetxController {
     }
     isLoading(false);
   }
-
-
-
 
   Future<void> forgetPassword({required String email}) async {
     isForgetLoading(true);

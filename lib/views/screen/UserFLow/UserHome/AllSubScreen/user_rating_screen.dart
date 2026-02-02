@@ -196,11 +196,7 @@ class _RatePessengersScreenState extends State<UserRatingScreen> {
                       loading: _userProfileController.isLaoding.value,
                       onTap: () {
                         _userProfileController.submitRating(
-                          userId: _userProfileController
-                              .userProfileModel
-                              .value
-                              .id
-                              .toString(),
+                          userId: widget.tripModel.driverId.toString(),
 
                           tripId: widget.tripModel.id.toString(),
                         );
