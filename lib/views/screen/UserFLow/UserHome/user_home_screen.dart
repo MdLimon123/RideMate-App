@@ -163,7 +163,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               onTap: () {
                                 _homeController.updateSelectedIndex(
                                   0,
-                                ); // Update index to 0 for Book a Ride
+                                ); 
                                 Get.to(() => BookARideScreen());
                               },
                               child: Container(

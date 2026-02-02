@@ -187,6 +187,8 @@ class HomeController extends GetxController {
     } else {
       showCustomSnackBar(response.statusText, isError: true);
     }
+
+    isShowAnountLoading(false);
   }
 
   Future<void> calculateAccount() async {
