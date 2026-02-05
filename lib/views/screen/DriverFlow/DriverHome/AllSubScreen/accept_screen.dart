@@ -221,7 +221,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                           ),
                                           SizedBox(width: 4),
                                           Text(
-                                            "(XAF)",
+                                            "(£)",
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w200,
@@ -249,7 +249,7 @@ class _AcceptScreenState extends State<AcceptScreen> {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      "(XAF)",
+                                      "(£)",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w200,

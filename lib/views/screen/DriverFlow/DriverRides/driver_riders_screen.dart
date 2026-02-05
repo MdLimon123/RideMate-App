@@ -81,99 +81,103 @@ class _DriverRidersScreenState extends State<DriverRidersScreen> {
                 ],
               ),
               SizedBox(height: 20),
-              Obx(
-                () => _driverRiderController.isLoading.value
-                    ? Center(
-                        child: CustomLoading(color: AppColors.primaryColor),
-                      )
-                    : Expanded(
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            final item =
-                                _driverRiderController.riderHistoryList[index];
-                            return InkWell(
-                              onTap: () {
-                                Get.to(
-                                  () => DriverRiderDetailsScreen(
-                                    isParcel: item.isParcel,
-                                    riderHistoryItem: item,
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 13,
-                                ),
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFE6E6E6),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item.completedAt != null
-                                              ? DateFormat(
-                                                  'yyyy-MM-dd',
-                                                ).format(item.completedAt!)
-                                              : item.date ?? 'N/A',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFF333333),
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          "From :${item.pickupAddress}",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFF87878A),
-                                          ),
-                                        ),
 
-                                        SizedBox(width: 4),
-                                        Text(
-                                          "To :${item.dropoffAddress}",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFF87878A),
-                                          ),
-                                        ),
-                                      ],
+              Obx(() {
+                if (_driverRiderController.isLoading.value) {
+                  return Center(
+                    child: CustomLoading(color: AppColors.primaryColor),
+                  );
+                }
+
+                if (_driverRiderController.riderHistoryList.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No ride history available",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF87878A),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  );
+                }
+
+                return Expanded(
+                  child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      final item =
+                          _driverRiderController.riderHistoryList[index];
+
+                      return InkWell(
+                        onTap: () {
+                          Get.to(
+                            () => DriverRiderDetailsScreen(
+                              isParcel: item.isParcel,
+                              riderHistoryItem: item,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 13,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFE6E6E6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.completedAt != null
+                                        ? DateFormat(
+                                            'yyyy-MM-dd',
+                                          ).format(item.completedAt!)
+                                        : item.date ?? 'N/A',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Color(0xFF333333),
                                     ),
-                                    Spacer(),
-                                    Text(
-                                      "\$${item.totalCost}",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF012F64),
-                                      ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "From : ${item.pickupAddress}",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF87878A),
                                     ),
-                                  ],
+                                  ),
+                                  Text(
+                                    "To : ${item.dropoffAddress}",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF87878A),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Spacer(),
+                              Text(
+                                "\$${item.totalCost}",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF012F64),
                                 ),
                               ),
-                            );
-                          },
-                          separatorBuilder: (_, _) => SizedBox(height: 8),
-                          itemCount:
-                              _driverRiderController.riderHistoryList.length,
+                            ],
+                          ),
                         ),
-                      ),
-              ),
+                      );
+                    },
+                    separatorBuilder: (_, _) => SizedBox(height: 8),
+                    itemCount: _driverRiderController.riderHistoryList.length,
+                  ),
+                );
+              }),
             ],
           ),
         ),

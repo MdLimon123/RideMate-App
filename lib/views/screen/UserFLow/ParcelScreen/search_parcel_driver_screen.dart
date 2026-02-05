@@ -269,7 +269,7 @@ class _SearchParcelDriverScreenState extends State<SearchParcelDriverScreen>
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Text(
-                                "28 XAF",
+                                "28 £",
                                 style: TextStyle(
                                   color: Color(0xFF012F64),
                                   fontWeight: FontWeight.w500,

@@ -187,7 +187,7 @@
 //                           ),
 //                           const SizedBox(width: 4),
 //                           Text(
-//                             "(XAF)",
+//                             "(£)",
 //                             style: TextStyle(
 //                               fontSize: 16,
 //                               fontWeight: FontWeight.w200,

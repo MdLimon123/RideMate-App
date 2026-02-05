@@ -42,7 +42,7 @@ class _DriverWalletScreenState extends State<DriverWalletScreen> {
             child: Center(
               child: Obx(
                 () => Text(
-                  " + ${_driverProfileController.driverProfileModel.value.wallet!.balance} XAF",
+                  " + ${_driverProfileController.driverProfileModel.value.wallet!.balance} £",
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w600,

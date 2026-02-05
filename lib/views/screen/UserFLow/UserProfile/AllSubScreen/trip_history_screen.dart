@@ -146,7 +146,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                     ),
                                     SizedBox(width: 20),
                                     Text(
-                                      "${item.totalCost} XAF",
+                                      "${item.totalCost} £",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w400,

@@ -201,7 +201,7 @@ class _ShowParcelAmountScreenState extends State<ShowParcelAmountScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          "${widget.showAmount} XAF",
+                          "${widget.showAmount} £",
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.w500,

@@ -247,7 +247,22 @@ class _DriverParcelConfirmationScreenState
                           ),
                         ],
                       ),
+                      SizedBox(height: 12),
+                      Row(
+                        children: [
+                          SvgPicture.asset("assets/icons/kg.svg"),
+                          SizedBox(width: 12),
 
+                          Text(
+                            "${_parcelStateController.parcel.value!.weight} Kg",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w200,
+                              color: AppColors.textColor,
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 12),
                       Row(
                         children: [
@@ -268,7 +283,7 @@ class _DriverParcelConfirmationScreenState
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            "(XAF)",
+                            "(£)",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w200,
@@ -280,34 +295,34 @@ class _DriverParcelConfirmationScreenState
 
                       const SizedBox(height: 12),
 
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/dollar_fill.svg',
-                            color: AppColors.textColor,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            _parcelStateController.parcel.value?.amount
-                                    .toString() ??
-                                "0",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF012F64),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "(XAF)",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w200,
-                              color: AppColors.textColor,
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Row(
+                      //   children: [
+                      //     SvgPicture.asset(
+                      //       'assets/icons/dollar_fill.svg',
+                      //       color: AppColors.textColor,
+                      //     ),
+                      //     const SizedBox(width: 12),
+                      //     Text(
+                      //       _parcelStateController.parcel.value?.amount
+                      //               .toString() ??
+                      //           "0",
+                      //       style: TextStyle(
+                      //         fontSize: 20,
+                      //         fontWeight: FontWeight.w500,
+                      //         color: Color(0xFF012F64),
+                      //       ),
+                      //     ),
+                      //     const SizedBox(width: 4),
+                      //     Text(
+                      //       "(£)",
+                      //       style: TextStyle(
+                      //         fontSize: 16,
+                      //         fontWeight: FontWeight.w200,
+                      //         color: AppColors.textColor,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),

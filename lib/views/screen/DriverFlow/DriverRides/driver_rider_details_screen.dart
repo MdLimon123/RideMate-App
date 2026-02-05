@@ -188,7 +188,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                       ),
                                       SizedBox(width: 4),
                                       Text(
-                                        "(XAF)",
+                                        "(£)",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w200,
@@ -216,7 +216,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  "(XAF)",
+                                  "(£)",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w200,
@@ -354,7 +354,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    "(XAF)",
+                                    "(£)",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w200,
@@ -408,7 +408,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      "$driverEarn (XAF)",
+                      "$driverEarn (£)",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF012F64),
@@ -442,7 +442,7 @@ class _DriverRiderDetailsScreenState extends State<DriverRiderDetailsScreen> {
                     ),
                     SizedBox(width: 6),
                     Text(
-                      "(XAF)",
+                      "(£)",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w200,

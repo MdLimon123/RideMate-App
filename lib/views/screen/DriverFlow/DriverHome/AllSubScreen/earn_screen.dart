@@ -7,13 +7,9 @@ import 'package:radeef/views/screen/DriverFlow/DriverHome/driver_home_screen.dar
 
 class EarnScreen extends StatefulWidget {
   final double amount;
-  final double vat; 
+  final double vat;
 
-  const EarnScreen({
-    super.key,
-    required this.amount,
-    required this.vat,  
-  });
+  const EarnScreen({super.key, required this.amount, required this.vat});
 
   @override
   State<EarnScreen> createState() => _EarnScreenState();
@@ -66,7 +62,7 @@ class _EarnScreenState extends State<EarnScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          "${widget.amount} (XAF)",
+                          "${widget.amount} (£)",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF012F64),
@@ -92,9 +88,9 @@ class _EarnScreenState extends State<EarnScreen> {
                       SizedBox(width: 6),
                       SvgPicture.asset("assets/icons/percentige.svg"),
                       SizedBox(width: 4),
-                     
+
                       Text(
-                        "(XAF)",
+                        "(£)",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w200,

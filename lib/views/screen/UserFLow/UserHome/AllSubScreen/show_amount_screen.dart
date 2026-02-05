@@ -205,7 +205,7 @@ class _ShowAmountScreenState extends State<ShowAmountScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          "${widget.showAmount} XAF",
+                          "${widget.showAmount} £",
                           style: TextStyle(
                             fontSize: 50,
                             fontWeight: FontWeight.w500,

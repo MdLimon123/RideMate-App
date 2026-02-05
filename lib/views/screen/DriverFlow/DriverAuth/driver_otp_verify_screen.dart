@@ -1,7 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:get/get.dart';
-import 'package:radeef/helpers/route.dart';
+import 'package:radeef/controllers/DriverController/driver_auth_controller.dart';
 import 'package:radeef/utils/app_colors.dart';
 import 'package:radeef/views/base/custom_button.dart';
 
@@ -14,6 +15,8 @@ class DriverOtpVerifyScreen extends StatefulWidget {
 }
 
 class _DriverOtpVerifyScreenState extends State<DriverOtpVerifyScreen> {
+  final _driverAuthController = Get.put(DriverAuthController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +45,9 @@ class _DriverOtpVerifyScreenState extends State<DriverOtpVerifyScreen> {
             filled: true,
             fillColor: Color(0xFFE6E6E6),
             onCodeChanged: (String code) {},
-            onSubmit: (String verificationCode) {},
+            onSubmit: (String verificationCode) {
+              _driverAuthController.isForgetOtp.value = verificationCode;
+            },
           ),
           SizedBox(height: 32),
           Center(
@@ -64,17 +69,26 @@ class _DriverOtpVerifyScreenState extends State<DriverOtpVerifyScreen> {
                       fontWeight: FontWeight.w400,
                       color: AppColors.primaryColor,
                     ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        _driverAuthController.resendOtpVerify(
+                          email: widget.email,
+                        );
+                      },
                   ),
                 ],
               ),
             ),
           ),
           SizedBox(height: 322),
-          CustomButton(
-            onTap: () {
-              Get.offAllNamed(AppRoutes.driverResetPasswordScreen);
-            },
-            text: "verify".tr,
+          Obx(
+            () => CustomButton(
+              loading: _driverAuthController.isVerify.value,
+              onTap: () {
+                _driverAuthController.otpForgetVerify(email: widget.email);
+              },
+              text: "verify".tr,
+            ),
           ),
         ],
       ),

@@ -412,7 +412,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen>
                                       ),
                                       Expanded(
                                         child: Text(
-                                          "${home.totalEarnings} XAF",
+                                          "£ ${home.totalEarnings}",
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
                                             fontSize: 20,

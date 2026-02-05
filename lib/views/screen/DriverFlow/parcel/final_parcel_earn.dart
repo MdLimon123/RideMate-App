@@ -69,7 +69,7 @@ class _FinalParcelEarnState extends State<FinalParcelEarn> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  '26 (XAF)',
+                                  '26 (£)',
                                   style: TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.w500,
@@ -106,7 +106,7 @@ class _FinalParcelEarnState extends State<FinalParcelEarn> {
                                   ),
                                   SizedBox(width: 4),
                                   Text(
-                                    '(XAF)',
+                                    '(£)',
                                     style: TextStyle(
                                       fontSize: 20,
                                       color: Color(0xFF333333),

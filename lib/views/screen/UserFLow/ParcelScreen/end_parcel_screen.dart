@@ -236,14 +236,13 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                           SizedBox(height: 16),
                           Center(
                             child: Container(
-                      
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Color(0xFFFFFFFF),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
-                                 mainAxisSize: MainAxisSize.min,
+                                mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset("assets/icons/cycle.svg"),
@@ -342,7 +341,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                     SvgPicture.asset('assets/icons/dollar.svg'),
                                     SizedBox(width: 12),
                                     Text(
-                                      "${_parcelStateController.parcel.value!.totalCost!} XAF",
+                                      "${_parcelStateController.parcel.value!.totalCost!} £",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w400,
@@ -351,7 +350,7 @@ class _EndParcelScreenState extends State<EndParcelScreen> {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      "(XAF)",
+                                      "(£)",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w200,

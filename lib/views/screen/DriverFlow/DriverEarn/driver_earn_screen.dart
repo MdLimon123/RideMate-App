@@ -5,6 +5,8 @@ import 'package:radeef/controllers/DriverController/earing_controller.dart';
 import 'package:radeef/models/Driver/parcel_earn_model.dart';
 import 'package:radeef/models/Driver/trip_earn_model.dart';
 import 'package:radeef/views/base/bottom_menu.dart';
+import 'package:radeef/views/base/custom_loading.dart';
+import 'package:radeef/views/base/custom_page_loading.dart';
 import 'package:radeef/views/base/format_time.dart';
 
 class DriverEarnScreen extends StatefulWidget {
@@ -22,7 +24,7 @@ class _DriverEarnScreenState extends State<DriverEarnScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    _earingController.fetchEarnings(); 
+    _earingController.fetchEarnings();
     super.initState();
   }
 
@@ -231,10 +233,10 @@ class _DriverEarnScreenState extends State<DriverEarnScreen>
           if (index < list.length) {
             final item = list[index];
 
-             String date = '';
-             int count = 0;
-             int time = 0;
-             num cost = 0;
+            String date = '';
+            int count = 0;
+            int time = 0;
+            num cost = 0;
 
             if (item is TripEarnItem) {
               date = item.date;
@@ -243,8 +245,8 @@ class _DriverEarnScreenState extends State<DriverEarnScreen>
               cost = item.totalCost;
             } else if (item is ParcelEarnItem) {
               date = item.date;
-              count = item.totalCount; 
-              time = item.totalTime; 
+              count = item.totalCount;
+              time = item.totalTime;
               cost = item.totalCost;
             }
 
@@ -254,7 +256,7 @@ class _DriverEarnScreenState extends State<DriverEarnScreen>
               () => _earingController.isLoading.value
                   ? const Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: CustomLoading()),
                     )
                   : const SizedBox.shrink(),
             );

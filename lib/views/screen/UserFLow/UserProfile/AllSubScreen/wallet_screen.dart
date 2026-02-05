@@ -19,7 +19,7 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   void initState() {
- WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _userProfileController.fetchUserInfo();
     });
     super.initState();
@@ -42,7 +42,7 @@ class _WalletScreenState extends State<WalletScreen> {
             child: Center(
               child: Obx(
                 () => Text(
-                  " + ${_userProfileController.userProfileModel.value.wallet!.balance} XAF",
+                  " + ${_userProfileController.userProfileModel.value.wallet!.balance} £",
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w600,

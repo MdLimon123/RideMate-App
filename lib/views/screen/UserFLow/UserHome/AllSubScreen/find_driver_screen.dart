@@ -341,7 +341,7 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      "(XAF)",
+                                      "(£)",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w200,
@@ -403,7 +403,6 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                     ),
                     SizedBox(height: 98),
 
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -450,10 +449,10 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                                 ),
                               );
                             },
-                          
+
                             child: Container(
                               height: 46,
-                                              
+
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(24),
@@ -507,8 +506,6 @@ class _FindDriverScreenState extends State<FindDriverScreen> {
                         // ),
                       ],
                     ),
-                 
-                 
                   ],
                 ),
               ),

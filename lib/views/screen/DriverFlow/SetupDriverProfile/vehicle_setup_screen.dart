@@ -81,6 +81,7 @@ class _VehicleSetupScreenState extends State<VehicleSetupScreen> {
             SizedBox(height: 8),
             CustomTextField(
               controller: licenseController,
+              keyboardType: TextInputType.number,
               hintText: "License Plate Number",
               validator: (value) {
                 if (value!.isEmpty) {

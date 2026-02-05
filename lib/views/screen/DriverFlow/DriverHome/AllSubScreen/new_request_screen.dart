@@ -36,7 +36,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   @override
   void initState() {
-    
     cancelTrip();
     super.initState();
   }
@@ -199,7 +198,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                           ),
                                           SizedBox(width: 4),
                                           Text(
-                                            "(XAF)",
+                                            "(£)",
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w200,
@@ -228,7 +227,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      "(XAF)",
+                                      "(£)",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w200,
@@ -267,8 +266,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                           Get.back();
                         } else {
                           //  Trip accept
-                          _tripSocketController
-                              .driverRejectTripRequest(widget.trip!.id);
+                          _tripSocketController.driverRejectTripRequest(
+                            widget.trip!.id,
+                          );
                         }
                       },
                       child: Container(

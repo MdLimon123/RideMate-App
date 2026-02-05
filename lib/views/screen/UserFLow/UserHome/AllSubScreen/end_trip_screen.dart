@@ -233,14 +233,13 @@ class _EndTripScreenState extends State<EndTripScreen> {
                           SizedBox(height: 16),
                           Center(
                             child: Container(
-                           
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Color(0xFFFFFFFF),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
-                                 mainAxisSize: MainAxisSize.min,
+                                mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset("assets/icons/cycle.svg"),
@@ -342,7 +341,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      "(XAF)",
+                                      "(£)",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w200,
@@ -416,8 +415,6 @@ class _EndTripScreenState extends State<EndTripScreen> {
                         //   ),
                         //   child: SvgPicture.asset('assets/icons/phone.svg'),
                         // ),
-
-
                         SizedBox(width: 16),
                         InkWell(
                           onTap: () async {

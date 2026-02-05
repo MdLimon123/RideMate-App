@@ -352,7 +352,7 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      "(XAF)",
+                                      "(£)",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w200,
@@ -451,11 +451,10 @@ class _FindParcelDriverScreenState extends State<FindParcelDriverScreen> {
                         SizedBox(width: 22),
                         Expanded(
                           child: InkWell(
-                          
                             onTap: () {
                               Get.to(() => TrackParcelDriverScreen());
                             },
-                          
+
                             child: Container(
                               height: 46,
                               padding: EdgeInsets.symmetric(horizontal: 10),

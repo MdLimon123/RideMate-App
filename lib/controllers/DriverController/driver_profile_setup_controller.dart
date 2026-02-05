@@ -128,10 +128,13 @@ class DriverProfileSetupController extends GetxController {
       multipartBody: multipartBody,
     );
 
+    print("status code ====> ${response.statusCode}");
+
     if (response.statusCode == 200 || response.statusCode == 201) {
       showCustomSnackBar(response.statusText, isError: false);
       Get.to(() => DriverVerifySuccessScreen());
     } else {
+      print("status text ====> ${response.statusText}");
       showCustomSnackBar(response.statusText, isError: true);
     }
     isLoading(false);
